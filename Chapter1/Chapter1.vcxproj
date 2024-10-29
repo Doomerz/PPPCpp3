@@ -21,10 +21,9 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{d84f59db-4afd-4bff-80dd-6b3caa610cd5}</ProjectGuid>
-    <RootNamespace>PPPCpp3</RootNamespace>
+    <ProjectGuid>{dc1c97e8-c4f2-4f79-8a72-81e3a0d5d76e}</ProjectGuid>
+    <RootNamespace>Chapter1</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>PPPCpp3</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
