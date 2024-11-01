@@ -116,12 +116,87 @@ int Drill3() {
 	cin >> first_name;
 	cout << "Please enter a friend's name(followed by 'enter') :\n";
 	cin >> friend_name;
+
 	cout << "Hello " << first_name << ",\n"
 		<< "\n\tHow are you? I am fine. I miss you..."
 		<< "\nHave you seen " << friend_name << " lately?" << endl;
 	return 0;
 }
+int Drill4() {
+	cout << "Please enter your first name(followed by 'enter') :\n";
+	string first_name, friend_name;
+	cin >> first_name;
+	cout << "Please enter a friend's name(followed by 'enter') :\n";
+	cin >> friend_name;
+	cout << "Please enter your age(followed by 'enter') :\n";
+	int age;
+	cin >> age;
+	if (age <= 0) throw std::runtime_error("Hey, you can't be 0 or less years old!");
+	if (age >= 110) throw std::runtime_error("Whoa!? Are you sure you can be 110 or more years old!?");
+	
+	cout << "Hello " << first_name << ",\n"
+		<< "\n\tHow are you? I am fine. I miss you..."
+		<< "\nHave you seen " << friend_name << " lately?"
+		<< "\nI hear you just had a birthday and you are " << age << " years old."
+		<< endl;
+
+	return 0;
+}
+int Drill5() {
+	cout << "Please enter your first name(followed by 'enter') :\n";
+	string first_name, friend_name;
+	cin >> first_name;
+	cout << "Please enter a friend's name(followed by 'enter') :\n";
+	cin >> friend_name;
+	cout << "Please enter your age(followed by 'enter') :\n";
+	int age;
+	cin >> age;
+	if (age <= 0) throw std::runtime_error("Hey, you can't be 0 or less years old!");
+	if (age >= 110) throw std::runtime_error("Whoa!? Are you sure you can be 110 or more years old!?");
+
+	cout << "Hello " << first_name << ",\n"
+		<< "\n\tHow are you? I am fine. I miss you..."
+		<< "\nHave you seen " << friend_name << " lately?"
+		<< "\nI hear you just had a birthday and you are " << age << " years old."
+		<< endl;
+
+	if (age < 12) cout << "Next year you will be " << age + 1 << '.';
+	if (age == 17) cout << "Next year you will be able to vote.";
+	if (age > 70) cout << "Are you retired?";
+
+	return 0;
+}
+int Drill6() {
+	cout << "Please enter your first name(followed by 'enter') :\n";
+	string first_name, friend_name;
+	cin >> first_name;
+	cout << "Please enter a friend's name(followed by 'enter') :\n";
+	cin >> friend_name;
+	cout << "Please enter your age(followed by 'enter') :\n";
+	int age;
+	cin >> age;
+	if (age <= 0) throw std::runtime_error("Hey, you can't be 0 or less years old!");
+	if (age >= 110) throw std::runtime_error("Whoa!? Are you sure you can be 110 or more years old!?");
+
+	cout << "Hello " << first_name << ",\n"
+		<< "\n\tHow are you? I am fine. I miss you..."
+		<< "\nHave you seen " << friend_name << " lately?"
+		<< "\nI hear you just had a birthday and you are " << age << " years old."
+		<< endl;
+
+	if (age < 12) cout << "Next year you will be " << age + 1 << '.';
+	if (age == 17) cout << "Next year you will be able to vote.";
+	if (age > 70) cout << "Are you retired?";
+
+	cout << "\nYours Sincerely,\n\n";
+	return 0;
+}
+
+
+/// Review
+
+//
 
 int main() {
-	return Drill3();
+	return Drill6();
 }
