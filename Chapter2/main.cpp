@@ -195,8 +195,102 @@ int Drill6() {
 
 /// Review
 
-//
+///what is meant by the term prompts?
+// something that calls upon the user to take an action
+///which operator do you use to read into a variable?
+// >>
+///what notations can you use to initialize an object?
+// name(), name{}, name = rval;
+///if you want the user to input an integer value into your program for a variable named number, what are two lines of code you could write to ask the user to do it and to input the value into your program?
+// cout << "please enter an integer: "; cin >> number;
+///what is \n called and what purpose does it server?
+// a newline character. moves the cursor to the next line.
+///what terminates input into a string?
+// whitespace, conventionally.
+///what terminates input into an integer?
+// any non-'-'(at the beginning) or not a digit.
+///how would you write the following as a single line of code: cout << "Hello, "; cout << first_name; cout << "!\n";
+// cout << "Hello, " << first_name << "!\n";
+///what is an object?
+// an allocated space of memory where the meaning of the values are interpreted in relation to the type.
+///what is a literal?
+// a direct value not held in a variable directly.
+///what kinds of literals are there?
+// boolean, integer, floating-point, string, character.
+///what is a variable?
+// a space in memory that holds a value in bytes.
+///what are typical sizes for a char, an int, and a double?
+// 1, 4, 8 bytes respectively.
+///what measures do we use for the size of small entities in memory, such as ints and strings?
+// bytes
+///what is the difference between = and ==?
+// = is assignment and == is evaluating whether they are equal
+///what is a definition?
+// where the operation of a function or a class is defined.
+///what is an initialization and how does it differ from an assignment?
+// initialization is setting a starting value for a variable, assignment changes its held value.
+///what is string concatenation and how do you make it work in c++?
+// concatenation is combining two strings to form the first appended by the second. ie. string1 + string2 == string1appended_by_string2
+///what operators can you apply to an int?
+// +,-,*,/,=,==,%,<,>,<=,>=, ++, --, +=, -=, *=, /=, %=, !=, >>, <<
+///which of the following are legal names in C++? if a name is illegal, why not?
+// good: This_little_pig, _this_is_ok, MineMineMine, number
+// bad:'This_1_is fine' - cannot have whitespace, '2_For_1_special' - must start with '_' or alphabetical, 'latest thing' - cannot have whitespace, 'George@home' - @ not a alphanumeric, 'correct?' - '?' not a alphanumeric, Stroustrup.com - '.' non-alphanumeric, $PATH - '$' not a alphanumeric
+///give five examples of legal names that you shouldn't use because they are likely to cause confusion.
+// things with i, l, 1 and o,O,0.
+///what are some good rules for choosing names?
+// concise but descriptive.
+///what is type safety and why is it important?
+// type safety prevents unintentional operations occuring on the wrong type.
+///why can conversion from double to int be a bad thing?
+// it can be narrowing causing unintentional loss of data.
+///define a rule to help decide if a conversion from one type to another is safe or unsafe.
+// if the convert to type can hold all potential values from convert from type it is safe.
+///How can we avoid undesirable conversions?
+// using static_cast<T> and {}
+///what are the uses of auto
+// to impicitly create variable based on the type of the rvalue given.
+
+
+/// Exercises
+
+//see trythis above
+int c2e2() {
+	cout << "Please enter a number of miles to convert to km: ";
+	double miles;
+	double conversion{1.609};
+	cin >> miles;
+	cout << miles << " miles is " << miles * conversion << " km.";
+	return 0;
+}
+int c2e3() {
+	//int double = 0;
+	//bool this_is fine = false;
+	string $PATH = "C:\\"; //this shouldn't work, but does?
+	//string George@home;
+	//char 23c = 23;
+	return 0;
+}
+int c2e4() {
+	//Write a program that prompts the user to enter two integer values. Store
+	//these values in int variables named val1 and val2.Write your program to
+	//	determine the smaller, larger, sum, difference, product, and ratio of
+	//	these values and report them to the user.
+	int a, b;
+	cout << "Enter two integers to see how they evaluate.\n"
+		<< "int a = ";
+	cin >> a;
+	cout << "int b = ";
+	cin >> b;
+	//who is larger
+	//sum
+	//diff
+	//*
+	//ratio? / and %
+	return 0;
+}
+
 
 int main() {
-	return Drill6();
+	return c2e3();
 }
