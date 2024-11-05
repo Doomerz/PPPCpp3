@@ -272,25 +272,93 @@ int c2e3() {
 	return 0;
 }
 int c2e4() {
-	//Write a program that prompts the user to enter two integer values. Store
-	//these values in int variables named val1 and val2.Write your program to
-	//	determine the smaller, larger, sum, difference, product, and ratio of
-	//	these values and report them to the user.
 	int a, b;
 	cout << "Enter two integers to see how they evaluate.\n"
 		<< "int a = ";
 	cin >> a;
 	cout << "int b = ";
 	cin >> b;
-	//who is larger
-	//sum
-	//diff
-	//*
-	//ratio? / and %
+	cout << "a >= b : " << (a >= b)
+		<< "\na + b : " << a + b
+		<< "\na - b : " << a - b
+		<< "\na * b : " << a * b
+		<< "\na / b : " << a / b
+		<< "\na % b : " << a % b;
 	return 0;
+}
+int c2e5() {
+	double a, b;
+	cout << "Enter two floating-point numbers to see how they evaluate.\n"
+		<< "float a = ";
+	cin >> a;
+	cout << "float b = ";
+	cin >> b;
+	cout << "a >= b : " << (a >= b)
+		<< "\na + b : " << a + b
+		<< "\na - b : " << a - b
+		<< "\na * b : " << a * b
+		<< "\na / b : " << a / b;
+	return 0;
+}
+int c2e6() {
+	int a, b, c;
+	cout << "Enter 3 integers to sort.\n"
+		<< "int a = ";
+	cin >> a;
+	cout << "int b = ";
+	cin >> b;
+	cout << "int c = ";
+	cin >> c;
+	if (a > b) swap(a, b); //just swaps values
+	if (b > c) swap(b, c);
+	if (a > b) swap(a, b);
+	cout << a << ", " << b << ", " << c << endl;
+	return 0;
+}
+int c2e7() {
+	string a, b, c;
+	cout << "Enter 3 strings to sort.\n"
+		<< "a = ";
+	cin >> a;
+	cout << "b = ";
+	cin >> b;
+	cout << "c = ";
+	cin >> c;
+	if (a > b) swap(a, b);
+	if (b > c) swap(b, c);
+	if (a > b) swap(a, b);
+	cout << a << ", " << b << ", " << c << endl;
+	return 0;
+}
+int c2e8() {
+	int x;
+	cout << "Enter a number to determine evenness: ";
+	cin >> x;
+	cout << "The value " << x << " is an " << (x % 2 ? "odd" : "even") << "number"; //a fancy if/else style syntax
+	return 0;
+}
+int c2e9() {
+	string s;
+	cout << "Enter a word to evaluate to a number: ";
+	cin >> s;
+	if (s == "zero") cout << "zero is 0";
+	else if (s == "one") cout << "one is 1";
+	else if (s == "two") cout << "two is 2";
+	else if (s == "three") cout << "three is 3";
+	else if (s == "four") cout << "four is 4";
+	else cout << "not a prepared input";
+	return 0;
+}
+int c2e10() {
+	string op;
+	double x, y;
+	cout << "";
+	cin >> op;
+	cin >> x;
+	cin >> y;
 }
 
 
 int main() {
-	return c2e3();
+	return c2e6();
 }
