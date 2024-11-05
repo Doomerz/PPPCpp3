@@ -351,14 +351,48 @@ int c2e9() {
 }
 int c2e10() {
 	string op;
-	double x, y;
-	cout << "";
+	double x{}, y{};
+	cout << "Enter operator followed by operands left then right:";
 	cin >> op;
 	cin >> x;
 	cin >> y;
+	cout << "result: ";
+	if (op == "+" || op == "plus") cout << x + y;
+	else if (op == "-" || op == "minus") cout << x - y;
+	else if (op == "*" || op == "multi" || op == "multiplication" || op == "multiply") cout << x * y;
+	else if (op == "/" || op == "divide" || op == "division") {
+		if (y == 0) cout << "undefined (divide by 0)";
+		else cout << x / y;
+	}
+	else cout << "operator not recognized: " << op;
+	return 0;
+}
+int c2e11() {
+	int pennies{}, nickels{}, dimes{}, quarters{}, half_dollars{}, dollars{};
+	constexpr int p = 1, n = 5, d = 10, q = 25, h = 50, c = 100;
+	cout << "Enter the change that you have.\n"
+		<< "Pennies: ";
+	cin >> pennies;
+	cout << "Nickels: ";
+	cin >> nickels;
+	cout << "Dimes: ";
+	cin >> dimes;
+	cout << "Quarters: ";
+	cin >> quarters;
+	cout << "Half Dollars: ";
+	cin >> half_dollars;
+	cout << "Dollars: ";
+	cin >> dollars;
+	cout << "You have " << pennies << (pennies == 1 ? " Pennies.\n" : " Penny.\n")
+		<< "You have " << nickels << (nickels == 1 ? " Nickels.\n" : " Nickel.\n")
+		<< "You have " << dimes << (dimes == 1 ? " Dimes.\n" : " Dime.\n")
+		<< "You have " << quarters << (quarters == 1 ? " Quarters.\n" : " Quarter.\n")
+		<< "You have " << half_dollars << (half_dollars == 1 ? " Half Dollars.\n" : " Half Dollar.\n")
+		<< "You have " << dollars << (dollars == 1 ? " Dollars.\n" : " Dollar.\n")
+		<< "The value of all of your coins is " << p * pennies + n * nickels + d * dimes + q * quarters + h * half_dollars + c * dollars << (p * pennies + n * nickels + d * dimes + q * quarters + h * half_dollars + c * dollars == 1 ? " cents." : " cent.");
+	return 0;
 }
 
-
 int main() {
-	return c2e6();
+	return c2e11();
 }
