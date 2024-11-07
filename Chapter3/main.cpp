@@ -1,9 +1,6 @@
 import std;
 using namespace std;
 
-/// Notes
-
-//last on 113
 //https://www.youtube.com/watch?v=DaMimdNNnAw
 
 void TryThis4_1_1() {
@@ -166,10 +163,120 @@ void TryThis4_2_1() {
 		cout << c << "\t" << short(c) << endl;
 		c++;
 	}
-	//TODO
-	//WRITE A WHILE LOOP OUT PUTTING THE ASSOCIATED VALUE OF CHARS AND THEIR int equivalent separated by a \t
+}
+void TryThis4_2_3() {
+	char c = 'a';
+	cout << "lower case letters:\n";
+	for (; c <= 'z'; c++) cout << c << '\t' << short(c) << endl;
+	c = 'A';
+	cout << "upper case letters:\n";
+	for (; c <= 'Z'; c++) cout << c << '\t' << short(c) << endl;
+	c = '0';
+	cout << "digits:\n";
+	for (; c <= '9'; c++) cout << c << '\t' << short(c) << endl;
+	/*lower case letters:
+	a       97
+	b       98
+	c       99
+	d       100
+	e       101
+	f       102
+	g       103
+	h       104
+	i       105
+	j       106
+	k       107
+	l       108
+	m       109
+	n       110
+	o       111
+	p       112
+	q       113
+	r       114
+	s       115
+	t       116
+	u       117
+	v       118
+	w       119
+	x       120
+	y       121
+	z       122
+	upper case letters:
+	A       65
+	B       66
+	C       67
+	D       68
+	E       69
+	F       70
+	G       71
+	H       72
+	I       73
+	J       74
+	K       75
+	L       76
+	M       77
+	N       78
+	O       79
+	P       80
+	Q       81
+	R       82
+	S       83
+	T       84
+	U       85
+	V       86
+	W       87
+	X       88
+	Y       89
+	Z       90
+	digits:
+	0       48
+	1       49
+	2       50
+	3       51
+	4       52
+	5       53
+	6       54
+	7       55
+	8       56
+	9       57*/
+}
+int sqr(int x) {
+	int res{};
+	for (int i = 0; i < x; i++) res += x;
+	return res;
+}
+void TryThis5_1() {
+	for (int i = 0; i <= 100; i++) cout << i << '\t' << sqr(i) << endl;
+}
+void TryThis6_4() {
+	const string censor = "BLEEP";
+	vector<string> disliked;
+	string s;
+
+	disliked.push_back("Broccoli");
+	disliked.push_back("Poo");
+
+	cout << "Enter a word to censor it\n";
+	while (cin >> s) {
+		for (string str : disliked) {
+			if (s == str) {
+				s = str;
+				break;
+			}
+		}
+		cout << s;
+	}
+	cout << "end of input stream...";
 }
 
+/// Drill
+void Drill1() {
+	int a, b;
+	while (cin >> a >> b) {
+		cout << a << b;
+	}
+} //TODO FINISH
+
 int main() {
-	TryThis4_2_1();
+	Drill1();
 }
