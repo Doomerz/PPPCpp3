@@ -270,12 +270,55 @@ void TryThis6_4() {
 }
 
 /// Drill
+void graceful_exit() {
+	cout << "Exit Character detected, ending program.\n";
+}
+void invalid_input() {
+	cout << "Invalid input detected, please review input and try again.\n";
+}
+void process1(const int a, const int b) {
+	cout << a << "\t" << b << endl;
+}
 void Drill1() {
+	//pseudo
+	//RAII
+	//loop
+		//prompt
+		//check for exit
+		// +graceful exit
+		//intake int
+		//check failure
+		// +invalid input exit
+		//check for exit
+		// +graceful exit
+		//intake int
+		//check failure
+		// +invalid input exit
+		//generate output
 	int a, b;
-	while (cin >> a >> b) {
-		cout << a << b;
+	while (true) {
+		cout << "Enter two integers and I will output them back.\n"
+			<< "int a = ";
+		if (cin.peek() == '|') {
+			graceful_exit();
+			return;
+		}
+		if (!(cin >> a)) {
+			invalid_input();
+			return;
+		}
+		cout << "int b = ";
+		if (cin.peek() == '|') {
+			graceful_exit();
+			return;
+		}
+		if (!(cin >> a)) {
+			invalid_input();
+			return;
+		}
+		process1(a, b);
 	}
-} //TODO FINISH
+}
 
 int main() {
 	Drill1();
