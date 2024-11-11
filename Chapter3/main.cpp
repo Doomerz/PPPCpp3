@@ -1,8 +1,6 @@
 import std;
 using namespace std;
 
-//https://www.youtube.com/watch?v=DaMimdNNnAw
-
 void TryThis4_1_1() {
 	constexpr double d = 1,y = 151.95, k = 10.96, p = 0.77;
 	double x{}, res{};
@@ -276,6 +274,21 @@ void graceful_exit() {
 void invalid_input() {
 	cout << "Invalid input detected, please review input and try again.\n";
 }
+double obtain_drill6() {
+	double res;
+	if (cin >> res) {
+		return res;
+	}
+	char c;
+	cin.clear();
+	cin >> c;
+	if (c == '|') {
+		graceful_exit();
+		exit(0);
+	}
+	invalid_input();
+	exit(-1);
+}
 void process1(const int a, const int b) {
 	cout << a << "\t" << b << endl;
 }
@@ -299,27 +312,283 @@ void Drill1() {
 	while (true) {
 		cout << "Enter two integers and I will output them back.\n"
 			<< "int a = ";
-		if (cin.peek() == '|') {
-			graceful_exit();
-			return;
-		}
 		if (!(cin >> a)) {
+			char c;
+			cin.clear();
+			cin >> c;
+			if (c == '|') {
+				graceful_exit();
+				return;
+			}
 			invalid_input();
 			return;
 		}
 		cout << "int b = ";
-		if (cin.peek() == '|') {
-			graceful_exit();
-			return;
-		}
-		if (!(cin >> a)) {
+		if (!(cin >> b)) {
+			char c;
+			cin.clear();
+			cin >> c;
+			if (c == '|') {
+				graceful_exit();
+				return;
+			}
 			invalid_input();
 			return;
 		}
 		process1(a, b);
+		cout << endl;
 	}
 }
+void process2(const int a, const int b) {
+	cout << "The smaller value is: " << (a>b?b:a) << "\n"
+		<< "The larger value is: " << (a>b?a:b) << endl;
+}
+void Drill2() {
+	int a, b;
+	while (true) {
+		cout << "Enter two integers and I will tell you which is larger.\n"
+			<< "int a = ";
+		if (!(cin >> a)) {
+			char c;
+			cin.clear();
+			cin >> c;
+			if (c == '|') {
+				graceful_exit();
+				return;
+			}
+			invalid_input();
+			return;
+		}
+		cout << "int b = ";
+		if (!(cin >> b)) {
+			char c;
+			cin.clear();
+			cin >> c;
+			if (c == '|') {
+				graceful_exit();
+				return;
+			}
+			invalid_input();
+			return;
+		}
+		process2(a, b);
+		cout << endl;
+	}
+}
+void process3(const int a, const int b) {
+	if (a == b) cout << "The numbers are equal." << endl;
+	else cout << "The smaller value is: " << (a > b ? b : a) << "\n"
+			<< "The larger value is: " << (a > b ? a : b) << endl;
+}
+void Drill3() {
+	int a, b;
+	while (true) {
+		cout << "Enter two integers and I will tell you which is larger.\n"
+			<< "int a = ";
+		if (!(cin >> a)) {
+			char c;
+			cin.clear();
+			cin >> c;
+			if (c == '|') {
+				graceful_exit();
+				return;
+			}
+			invalid_input();
+			return;
+		}
+		cout << "int b = ";
+		if (!(cin >> b)) {
+			char c;
+			cin.clear();
+			cin >> c;
+			if (c == '|') {
+				graceful_exit();
+				return;
+			}
+			invalid_input();
+			return;
+		}
+		process3(a, b);
+		cout << endl;
+	}
+}
+void process4(const double a, const double b) {
+	if (a == b) cout << "The numbers are equal." << endl;
+	else cout << "The smaller value is: " << (a > b ? b : a) << "\n"
+		<< "The larger value is: " << (a > b ? a : b) << endl;
+}
+void Drill4() {
+	double a, b;
+	while (true) {
+		cout << "Enter two numbers and I will tell you which is larger.\n"
+			<< "int a = ";
+		if (!(cin >> a)) {
+			char c;
+			cin.clear();
+			cin >> c;
+			if (c == '|') {
+				graceful_exit();
+				return;
+			}
+			invalid_input();
+			return;
+		}
+		cout << "int b = ";
+		if (!(cin >> b)) {
+			char c;
+			cin.clear();
+			cin >> c;
+			if (c == '|') {
+				graceful_exit();
+				return;
+			}
+			invalid_input();
+			return;
+		}
+		process4(a, b);
+		cout << endl;
+	}
+}
+void process5(const double a, const double b) {
+	if (a == b) cout << "The numbers are equal." << endl;
+	else {
+		cout << "The smaller value is: " << (a > b ? b : a) << "\n"
+			<< "The larger value is: " << (a > b ? a : b) << endl;
+		if (a - b < .01 && a - b > -.01) cout << "The numbers are almost equal." << endl;
+	}
+}
+void Drill5() {
+	double a, b;
+	while (true) {
+		cout << "Enter two numbers and I will tell you which is larger.\n"
+			<< "int a = ";
+		if (!(cin >> a)) {
+			char c;
+			cin.clear();
+			cin >> c;
+			if (c == '|') {
+				graceful_exit();
+				return;
+			}
+			invalid_input();
+			return;
+		}
+		cout << "int b = ";
+		if (!(cin >> b)) {
+			char c;
+			cin.clear();
+			cin >> c;
+			if (c == '|') {
+				graceful_exit();
+				return;
+			}
+			invalid_input();
+			return;
+		}
+		process5(a, b);
+		cout << endl;
+	}
+}
+void Drill6() {
+	double big, lil;
+	cout << "Enter a starting number: ";
+	if (!(cin >> big)) {
+		invalid_input();
+		return;
+	}
+	lil = big;
+
+	while (true) {
+		double x;
+		cout << "Enter a number: ";
+		x = obtain_drill6();
+		if (x > big) {
+			cout << x << " is the largest so far.\n";
+			big = x;
+		}
+		else if (x < lil) {
+			cout << x << " is the smallest so far.\n";
+			lil = x;
+		}
+		else cout << x << " is between the largest and smallest";
+	}
+}
+double Drill7get_dist() {
+	const vector<string> units{ "cm","m","in","ft" };
+	const vector<double> conversion{ 0.01,1,0.0254,0.0254 * 12 };
+	double quantity;
+	string quality;
+	if (!(cin >> quantity)) {
+		char c;
+		cin.clear();
+		cin >> c;
+		if (c == '|') {
+			graceful_exit();
+			exit(0);
+		}
+		invalid_input();
+		exit(-1);
+	}
+	cin >> quality;
+	if (quality[0] == '|') {
+		graceful_exit();
+		exit(0);
+	}
+	for (int i{}; i < units.size(); i++) {
+		if (units[i] == quality) {
+			return quantity * conversion[i];
+		}
+	}
+	invalid_input();
+	exit(-1);
+}
+void Drill7() {
+	double big, lil;
+	cout << "Enter a starting distance: ";
+	big = Drill7get_dist();
+	lil = big;
+
+	while (true) {
+		double x;
+		cout << "Enter a distance: ";
+		x = Drill7get_dist();
+		if (x > big) {
+			cout << x << "m is the largest so far.\n";
+			big = x;
+		}
+		else if (x < lil) {
+			cout << x << "m is the smallest so far.\n";
+			lil = x;
+		}
+		else cout << x << "m is between the largest and smallest";
+	}
+}
+void Drill9() {
+	int entries{ 1 };
+	double big, lil, sum;
+	cout << "Enter a starting distance: ";
+	sum = lil = big = Drill7get_dist();
+
+	while (true) {
+		double x;
+		cout << "Enter a distance: ";
+		x = Drill7get_dist();
+		if (x > big) {
+			cout << x << "m is the largest so far.\n";
+			big = x;
+		}
+		else if (x < lil) {
+			cout << x << "m is the smallest so far.\n";
+			lil = x;
+		}
+		else cout << x << "m is between the largest and smallest";
+	}
+	cout << "The largest distances: " << big << "m\n"
+		<< "The smallest distances: " << lil << "m\n"
+		<< "The sum of distances: " << sum << "m\n"
+		<< "number of entries: " << entries << endl;
+} //TODO  finsih
 
 int main() {
-	Drill1();
+	Drill7();
 }
