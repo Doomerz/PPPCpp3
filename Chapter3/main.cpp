@@ -563,16 +563,56 @@ void Drill7() {
 		else cout << x << "m is between the largest and smallest";
 	}
 }
+double Drill9get_dist(int entries, double big, double lil, double sum) {
+	const vector<string> units{ "cm","m","in","ft" };
+	const vector<double> conversion{ 0.01,1,0.0254,0.0254 * 12 };
+	double quantity;
+	string quality;
+	if (!(cin >> quantity)) {
+		char c;
+		cin.clear();
+		cin >> c;
+		if (c == '|') {
+			graceful_exit();
+
+			cout << "The largest distances: " << big << "m\n"
+				<< "The smallest distances: " << lil << "m\n"
+				<< "The sum of distances: " << sum << "m\n"
+				<< "number of entries: " << entries << endl;
+			exit(0);
+		}
+		invalid_input();
+		exit(-1);
+	}
+	cin >> quality;
+	if (quality[0] == '|') {
+		graceful_exit();
+
+		cout << "The largest distances: " << big << "m\n"
+			<< "The smallest distances: " << lil << "m\n"
+			<< "The sum of distances: " << sum << "m\n"
+			<< "number of entries: " << entries << endl;
+		exit(0);
+	}
+	for (int i{}; i < units.size(); i++) {
+		if (units[i] == quality) {
+			return quantity * conversion[i];
+		}
+	}
+	invalid_input();
+	exit(-1);
+}
 void Drill9() {
-	int entries{ 1 };
-	double big, lil, sum;
+	int entries{};
+	double big{}, lil{}, sum{};
 	cout << "Enter a starting distance: ";
-	sum = lil = big = Drill7get_dist();
+	sum = lil = big = Drill9get_dist(entries,big,lil,sum);
+	entries++;
 
 	while (true) {
 		double x;
 		cout << "Enter a distance: ";
-		x = Drill7get_dist();
+		x = Drill9get_dist(entries, big, lil, sum);
 		if (x > big) {
 			cout << x << "m is the largest so far.\n";
 			big = x;
@@ -583,12 +623,219 @@ void Drill9() {
 		}
 		else cout << x << "m is between the largest and smallest";
 	}
+}
+void finish_drill10(int entries, double big, double lil, double sum, vector<double> values) {
 	cout << "The largest distances: " << big << "m\n"
 		<< "The smallest distances: " << lil << "m\n"
 		<< "The sum of distances: " << sum << "m\n"
-		<< "number of entries: " << entries << endl;
-} //TODO  finsih
+		<< "number of entries: " << entries << endl
+		<< "Values entered:" << endl;
+	for (auto& v : values)
+		cout << v << "m\n";
+	exit(0);
+}
+double Drill10get_dist(int entries, double big, double lil, double sum, vector<double> values) {
+	const vector<string> units{ "cm","m","in","ft" };
+	const vector<double> conversion{ 0.01,1,0.0254,0.0254 * 12 };
+	double quantity;
+	string quality;
+	if (!(cin >> quantity)) {
+		char c;
+		cin.clear();
+		cin >> c;
+		if (c == '|') {
+			graceful_exit();
+			finish_drill10(entries, big, lil, sum, values);
+		}
+		invalid_input();
+		exit(-1);
+	}
+	cin >> quality;
+	if (quality[0] == '|') {
+		graceful_exit();
+		finish_drill10(entries, big, lil, sum, values);
+	}
+	for (int i{}; i < units.size(); i++) {
+		if (units[i] == quality) {
+			return quantity * conversion[i];
+		}
+	}
+	invalid_input();
+	exit(-1);
+}
+void Drill10() {
+	int entries{};
+	double big{}, lil{}, sum{};
+	vector<double> values;
+
+	cout << "Enter a starting distance: ";
+	sum = lil = big = Drill10get_dist(entries, big, lil, sum, values);
+	entries++;
+
+	while (true) {
+		double x;
+		cout << "Enter a distance: ";
+		x = Drill10get_dist(entries, big, lil, sum, values);
+		if (x > big) {
+			cout << x << "m is the largest so far.\n";
+			big = x;
+		}
+		else if (x < lil) {
+			cout << x << "m is the smallest so far.\n";
+			lil = x;
+		}
+		else cout << x << "m is between the largest and smallest";
+		values.push_back(x);
+	}
+}
+void finish_drill11(int entries, double big, double lil, double sum, vector<double> values) {
+	cout << "The largest distances: " << big << "m\n"
+		<< "The smallest distances: " << lil << "m\n"
+		<< "The sum of distances: " << sum << "m\n"
+		<< "number of entries: " << entries << endl
+		<< "Values entered:" << endl;
+	sort(values.begin(), values.end());
+	for (auto& v : values)
+		cout << v << "m\n";
+	exit(0);
+}
+double Drill11get_dist(int entries, double big, double lil, double sum, vector<double> values) {
+	const vector<string> units{ "cm","m","in","ft" };
+	const vector<double> conversion{ 0.01,1,0.0254,0.0254 * 12 };
+	double quantity;
+	string quality;
+	if (!(cin >> quantity)) {
+		char c;
+		cin.clear();
+		cin >> c;
+		if (c == '|') {
+			graceful_exit();
+			finish_drill11(entries, big, lil, sum, values);
+		}
+		invalid_input();
+		exit(-1);
+	}
+	cin >> quality;
+	if (quality[0] == '|') {
+		graceful_exit();
+		finish_drill11(entries, big, lil, sum, values);
+	}
+	for (int i{}; i < units.size(); i++) {
+		if (units[i] == quality) {
+			return quantity * conversion[i];
+		}
+	}
+	invalid_input();
+	exit(-1);
+}
+void Drill11() {
+	int entries{};
+	double big{}, lil{}, sum{};
+	vector<double> values;
+
+	cout << "Enter a starting distance: ";
+	sum = lil = big = Drill11get_dist(entries, big, lil, sum, values);
+	entries++;
+
+	while (true) {
+		double x;
+		cout << "Enter a distance: ";
+		x = Drill11get_dist(entries, big, lil, sum, values);
+		if (x > big) {
+			cout << x << "m is the largest so far.\n";
+			big = x;
+		}
+		else if (x < lil) {
+			cout << x << "m is the smallest so far.\n";
+			lil = x;
+		}
+		else cout << x << "m is between the largest and smallest";
+		values.push_back(x);
+	}
+}
+
+/// REVIEW
+//What is a computation?
+// something that takes an input and gives an output
+//what do we mean by inputs and outputs to a computation?
+// information used by the computer to determine and output is an input and the result of the computation is the output.
+//what are the three requirements a programmer should keep in mind when expressing computations?
+// readability, correctness, efficiency.
+//what does an expression do?
+// resolves to some value
+//what is the difference between a statement and an expression, as described in this chapter?
+// statements do something, expressions are something.
+//what is an lvalue? list the operators that require an lvalue. why do these operators, and not the others, require an lvalue?
+// ..
+//what is a constant expression?
+// ..
+//what is a literal?
+// ..
+//what is a symbolic constant and why do we use them?
+// ..
+//what is a magic constant? give examples.
+// ..
+//what are some operators that we can use for integers and floating-point values?
+// ..
+//what operators can be used on integers but not on floating-point numbers?
+// ..
+//what are some operators that can be used for strings?
+// ..
+//when would a programmer prefer a switch-statement to an if-statement?
+// ..
+//what are some common problems with switch-statements?
+// ..
+//what is the function of each part of the header line in a for-loop, and in what sequence are they executed?
+// ..
+//what when should the for-loop be used and when should the while-loop be used?
+// ..
+//describe what the line char foo(int x) means in a function definition.
+// ..
+//when should you define a separate function for part of a program? list reasons.
+// ..
+//what can you do to an int that you cannot do to a string?
+// ..
+//what is the index of the third element of a vector?
+// ..
+//how do you write a for-loop that prints every element of a vector?
+// ..
+//what does vector<char> alphabet(26); do?
+// ..
+//describe what push_back() does to a vector.
+// ..
+//what does vector's member size() do?
+// ..
+//what makes vector so popular/useful?
+// ..
+//how do you sort the elements of a vector?
+// ..
+
+void c3e2() {
+	char c;
+	while (cin >> c) {
+		if (c == '|') {
+			cout << c << " = " << int(c) << endl;
+			return;
+		}
+		cout << c << " = " << int(c) << endl;
+	}
+}
+void c3e3() {
+	vector<double> temps;
+	for (double temp; cin >> temp;)
+		temps.push_back(temp);
+
+	if (!temps.size()) return;
+	
+	double sum = 0;
+	for (double x : temps)
+		sum += x;
+	cout << "Average temperature: " << sum / temps.size() << '\n';
+
+	sort(temps.begin(), temps.end());
+	cout << "Median temperature: " << temps[temps.size() / 2] << '\n';
+} //verify finished
 
 int main() {
-	Drill7();
+	c3e3();
 }
