@@ -834,8 +834,142 @@ void c3e3() {
 
 	sort(temps.begin(), temps.end());
 	cout << "Median temperature: " << temps[temps.size() / 2] << '\n';
-} //verify finished
+}
+void c3e4() {
+	//read doubles into a vector.
+	//output the sum, smallest, largest, mean
+	vector<double> route;
+	double sum{},
+		near{},
+		far{},
+		dist;
+
+	cout << "Enter distances between cities along a route, terminate with any non-double:\n";
+	if (!(cin >> dist)) {
+		cout << "no values entered, exiting application.";
+		return;
+	}
+	sum = near = far = dist;
+	route.push_back(dist);
+
+	while(cin >> dist) {
+		route.push_back(dist);
+		sum += dist;
+		if (dist > far) far = dist;
+		if (dist < near) near = dist;
+	}
+
+	sort(route.begin(), route.end());
+
+	cout << "Total Distance: " << sum << endl
+		<< "Shortest Distance: " << near << endl
+		<< "Longest Distance: " << far << endl
+		<< "Mean Distance: " << sum / route.size() << endl;
+}
+void c3e5() {
+	//program to play a numbers guessing game; pick number between 1-100 > program asks questions to figure out what the number is.
+	//program gets answer after no more than seven questions
+	int lowest{ 1 }, highest{ 100 }, ref{50};
+	char c;
+
+	cout << "Think of a number between 1-100.\nIs it over " << ref << "?[y/n]: ";
+	if (!(cin >> c)) {
+		cout << "Unexpected end of file";
+		return;
+	}
+	do {
+		switch (c) {
+		case 'y':
+			lowest = ref+1;
+			break;
+		case 'n':
+			highest = ref;
+			break;
+		default:
+			cout << "unexpected character, closing application";
+			return;
+		}
+		if (lowest == highest) {
+			cout << "Your number is " << lowest << "!" << endl;
+			return;
+		}
+
+		ref = (lowest + highest) / 2;
+		cout << "Is it over " << ref << "?[y/n]: ";
+	} while (cin >> c);
+	cout << "unexpected end of file" << endl;
+	return;
+}
+void c3e6() {
+	//simple calc
+	double a, b, res;
+	char c;
+	string str;
+	while (true) {
+		cout << "Simple Calculator!\nEnter first operand: ";
+		if (!(cin >> a)) {
+			cout << "Invalid input, closing application\n";
+			return;
+		}
+		cout << "Enter second operand: ";
+		if (!(cin >> b)) {
+			cout << "Invalid input, closing application\n";
+			return;
+		}
+		cout << "Enter operator: ";
+		if (!(cin >> c)) {
+			cout << "unexpected end of file, closing application\n";
+			return;
+		}
+
+		string str;
+		switch (c) {
+		case '+':
+			str = "sum";
+			res = a + b;
+			break;
+		case '-':
+			str = "difference";
+			res = a - b;
+			break;
+		case '*':
+			str = "multiplication";
+			res = a * b;
+			break;
+		case '/':
+			if (b == 0) {
+				cout << "The division of " << a << " and " << b << " is undefined.\n";
+				continue;
+			}
+			str = "division";
+			res = a / b;
+			break;
+		default:
+			cout << "Invalid input, closing application\n";
+			return;
+		}
+		cout << "The " << str << " of " << a << " and " << b << " is " << res << ".\n\n";
+	}
+}
+void c3e7() {
+	//make a vector holding the ten string values of "zero" through "nine"
+	//use this to convert digit to spelled out and vice versa
+	const vector<string> nums{"zero","one","two","three","four","five","six","seven","eight","nine"};
+	string input;
+
+	cout << "single digit number to convert: ";
+	while (cin >> input) {
+		if (input.size() == 1) {
+			if (isdigit(input[0])) {
+
+			}
+			else {
+
+			}
+		}
+	}
+}
 
 int main() {
-	c3e3();
+	c3e5();
 }
