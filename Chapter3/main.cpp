@@ -922,7 +922,6 @@ void c3e6() {
 			return;
 		}
 
-		string str;
 		switch (c) {
 		case '+':
 			str = "sum";
@@ -951,25 +950,220 @@ void c3e6() {
 		cout << "The " << str << " of " << a << " and " << b << " is " << res << ".\n\n";
 	}
 }
+void c3e7_convert(const vector<string> nums, const string input) {
+	for (int i{}; i < nums.size(); i++) {
+		if (nums[i] == input) {
+			cout << input << " is " << i << endl;
+			return;
+		}
+	}
+	cout << "Invalid input, please try again.\n";
+}
 void c3e7() {
 	//make a vector holding the ten string values of "zero" through "nine"
 	//use this to convert digit to spelled out and vice versa
 	const vector<string> nums{"zero","one","two","three","four","five","six","seven","eight","nine"};
-	string input;
+	string input, prompt = "Single digit number to convert: ";
 
 	cout << "single digit number to convert: ";
 	while (cin >> input) {
 		if (input.size() == 1) {
 			if (isdigit(input[0])) {
-
+				cout << input << " is " << nums[stoi(input)] << endl << prompt; //stoi is short for string to int.
+				continue;
 			}
-			else {
-
-			}
+			cout << "Invalid input, please try again.\n" << prompt;
+			continue;
 		}
+		c3e7_convert(nums, input);
+		cout << prompt;
 	}
 }
+double c3e8_getinput() {
+	const vector<string> nums{ "zero","one","two","three","four","five","six","seven","eight","nine" };
+	string input;
+	if (!(cin >> input)) return -1;
+	if (input.size() == 1) {
+		if (isdigit(input[0])) {
+			return stoi(input);
+		}
+		return -1;
+	}
+	for (int i{}; i < nums.size(); i++) {
+		if (nums[i] == input) {
+			return i;
+		}
+	}
+	return -1;
+}
+void c3e8() {
+	//modify simple calc to use single digit and spelled out option
+	double a, b, res;
+	char c;
+	string str;
+	while (true) {
+		cout << "Simple Calculator!\nEnter first operand: ";
+		a = c3e8_getinput();
+		if (0 > a) {
+			cout << "Invalid input, closing application\n";
+			return;
+		}
+		cout << "Enter second operand: ";
+		b = c3e8_getinput();
+		if (0 > b) {
+			cout << "Invalid input, closing application\n";
+			return;
+		}
+		cout << "Enter operator: ";
+		if (!(cin >> c)) {
+			cout << "unexpected end of file, closing application\n";
+			return;
+		}
+
+		switch (c) {
+		case '+':
+			str = "sum";
+			res = a + b;
+			break;
+		case '-':
+			str = "difference";
+			res = a - b;
+			break;
+		case '*':
+			str = "multiplication";
+			res = a * b;
+			break;
+		case '/':
+			if (b == 0) {
+				cout << "The division of " << a << " and " << b << " is undefined.\n";
+				continue;
+			}
+			str = "division";
+			res = a / b;
+			break;
+		default:
+			cout << "Invalid input, closing application\n";
+			return;
+		}
+		cout << "The " << str << " of " << a << " and " << b << " is " << res << ".\n\n";
+	}
+}
+void c3e9() {
+	//64 squares; how many squares until 1000, 1000000, and 1000000000
+	long long sum{};
+	for (int i{}; i < 64; i++)
+		cout << "Square " << i + 1 << " has " << (long long)(pow(2, i)) << " grains of rice for a sum of " << (sum += (long long)(pow(2, i))) << endl;
+	//note squares 63 and 64
+}
+void c3e10() {
+	//answer: int = 31, double = 64+
+
+	int sum{};
+	for (int i{}; i < 64; i++)
+		cout << "Square " << i + 1 << " has " << static_cast<int>(pow(2, i)) << " grains of rice for a sum of " << (sum += static_cast<int>(pow(2, i))) << endl;
+	for (int i{}; i < 64; i++)
+		cout << i + 1 << " | " << pow(2, i) << endl;
+}
+string c3e11_enum2word(int e) {
+	switch (e) {
+	case 0:
+		return "rock";
+	case 1:
+		return "paper";
+	case 2:
+		return "scissors";
+	default:
+		return "<ERROR>";
+	}
+}
+void c3e11() {
+	//roshambo
+	vector<int> moves{ 0,1,2,1,0,2,0,1,2,0 };
+	int move{}, player;
+	string input;
+	while (true) {
+		cout << "Your move: ";
+		if (!(cin >> input)) {
+			cout << "Encountered eof" << endl;
+			return;
+		}
+		if (input == "rock") player = 0;
+		else if (input == "paper") player = 1;
+		else if (input == "scissors") player = 2;
+		else {
+			cout << "invalid input. closing application." << endl;
+			return;
+		}
+		if (player == moves[move%moves.size()]) {
+			cout << "It's a tie!" << endl;
+			move++;
+			continue;
+		}
+		if ((player + 1) % 3 == moves[move%moves.size()]) {
+			cout << "Computer wins! " << c3e11_enum2word(moves[move%moves.size()]) << " beats " << input << endl;
+			moves[move%moves.size()] = player;
+			move++;
+			continue;
+		}
+		cout << "Player wins! " << input << " beats " << c3e11_enum2word(moves[move % moves.size()]) << endl;
+		moves[move % moves.size()] = player;
+		move++;
+	}
+}
+void c3e12() {
+	//find prime numbers between 1-100
+	cout << "Calculating...\n";
+	vector<int> primes{ 2 };
+	int max = 100;
+	for (int i{3}; i <= max; i++) {
+		bool prime = true;
+		for (int k{}; k < primes.size(); k++) {
+			if (!(i % primes[k])) {
+				prime = false;
+				break;
+			}
+		}
+		if (prime)
+			primes.push_back(i);
+	}
+	//output
+	cout << "primes up to 100:\n";
+	for (int i{}; i < primes.size(); i++)
+		cout << primes[i];
+}
+vector<int> remove_divisible(vector<int> arr, int val) {
+	vector<int> res;
+	for (int i{}; i < arr.size(); i++) {
+		if (arr[i] % val) continue;
+		res.push_back(arr[i]);
+	}
+	return res;
+}
+void c3e13() {
+	cout << "Calculating...\n";
+	//build board
+	int max = 100;
+	vector<int> num, temp, primes{ 2 };
+	//build num
+	for (int i{ 3 }; i < max; i++) {
+		num.push_back(i);
+	}
+	//cull even
+	for (int i{ 0 }; i < num.size(); i++) {
+		if (num[i] % primes[0]) continue;
+		temp.push_back(num[i]);
+	}
+	num = temp;
+	temp = vector<int>();
+
+
+	//start with 2
+	//clear even numbers from num
+	//loop
+	//if (
+} //TODO FINISH
 
 int main() {
-	c3e5();
+	c3e12();
+	c3e13();
 }
