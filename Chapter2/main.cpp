@@ -7,8 +7,6 @@
 //whitespace is ignored by >>
 //some possible variable names are keywords and cannot be used.
 
-//on page 2.7
-
 import std;
 using namespace std;
 
@@ -334,7 +332,7 @@ int c2e8() {
 	int x;
 	cout << "Enter a number to determine evenness: ";
 	cin >> x;
-	cout << "The value " << x << " is an " << (x % 2 ? "odd" : "even") << "number"; //a fancy if/else style syntax
+	cout << "The value " << x << " is an " << (x % 2 ? "odd" : "even") << "number"; //a fancy if/else style syntax: <boolean expression> ? <if true result> : <if false result>
 	return 0;
 }
 int c2e9() {
