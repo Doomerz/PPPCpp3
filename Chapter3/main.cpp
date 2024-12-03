@@ -1129,41 +1129,73 @@ void c3e12() {
 	//output
 	cout << "primes up to 100:\n";
 	for (int i{}; i < primes.size(); i++)
-		cout << primes[i];
+		cout << primes[i] << endl;
 }
 vector<int> remove_divisible(vector<int> arr, int val) {
 	vector<int> res;
-	for (int i{}; i < arr.size(); i++) {
-		if (arr[i] % val) continue;
-		res.push_back(arr[i]);
-	}
+	for (int i{}; i < arr.size(); i++)
+		if (arr[i] % val)
+			res.push_back(arr[i]);
 	return res;
 }
 void c3e13() {
 	cout << "Calculating...\n";
 	//build board
-	int max = 100;
-	vector<int> num, temp, primes{ 2 };
+	constexpr int max = 100;
+	vector<int> num, primes{ 2 };
 	//build num
 	for (int i{ 3 }; i < max; i++) {
 		num.push_back(i);
 	}
 	//cull even
-	for (int i{ 0 }; i < num.size(); i++) {
-		if (num[i] % primes[0]) continue;
-		temp.push_back(num[i]);
+	num = remove_divisible(num, primes[primes.size() - 1]);
+
+	while (num.size()) {
+		primes.push_back(num[0]);
+		num = remove_divisible(num, primes[primes.size() - 1]);
 	}
-	num = temp;
-	temp = vector<int>();
 
+	cout << "Primes up to 100:\n";
+	for (int i{}; i < primes.size(); i++) {
+		cout << primes[i] << endl;
+	}
+}
+void c3e14() {
+	//find the first n primes where n = a number passed by the user.
+	vector<int> primes{ 2 };
+	int n;
 
-	//start with 2
-	//clear even numbers from num
-	//loop
-	//if (
-} //TODO FINISH
+	cout << "Please enter how many primes you want: ";
+	if (!(cin >> n)) {
+		cout << "input error, closing application.";
+		return;
+	}
+	if (n < 1) {
+		cout << "less than 1 prime makes no sense, closing application.";
+		return;
+	}
+	if (n > 1000) {
+		cout << "Arbitrary safety limit for primes set to a max of 1000.";
+		return;
+	}
+
+	cout << "Calculating...\n";
+	for (int i{ 3 }; primes.size() < n; i++) {
+		bool prime = true;
+		for (int k{}; k < primes.size(); k++) {
+			if (!(i % primes[k])) {
+				prime = false;
+				break;
+			}
+		}
+		if (prime)
+			primes.push_back(i);
+	}
+	//output
+	for (int i{}; i < primes.size(); i++)
+		cout << i << '|' << primes[i] << endl;
+}
 
 int main() {
-	c3e12();
-	c3e13();
+	c3e14();
 }
