@@ -1160,10 +1160,42 @@ void c3e13() {
 		cout << primes[i] << endl;
 	}
 }
+void find_max_primes() {
+	cout << "Finding max number of primes determinable in an int\nThis may take some time...\n";
+	vector<int> primes{ 2 };
+	bool prime = true;
+
+	for (int i{ 3 }; i < numeric_limits<int>::max(); i++) {
+		prime = true;
+		if (!(i % 1000000))
+			cout << "On " << i << " and still processing...\n";
+		for (int k{}; k < primes.size(); k++) {
+			if (i % primes[k]) continue;
+			prime = false;
+		}
+		if (prime)
+			primes.push_back(i);
+	}
+	prime = true;
+	for (int k{}; k < primes.size(); k++) {
+		if (numeric_limits<int>::max() % primes[k]) continue;
+		prime = false;
+	}
+	if (prime) {
+		primes.push_back(numeric_limits<int>::max());
+		cout << "Numeric limit is prime." << endl;
+	}
+
+	cout << "There are a max of " << primes.size() << "primes within the max value of an int.\nThese are:\n";
+	for (int i{}; i < primes.size(); i++)
+		cout << i << '|' << primes[i];
+}
 void c3e14() {
+	find_max_primes();
+	return;
 	//find the first n primes where n = a number passed by the user.
 	vector<int> primes{ 2 };
-	int n;
+	int n, max{};
 
 	cout << "Please enter how many primes you want: ";
 	if (!(cin >> n)) {
@@ -1174,8 +1206,8 @@ void c3e14() {
 		cout << "less than 1 prime makes no sense, closing application.";
 		return;
 	}
-	if (n > 1000) {
-		cout << "Arbitrary safety limit for primes set to a max of 1000.";
+	if (n > max) {
+		cout << "Safety limit for primes set to a max of " << max << endl;
 		return;
 	}
 
@@ -1188,12 +1220,277 @@ void c3e14() {
 				break;
 			}
 		}
-		if (prime)
+		if (prime) {
+			cout << primes.size() << "|" << i << endl;
 			primes.push_back(i);
+		}
 	}
-	//output
-	for (int i{}; i < primes.size(); i++)
-		cout << i << '|' << primes[i] << endl;
+	cout << "Complete." << endl;
+	fstream f;
+	f.open("maxprime.txt");
+	f << primes.size();
+	f.close();
+	cin.get();
+}
+void c3e15() {
+	cout << "Enter a series of numbers to find the mode.\n";
+	vector<int> set;
+	int x;
+
+	while (cin >> x)
+		set.push_back(x);
+
+	if (set.size() == 0) {
+		cout << "no values entered.";
+		return;
+	}
+
+	sort(set.begin(), set.end());
+
+	vector<int> value{ set[0] }, count{ 1 };
+	for (int i{ 1 }; i < set.size(); i++) {
+		if (set[i] != value[value.size() - 1]) {
+			value.push_back(set[i]);
+			count.push_back(1);
+		}
+		else
+			++count[count.size() - 1];
+	}
+
+	x = 0;
+	for (auto c : count)
+		if (c > x)
+			x = c;
+
+	cout << "The modes of this set with a total count of " << x << " are:\n";
+	for (int i{}; i < value.size(); i++)
+		if (count[i] == x)
+			cout << value[i] << endl;
+}
+void c3e16() {
+	//find min, max, and mode of strings
+	vector<string> set, value;
+	vector<int> count;
+	string str;
+	int x;
+
+	while (cin >> str) {
+		if (str == "|")
+			break;
+		set.push_back(str);
+	}
+
+	if (set.size() == 0) {
+		cout << "No values entered.\n";
+		return;
+	}
+
+	sort(set.begin(), set.end());
+
+	value.push_back(set[0]);
+	count.push_back(1);
+	for (int i{1}; i < set.size(); i++) {
+		if (set[i] != value[value.size() - 1]) {
+			value.push_back(set[i]);
+			count.push_back(1);
+		}
+		else
+			++count[count.size() - 1];
+	}
+
+	x = 0;
+	for (auto c : count)
+		if (c > x)
+			x = c;
+
+	cout << "The alphabetically minimum string is: " << set[0] << endl << "The maximum string is: " << set[set.size()-1] << "The mode(s) of the set with an occurance of " << x << " are:\n";
+	for (int i{}; i < count.size(); i++)
+		if (count[i] == x)
+			cout << value[i] << endl;
+}
+void e17badinput() {
+	cout << "Bad input, application closing.";
+}
+void c3e17() {
+	//x = (-b +/- sqrt(b^2-4ac))/2a
+	//init
+	double a, b, c, x1, x2;
+	
+	//prompt
+	cout << "Solve 0 = ax^2+bx+c...\n"
+		<< "Enter value for a: ";
+	if (!(cin >> a)) {
+		e17badinput();
+		return;
+	}
+	cout << "Enter value for b: ";
+	if (!(cin >> b)) {
+		e17badinput();
+		return;
+	}
+	cout << "Enter value for c: ";
+	if (!(cin >> c)) {
+		e17badinput();
+		return;
+	}
+	//calculation
+	x2 = b * b - 4 * a * c;
+	if (x2 == 0) {
+		x1 = -b / (2 * a);
+		cout << "vertex is the only point that intersects at x = " << x1 << endl;
+	}
+	else if (x2 > 0) {
+		x2 = sqrt(x2);
+		x1 = (-b + x2) / (2 * a);
+		x2 = (-b - x2) / (2 * a);
+		cout << "The polynomial intersects at " << x1 << " and " << x2 << endl;
+	}
+	else if (x2 < 0) {
+		x2 *= -1;
+		x2 = sqrt(x2) / (2 * a);
+		x1 = -b / (2 * a);
+		cout << "The polynomial does not intersect and has these imaginary intersects: " << x1 << " + " << x2 << "i and " << x1 << " - " << x2 << "i\n";
+	}
+}
+void c3e18() {
+	//take name-value pairs
+	//terminate on "NoName 0"
+	//verify each name is unique, if a repeat name exit with error
+	//write out each pair at the end
+	vector<string> names;
+	vector<int> scores;
+	while (true) {
+		string str;
+		int x;
+		//get string
+		if (!(cin >> str)) {
+			cout << "unexpected end of file";
+			return;
+		}
+		//get int
+		if (!(cin >> x)) {
+			cout << "bad input detected. closing application.";
+			return;
+		}
+		//check for end
+		if (str == "NoName" && x == 0)
+			break;
+		//check for duplicate
+		for (auto s : names) {
+			if (s == str) {
+				cout << "Duplicate detected. closing application.";
+				return;
+			}
+		}
+		names.push_back(str);
+		scores.push_back(x);
+	}
+	cout << "input complete, our set is:\n";
+	for (int i{}; i < names.size(); i++)
+		cout << names[i] << " : " << scores[i] << endl;
+}
+void c3e19() {
+	vector<string> names;
+	vector<int> scores;
+	string str;
+	int x;
+	bool found;
+	while (true) {
+		//get string
+		if (!(cin >> str)) {
+			cout << "unexpected end of file";
+			return;
+		}
+		//get int
+		if (!(cin >> x)) {
+			cout << "bad input detected. closing application.";
+			return;
+		}
+		//check for end
+		if (str == "NoName" && x == 0)
+			break;
+		//check for duplicate
+		for (auto s : names) {
+			if (s == str) {
+				cout << "Duplicate detected. closing application.";
+				return;
+			}
+		}
+		names.push_back(str);
+		scores.push_back(x);
+	}
+	cout << "input complete\nWho would you like the score for?\n";
+	while (true) {
+		found = false;
+		cout << ">>";
+		cin >> str;
+		if (!cin) {
+			cout << "Unexpected eof.";
+			return;
+		}
+		for (int i{}; i < names.size(); i++) {
+			if (names[i] == str) {
+				found = true;
+				cout << scores[i] << endl;
+				break;
+			}
+		}
+		if (!found) {
+			cout << "name not found\n";
+		}
+	}
+}
+void c3e20() {
+	vector<string> names;
+	vector<int> scores;
+	string str;
+	int x;
+	bool found;
+	while (true) {
+		//get string
+		if (!(cin >> str)) {
+			cout << "unexpected end of file";
+			return;
+		}
+		//get int
+		if (!(cin >> x)) {
+			cout << "bad input detected. closing application.";
+			return;
+		}
+		//check for end
+		if (str == "NoName" && x == 0)
+			break;
+		//check for duplicate
+		for (auto s : names) {
+			if (s == str) {
+				cout << "Duplicate detected. closing application.";
+				return;
+			}
+		}
+		names.push_back(str);
+		scores.push_back(x);
+	}
+	cout << "input complete\nwhat score would you like to know who got it?\n";
+	while (true) {
+		found = false;
+		cout << ">>";
+		if (!(cin>>x)) {
+			cout << "invalid input.";
+			return;
+		}
+		for (int i{}; i < names.size(); i++) {
+			if (scores[i] == x) {
+				if (found)
+					cout << ", ";
+				found = true;
+				cout << names[i];
+			}
+		}
+		if (!found) {
+			cout << "none";
+		}
+		cout << endl;
+	}
 }
 
 int main() {
