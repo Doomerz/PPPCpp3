@@ -1164,11 +1164,15 @@ void find_max_primes() {
 	cout << "Finding max number of primes determinable in an int\nThis may take some time...\n";
 	vector<int> primes{ 2 };
 	bool prime = true;
+	int progress{1};
 
 	for (int i{ 3 }; i < numeric_limits<int>::max(); i++) {
 		prime = true;
-		if (!(i % 1000000))
+		if (!(i % progress)) {
+			if (i / progress == 9)
+				progress *= 10;
 			cout << "On " << i << " and still processing...\n";
+		}
 		for (int k{}; k < primes.size(); k++) {
 			if (i % primes[k]) continue;
 			prime = false;
@@ -1189,6 +1193,11 @@ void find_max_primes() {
 	cout << "There are a max of " << primes.size() << "primes within the max value of an int.\nThese are:\n";
 	for (int i{}; i < primes.size(); i++)
 		cout << i << '|' << primes[i];
+	fstream f;
+	f.open("maxprime.txt");
+	f << primes.size();
+	f.close();
+	cin.get();
 }
 void c3e14() {
 	find_max_primes();
@@ -1226,11 +1235,6 @@ void c3e14() {
 		}
 	}
 	cout << "Complete." << endl;
-	fstream f;
-	f.open("maxprime.txt");
-	f << primes.size();
-	f.close();
-	cin.get();
 }
 void c3e15() {
 	cout << "Enter a series of numbers to find the mode.\n";
