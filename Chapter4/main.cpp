@@ -1,7 +1,9 @@
 import std;
 using namespace std;
 
+constexpr int frame_width = 2;
 int area(int length, int width) { return length * width; }
+int framed_area(int x, int y) { return area(x - frame_width, y - frame_width); }
 void TryThis3_1() {
 	//int s1 = area(7, 2;
 	//int s2 = area(7,2)
@@ -37,7 +39,7 @@ void TryThis3_2() {
 //errors x2
 	//error C2664: 'int area(int,int)': cannot convert argument 1 from 'const char [6]' to 'int'
 void TryThis() {
-	//pick up at 4.5.1 pg.153
+	//pick up at 4.5.3 pg.157
 }
 
 ///Drill

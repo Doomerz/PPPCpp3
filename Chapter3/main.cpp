@@ -1160,7 +1160,7 @@ void c3e13() {
 		cout << primes[i] << endl;
 	}
 }
-void find_max_primes() {
+void find_max_primes() { //this will take a wild amount of time.. Perhaps evaluating this could be done reasonably but would require condsiderably greater skill and knowledge.
 	cout << "Finding max number of primes determinable in an int\nThis may take some time...\n";
 	vector<int> primes{ 2 };
 	bool prime = true;
@@ -1171,7 +1171,7 @@ void find_max_primes() {
 		if (!(i % progress)) {
 			if (i / progress == 9)
 				progress *= 10;
-			cout << "On " << i << " and still processing...\n";
+			cout << "On " << i << " and still processing... " << chrono::utc_clock::now() << endl;
 		}
 		for (int k{}; k < primes.size(); k++) {
 			if (i % primes[k]) continue;
@@ -1193,9 +1193,10 @@ void find_max_primes() {
 	cout << "There are a max of " << primes.size() << "primes within the max value of an int.\nThese are:\n";
 	for (int i{}; i < primes.size(); i++)
 		cout << i << '|' << primes[i];
-	fstream f;
-	f.open("maxprime.txt");
+	ofstream f("maxprime.txt");
 	f << primes.size();
+	for (int i{}; i < primes.size(); i++)
+		f << endl << i << " | " << primes[i];
 	f.close();
 	cin.get();
 }
@@ -1204,7 +1205,7 @@ void c3e14() {
 	return;
 	//find the first n primes where n = a number passed by the user.
 	vector<int> primes{ 2 };
-	int n, max{};
+	int n, max{105097565};
 
 	cout << "Please enter how many primes you want: ";
 	if (!(cin >> n)) {
@@ -1220,7 +1221,8 @@ void c3e14() {
 		return;
 	}
 
-	cout << "Calculating...\n";
+	cout << "Calculating...\n"
+		<< primes.size() << "|" << primes[0] << endl;
 	for (int i{ 3 }; primes.size() < n; i++) {
 		bool prime = true;
 		for (int k{}; k < primes.size(); k++) {
@@ -1230,8 +1232,8 @@ void c3e14() {
 			}
 		}
 		if (prime) {
-			cout << primes.size() << "|" << i << endl;
 			primes.push_back(i);
+			cout << primes.size() << "|" << i << endl;
 		}
 	}
 	cout << "Complete." << endl;
@@ -1266,7 +1268,7 @@ void c3e15() {
 		if (c > x)
 			x = c;
 
-	cout << "The modes of this set with a total count of " << x << " are:\n";
+	cout << "The mode(s) of this set with a total count of " << x << " are:\n";
 	for (int i{}; i < value.size(); i++)
 		if (count[i] == x)
 			cout << value[i] << endl;
@@ -1277,6 +1279,8 @@ void c3e16() {
 	vector<int> count;
 	string str;
 	int x;
+
+	cout << "Enter a series of strings and terminate with '|' character to find min, max, and mode.\n";
 
 	while (cin >> str) {
 		if (str == "|")
@@ -1307,7 +1311,7 @@ void c3e16() {
 		if (c > x)
 			x = c;
 
-	cout << "The alphabetically minimum string is: " << set[0] << endl << "The maximum string is: " << set[set.size()-1] << "The mode(s) of the set with an occurance of " << x << " are:\n";
+	cout << "The alphabetically minimum string is: " << set[0] << endl << "The maximum string is: " << set[set.size()-1] << endl << "The mode(s) of the set with an occurance of " << x << " are:\n";
 	for (int i{}; i < count.size(); i++)
 		if (count[i] == x)
 			cout << value[i] << endl;
@@ -1363,6 +1367,9 @@ void c3e18() {
 	//write out each pair at the end
 	vector<string> names;
 	vector<int> scores;
+
+	cout << "Enter a user name followed by score separated by a space. Terminate with input: \"NoName 0\"\n";
+
 	while (true) {
 		string str;
 		int x;
@@ -1399,6 +1406,9 @@ void c3e19() {
 	string str;
 	int x;
 	bool found;
+
+	cout << "Enter a user name followed by score separated by a space. Terminate with input: \"NoName 0\"\n";
+
 	while (true) {
 		//get string
 		if (!(cin >> str)) {
@@ -1450,6 +1460,9 @@ void c3e20() {
 	string str;
 	int x;
 	bool found;
+
+	cout << "Enter a user name followed by score separated by a space. Terminate with input: \"NoName 0\"\n";
+
 	while (true) {
 		//get string
 		if (!(cin >> str)) {
@@ -1498,5 +1511,5 @@ void c3e20() {
 }
 
 int main() {
-	c3e14();
+	c3e20();
 }
