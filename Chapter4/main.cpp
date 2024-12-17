@@ -50,7 +50,7 @@ void TryThis5_3() {
 	double ratio = double(area1) / area3;
 }
 void TryThis() {
-	//pick up at 4.5.3 pg.157
+	//pick up at 4.6 pg.159
 }
 
 ///Drill
