@@ -38,6 +38,17 @@ void TryThis3_2() {
 	//error C2660: 'area': function does not take 1 arguments
 //errors x2
 	//error C2664: 'int area(int,int)': cannot convert argument 1 from 'const char [6]' to 'int'
+void TryThis5_3() {
+	int x = 0,
+		y = 0,
+		z = 0;
+	int area1 = area(x, y);
+	if (area1 <= 0)
+		cout << "Error: " << "non-positive area" << endl;
+	int area2 = framed_area(1, z);
+	int area3 = framed_area(y, z);
+	double ratio = double(area1) / area3;
+}
 void TryThis() {
 	//pick up at 4.5.3 pg.157
 }
