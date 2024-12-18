@@ -42,15 +42,27 @@ void TryThis5_3() {
 	int x = 0,
 		y = 0,
 		z = 0;
-	int area1 = area(x, y);
+	int area1 = area(x, y); //x and y cannot be negative
 	if (area1 <= 0)
 		cout << "Error: " << "non-positive area" << endl;
-	int area2 = framed_area(1, z);
-	int area3 = framed_area(y, z);
-	double ratio = double(area1) / area3;
+	int area2 = framed_area(1, z); //this outright will be negative and makes no sense without changing frame_width
+	int area3 = framed_area(y, z); //y and z must be >= 2; (therefore z>2 and y>2, because z=y=2 is an error)
+	double ratio = double(area1) / area3; //y and z must neither be == 2;
+	cout << "area1 = " << area1 << endl
+		<< "area2 = " << area2 << endl
+		<< "area3 = " << area3 << endl
+		<< "ratio = " << ratio << endl;
 }
+void TryThis6_3() {
+	throw std::runtime_error("test");
+}
+//void TryThis7_1() {
+	//hexagon w/ 2cm sides. calculate if area is ~9.
+	//6*1*tan(90-(360/6/2)) = 6*tan(90-30) = 6*tan(60deg) = 6*sqrt(3) = 6*1.7305080757 = 10.3923048454
+	//estimate travel distances. trivial
+//}
 void TryThis() {
-	//pick up at 4.6 pg.159
+	//pick up at 4. pg.176
 }
 
 ///Drill
@@ -114,6 +126,6 @@ void TryThis() {
 ///Exercises
 
 int main() {
-	TryThis3_1();
+	TryThis6_3();
 	return 0;
 }
