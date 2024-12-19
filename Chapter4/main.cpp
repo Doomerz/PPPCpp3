@@ -61,8 +61,21 @@ void TryThis6_3() {
 	//6*1*tan(90-(360/6/2)) = 6*tan(90-30) = 6*tan(60deg) = 6*sqrt(3) = 6*1.7305080757 = 10.3923048454
 	//estimate travel distances. trivial
 //}
+void expect(bool test, string error) {
+	if (test)
+		throw runtime_error(error);
+}
+void TryThis7_3_3() {
+	int length = 20, width = 200000000; //overflow the int into a negative number
+	expect(!(0 < length && 0 < width), "bad args to area()");
+	int a = length * width;
+	expect(!(0 < a), "bad area() result");
+	cout << a;
+	return;
+}
 void TryThis() {
-	//pick up at 4. pg.176
+	//pick up at 4.7.5 pg.181
+	default_random_engine rande;
 }
 
 ///Drill
@@ -126,6 +139,6 @@ void TryThis() {
 ///Exercises
 
 int main() {
-	TryThis6_3();
+	TryThis7_3_3();
 	return 0;
 }
