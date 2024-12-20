@@ -75,7 +75,12 @@ void TryThis7_3_3() {
 }
 void TryThis() {
 	//pick up at 4.7.5 pg.181
-	default_random_engine rande;
+	default_random_engine rande; //engine for generating randomness
+	uniform_int_distribution<int> dist(1, 6); //the distribution for randomness [1:6] range integers of uniform probability (like a die)
+	rande.seed(chrono::system_clock::now().time_since_epoch().count()); //seed random engine with something more or less random to get more or less random results
+	//without seed, or if an identical seed is given, a random number generator will produce identical results each time.
+	for (int i{}; i < 10; i++) //roll dice 10 times
+		cout << dist(rande) << endl;
 }
 
 ///Drill
@@ -139,6 +144,6 @@ void TryThis() {
 ///Exercises
 
 int main() {
-	TryThis7_3_3();
+	TryThis();
 	return 0;
 }
