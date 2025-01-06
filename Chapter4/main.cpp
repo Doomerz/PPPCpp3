@@ -85,6 +85,47 @@ void TryThis() {
 
 ///Drill
 
+int drill() 
+try {
+	//code
+	//1: Cout << "Success!\n"; //Cout should be cout
+	//2: cout << "Success!\n; //string literal not terminated
+	//3: cout << "Success" << !\n" //second string literal not started with '"' and not terminated with ;
+	//4: cout << success << '\n'; //success is not a literal and is not defined
+	//5: string res=7; vector<int> v(10); v[5] = res; cout << "Success!\n"; //can't init string with int nor assign a string to an int
+	//6: vector<int> v(10); v(5) = 7; if (v(5) != 7) cout << "Success!\n"; //accessing vector requires subscripting [] not parenthesis ()
+	//7: if (cond) cout << "Success!\n"; else cout << "Fail!\n"; //cond not defined
+	//8: bool c = false; if (c) cout << "Success!\n"; else cout << "Fail!\n"; //for success to be printed we'll need c = true
+	//9: string s = "ape"; boo c = "fool" < s; if (c) cout << "Success!\n"; //boo should be bool, since 'f' > 'a' "fool" < s is false and thus won't be true unless "fool" > s
+	//10: string s = "ape"; if (s == "fool") cout << "Success!\n"; //s != "fool" would result in success
+	//11: string s = "ape"; if (s == "fool") cout < "Success!\n"; //same as 10, but needs << not < for insertion operator
+	//12: string s = "ape"; if (s + "fool") cout < "Success!\n"; //insertion operator needed for cout like 11 and string isn't a boolean so we need != instead of +
+	//13: vector<char> v(5); for (int i = 0; 0 < v.size(); ++i); cout << "Success!\n"; //0 < v.size() will never evalutate to false stopping the loop
+	//14: vector<char> v(5); for (int i = 0; i <= v.size(); ++i); cout << "Success!\n"; //this is fine, but if we use i the subscript vector it will error on the last iteration as it is a range error
+	//15: string s = "Success!\n"; for (int i = 0; i < 6; ++i) cout << s[i]; //6 is not enough as it will cout << "Succe"; instead we need s.size() or 9 or 10 for the extra new line
+	//16: if (true) then cout << "Success!\n"; else cout << "Fail!\n"; //then is not defined, if removed it works.
+	//17: int x = 2000; char c = x; if (c == 2000) cout << "Success!\n"; //limit of char is 255, thus this is truncated and will never be true.
+	//18: string s = "Success!\n"; for (int i = 0; i < 10; ++i) cout << s[i]; //this is good.
+	//19: vector v(5); for (int i = 0; i <= v.size(); ++i); cout << "Success!\n"; //vector requires a type in <>
+	//20: int i = 0; int j = 9; while (i < 10) ++j; if (j < i) cout << "Success!\n"; //replace ++j with ++i
+	//21: int x = 2; double d = 5 / (x - 2); if (d == 2 * x + 0.5) cout << "Success!\n"; //if x = 2, x-2 is zero and will cause divide by 0 error
+	//22: string<char> s = "Success!\n"; for (int i = 0; i <= 10; ++i) cout << s[i]; //string doesn't take a type in <>, plus we have a range error, should be i<10 or i<s.size();
+	//23: int i = 0; while (i < 10) ++j; if (j < i) cout << "Success!\n"; //j is not defined and ++j must be ++i;
+	//24: int x = 4; double d = 5 / (x - 2); if (d = 2 * x + 0.5) cout << "Success!\n"; //this will pass as d= will result in d and since d would be != 0 it will be true
+	//25: cin << "Success!\n"; //cin doesn't use an insertion operator so cin should be cout
+
+	return 0;
+}
+catch (exception& e) {
+	cerr << "error: " << e.what() << '\n';
+	return 1;
+}
+catch (...) {
+	cerr << "Oops: unknown exception!\n";
+	return 2;
+}
+//1: Cout << "Success!\n;
+
 ///Review
 
 /// Name four major types of errors and briefly define each one.
@@ -142,8 +183,289 @@ void TryThis() {
 
 
 ///Exercises
+//ex1 done
+double ctok(double c) {
+	double k = c + 273.15;
+	return k;
+}
+void c4e2() {
+	double c = 0;
+	cin >> c;
+	double k = ctok(c);
+	cout << k << '\n';
+}
+//kelvin difference is 273.15
+//k should be a double
+//ctok should return k and end with ;
+//cin >> c instead of d
+//ctok(c) instead of ctok("c")
+//cout instead of Cout
+void c4e3() {
+	double c = 0;
+	cin >> c;
+	double k = ctok(c);
+	if (k < 0) cout << k << "not a real temperature.\n";
+	else cout << k << '\n';
+}
+double ctok4(double c) {
+	double k = c + 273.15;
+	if (k < 0) throw runtime_error("not a real temperature!\n");
+	return k;
+}
+void c4e4()
+try {
+	double c = 0;
+	cin >> c;
+	double k = ctok4(c);
+	cout << k << '\n';
+}
+catch (exception& e) {
+	cout << e.what();
+}
+double ktoc(double k) {
+	if (k < 0) throw runtime_error("not a real temperature!\n");
+	double c = k - 273.15;
+	return c;
+}
+void c4e5()
+try {
+	cout << "Enter a temperature and c for celsius or k for kelvin to convert to the other.\n";
+	double x{};
+	string unit;
+	cin >> x;
+	cin >> unit;
+	if (unit.size() != 1) throw runtime_error("Not a valid unit type.\n");
+	if (tolower(unit[0]) == 'c') cout << ctok4(x) << " Kelvin.\n";
+	else if (tolower(unit[0]) == 'k') cout << ktoc(x) << " Celsius.\n";
+	else throw runtime_error("not a valid unit type.\n");
+}
+catch (exception& e) {
+	cout << e.what() << endl;
+}
+double ftoc(double f) {
+	double c = 5 / 9 * (f - 32);
+	if (c < 273.15) throw runtime_error("not a real temperature!\n");
+	return c;
+}
+double ctof(double c) {
+	if (c < 273.15) throw runtime_error("not a real temperature!\n");
+	double f = 9 / 5 * c + 32;
+	return f;
+}
+void c4e6()
+try {
+	cout << "Enter a temperature and a unit type followed by a space and what to convert to. [c/k/f]\n";
+	double x{};
+	string unit1, unit2;
+	cin >> x >> unit1 >> unit2;
+	if (unit1.size() != 1 || unit2.size() != 1) throw runtime_error("Not ta valid unit type.\n");
+	switch (tolower(unit1[0])) {
+	case 'c':
+		if (tolower(unit2[0]) == 'k') cout << ctok4(x) << " Kelvin.\n";
+		else if (tolower(unit2[0]) == 'f') cout << ctof(x) << " Fahrenheit.\n";
+		else throw runtime_error("not a valid conversion type.\n");
+		break;
+	case 'k':
+		if (tolower(unit2[0]) == 'c') cout << ktoc(x) << " Celsius.\n";
+		else if (tolower(unit2[0]) == 'f') cout << ctof(ktoc(x)) << " Fahrenheit.\n";
+		else throw runtime_error("not a valid conversion type.\n");
+		break;
+	case 'f':
+		if (tolower(unit2[0]) == 'c') cout << ftoc(x) << " Celsius.\n";
+		else if (tolower(unit2[0]) == 'k') cout << ctok4(ftoc(x)) << " Kelvin.\n";
+		else throw runtime_error("not a valid converstion type.\n");
+		break;
+	default:
+		throw runtime_error("not a valid convert from type.\n");
+	}
+}
+catch (exception& e) {
+	cout << e.what() << endl;
+}
+void c4e7() {
+	double a, b, c, x1, x2;
+
+	//prompt
+	cout << "Solve 0 = ax^2+bx+c...\n"
+		<< "Enter value for a: ";
+	if (!(cin >> a)) {
+		cerr << "bad input.\n";
+		return;
+	}
+	cout << "Enter value for b: ";
+	if (!(cin >> b)) {
+		cerr << "bad input.\n";
+		return;
+	}
+	cout << "Enter value for c: ";
+	if (!(cin >> c)) {
+		cerr << "bad input.\n";
+		return;
+	}
+	//calculation
+	x2 = b * b - 4 * a * c;
+	if (x2 == 0) {
+		x1 = -b / (2 * a);
+		cout << "vertex is the only point that intersects at x = " << x1 << endl;
+	}
+	else if (x2 > 0) {
+		x2 = sqrt(x2);
+		x1 = (-b + x2) / (2 * a);
+		x2 = (-b - x2) / (2 * a);
+		cout << "The polynomial intersects at " << x1 << " and " << x2 << endl;
+	}
+	else if (x2 < 0) {
+		x2 *= -1;
+		x2 = sqrt(x2) / (2 * a);
+		x1 = -b / (2 * a);
+		cout << "The polynomial does not intersect and has these imaginary intersects: " << x1 << " + " << x2 << "i and " << x1 << " - " << x2 << "i\n";
+	}
+}
+void c4e8() {
+	//read in a series of integers and then compute the sum of the first n integers
+	//first ask for n, then read the values into a vector
+	//see book for format
+	//handle all inputs such as providing more than n inputs
+	cout << "Please enter the number of values you want to sum: ";
+	int n{};
+	bool loop = true;
+	vector<int> nums;
+	if (!(cin >> n)) {
+		cerr << "Expected int for n.\n";
+		return;
+	}
+	cout << "Please enter some integers (press '|' to stop): ";
+	while (true) {
+		string input;
+		if (!(cin >> input)) {
+			cerr << "unexpected end of file.\n";
+		}
+		try {
+			int x = stoi(input);
+			nums.push_back(x);
+		}
+		catch (exception& e) {
+			if (input == "|") loop=false;
+			else {
+				cerr << "input did not convert to number properly.\n";
+				return;
+			}
+		}
+	}
+	if (nums.size() != n) {
+		cout << "quantity of quantities provided don't match expected.\n";
+		return;
+	}
+	int sum = 0;
+	for (const auto& x : nums) sum += x;
+	cout << "The sum of the first " << n << " numbers ( ";
+	for (const auto& x : nums) cout << x << ' ';
+	cout << ") is " << sum << ".\n";
+}
+void c4e9() {
+	//read in a series of integers and then compute the sum of the first n integers
+	//first ask for n, then read the values into a vector
+	//see book for format
+	//handle all inputs such as providing more than n inputs
+	cout << "Please enter the number of values you want to sum: ";
+	int n{};
+	bool loop = true;
+	vector<int> nums;
+	if (!(cin >> n)) {
+		cerr << "Expected int for n.\n";
+		return;
+	}
+	cout << "Please enter some integers (press '|' to stop): ";
+	while (true) {
+		string input;
+		if (!(cin >> input)) {
+			cerr << "unexpected end of file.\n";
+		}
+		try {
+			int x = stoi(input);
+			nums.push_back(x);
+		}
+		catch (exception& e) {
+			if (input == "|") loop = false;
+			else {
+				cerr << "input did not convert to number properly.\n";
+				return;
+			}
+		}
+	}
+	if (nums.size() != n) {
+		cout << "quantity of quantities provided don't match expected.\n";
+		return;
+	}
+	int sum = 0;
+	for (const auto& x : nums) {
+		if (numeric_limits<int>::max() - sum < x) {
+			cout << "Sum exceeds numeric limits.\n";
+			return;
+		}
+		sum += x;
+	}
+	cout << "The sum of the first " << n << " numbers ( ";
+	for (const auto& x : nums) cout << x << ' ';
+	cout << ") is " << sum << ".\n";
+}
+void c4e10() {
+	//read in a series of integers and then compute the sum of the first n integers
+	//first ask for n, then read the values into a vector
+	//see book for format
+	//handle all inputs such as providing more than n inputs
+	cout << "Please enter the number of values you want to sum: ";
+	int n{};
+	bool loop = true;
+	vector<double> nums;
+	if (!(cin >> n)) {
+		cerr << "Expected int for n.\n";
+		return;
+	}
+	cout << "Please enter some integers (press '|' to stop): ";
+	while (true) {
+		string input;
+		if (!(cin >> input)) {
+			cerr << "unexpected end of file.\n";
+		}
+		try {
+			double x = stod(input);
+			nums.push_back(x);
+		}
+		catch (exception& e) {
+			if (input == "|") loop = false;
+			else {
+				cerr << "input did not convert to number properly.\n";
+				return;
+			}
+		}
+	}
+	if (nums.size() != n) {
+		cout << "quantity of quantities provided don't match expected.\n";
+		return;
+	}
+	double sum = 0;
+	for (const auto& x : nums) {
+		if (numeric_limits<double>::max() - sum < x) {
+			cout << "Sum exceeds numeric limits.\n";
+			return;
+		}
+		sum += x;
+	}
+	cout << "The sum of the " << n << " numbers ( ";
+	for (const auto& x : nums) cout << x << ' ';
+	cout << ") is " << sum << ".\n";
+	cout << "The differences in values are: ";
+	for (int i{}; i < nums.size() - 3; ++i) {
+		cout << nums[i] - nums[i + 1] << ", ";
+	}
+	cout << nums[nums.size() - 2] - nums[nums.size() - 1];
+}
+void c4e11() {
+	//
+}
 
 int main() {
-	TryThis();
+	drill();
 	return 0;
 }
