@@ -540,7 +540,7 @@ void c4e12() {
 			}
 		}
 		if (bullc == 4) {
-			cout << "Congratulations! You got it in only " << moves << " moves!\n";
+			cout << "Congratulations! You got it in only " << moves << " move" << (moves == 1 ? "" : "s") << "!\n";
 			break;
 		}
 		cout << "You have " << bullc << " Bulls and " << cows << " Cows.\n";
@@ -559,7 +559,26 @@ void c4e13() {
 		else return;
 	}
 }
+bool c4getpair(pair<string,int>& input) {
+	string s;
+	int i;
+	if (!(cin >> s)) {
+		return false;
+	}
+	if (s == "|") {
+		input.first = s;
+		input.second = 0;
+		return false;
+	}
+	if (!(cin >> i)) {
+		return false;
+	}
+	input.first = s;
+	input.second = i;
+	return true;
+}
 void c4e14() {
+	pair<string, int> input;
 	//read in day of the week - value pairs.
 	//reject values that aren't days of the week
 	//sum the values of valid days of the week at conclusion.
@@ -567,6 +586,8 @@ void c4e14() {
 }
 
 int main() {
-	c4e12();
+	c4e14();
 	return 0;
 }
+
+//auditions, agent orange
