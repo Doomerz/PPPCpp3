@@ -577,8 +577,115 @@ bool c4getpair(pair<string,int>& input) {
 	input.second = i;
 	return true;
 }
+string makelower(const string& in) {
+	string res;
+	for (const auto& c : in) {
+		res.push_back(tolower(c));
+	}
+	return res;
+}
+int dow2num(const string& dow) {
+	string chk = makelower(dow);
+	//sunday = 0
+	const vector<const string> sunday{"sunday", "sun", "su"},
+		monday{"monday","mon", "m"},
+		tuesday{"tuesday","tues","tu"},
+		wednesday{"wednesday", "wed", "w"},
+		thursday{"thursday", "thurs", "th"},
+		friday{"friday", "fri", "f"},
+		saturday{"saturday", "sat", "sa"};
+	for (const auto& s : sunday)
+		if (chk == s)
+			return 0;
+	for (const auto& s : monday)
+		if (chk == s)
+			return 1;
+	for (const auto& s : tuesday)
+		if (chk == s)
+			return 2;
+	for (const auto& s : wednesday)
+		if (chk == s)
+			return 3;
+	for (const auto& s : thursday)
+		if (chk == s)
+			return 4;
+	for (const auto& s : friday)
+		if (chk == s)
+			return 5;
+	for (const auto& s : saturday)
+		if (chk == s)
+			return 6;
+	return 7;
+}
 void c4e14() {
 	pair<string, int> input;
+	vector<vector<int>> rec(8);
+	int sum{};
+	while (true) {
+		if (c4getpair(input)) {
+			rec[dow2num(input.first)].push_back(input.second);
+			continue;
+		}
+		if (input.first == "|") break;
+		cout << "unexpected eof.\n";
+		break;
+	}
+	cout << "values by day of week:\n";
+	cout << "Sunday:\n";
+	for (auto& v : rec[0]) {
+		cout << v << endl;
+		sum += v;
+	}
+	cout << "Sum = " << sum << endl;
+	sum = 0;
+	cout << "Monday:\n";
+	for (auto& v : rec[1]) {
+		cout << v << endl;
+		sum += v;
+	}
+	cout << "Sum = " << sum << endl;
+	sum = 0;
+	cout << "Tuesday:\n";
+	for (auto& v : rec[2]) {
+		cout << v << endl;
+		sum += v;
+	}
+	cout << "Sum = " << sum << endl;
+	sum = 0;
+	cout << "Wednesday:\n";
+	for (auto& v : rec[3]) {
+		cout << v << endl;
+		sum += v;
+	}
+	cout << "Sum = " << sum << endl;
+	sum = 0;
+	cout << "Thursday:\n";
+	for (auto& v : rec[4]) {
+		cout << v << endl;
+		sum += v;
+	}
+	cout << "Sum = " << sum << endl;
+	sum = 0;
+	cout << "Friday:\n";
+	for (auto& v : rec[5]) {
+		cout << v << endl;
+		sum += v;
+	}
+	cout << "Sum = " << sum << endl;
+	sum = 0;
+	cout << "Saturday:\n";
+	for (auto& v : rec[6]) {
+		cout << v << endl;
+		sum += v;
+	}
+	cout << "Sum = " << sum << endl;
+	sum = 0;
+	cout << "Rejects:\n";
+	for (auto& v : rec[7]) {
+		cout << v << endl;
+		sum += v;
+	}
+	cout << "Sum = " << sum << endl;
 	//read in day of the week - value pairs.
 	//reject values that aren't days of the week
 	//sum the values of valid days of the week at conclusion.
