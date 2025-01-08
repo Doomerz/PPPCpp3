@@ -696,5 +696,3 @@ int main() {
 	c4e14();
 	return 0;
 }
-
-//auditions, agent orange
