@@ -1,7 +1,10 @@
 import std;
 using namespace std;
 
-void TryThis() {}
+void TryThis3() {
+	//
+}
+void TryThis() {} //resume 5.2.1 @194
 
 ///Drill
 
@@ -10,6 +13,6 @@ void TryThis() {}
 ///Exercises
 
 int main() {
-	TryThis();
+	TryThis3();
 	return 0;
 }
