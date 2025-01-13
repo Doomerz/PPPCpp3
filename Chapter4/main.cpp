@@ -587,7 +587,7 @@ string makelower(const string& in) {
 int dow2num(const string& dow) {
 	string chk = makelower(dow);
 	//sunday = 0
-	const vector<const string> sunday{"sunday", "sun", "su"},
+	vector<string> sunday{"sunday", "sun", "su"},
 		monday{"monday","mon", "m"},
 		tuesday{"tuesday","tues","tu"},
 		wednesday{"wednesday", "wed", "w"},
