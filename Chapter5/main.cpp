@@ -86,7 +86,7 @@ double tt6_term() {
 double tt6_primary() {
 	Token t = tt6_get_token();
 	switch (t.kind) {
-	case '(':
+	case '(': //handle '(' expression ')'
 	{
 		double d = tt6_expression();
 		t = tt6_get_token();
