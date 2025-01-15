@@ -103,7 +103,7 @@ double tt6_primary() {
 void TryThis6() {
 	try {
 		while (cin)
-			cout << tt6_expression() << '\n';
+			cout << "=" << tt6_expression() << '\n';
 	}
 	catch (exception& e) {
 		cerr << e.what() << '\n';
@@ -114,7 +114,9 @@ void TryThis6() {
 		return;
 	}
 }
-void TryThis() {} //resume 5.4.2 @212
+void TryThis9() {
+	TryThis6();
+} //resume 5.8.2 @234
 
 ///Drill
 
@@ -123,6 +125,6 @@ void TryThis() {} //resume 5.4.2 @212
 ///Exercises
 
 int main() {
-	TryThis6();
+	TryThis9();
 	return 0;
 }
