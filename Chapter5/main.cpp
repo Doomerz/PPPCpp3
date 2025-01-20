@@ -114,8 +114,147 @@ void TryThis6() {
 		return;
 	}
 }
+Token tt9_get_token() {
+	char ch;
+	cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
+
+	switch (ch) {
+		//not yet   case ';':    // for "print"
+		//not yet   case 'q':    // for "quit"
+	case '(': case ')': case '+': case '-': case '*': case '/':
+		return Token(ch);        // let each character represent itself
+	case '.':
+	case '0': case '1': case '2': case '3': case '4':
+	case '5': case '6': case '7': case '8': case '9':
+	{
+		cin.putback(ch);         // put digit back into the input stream
+		double val;
+		cin >> val;              // read a floating-point number
+		return Token('8', val);   // let '8' represent "a number"
+	}
+	default:
+		throw runtime_error("Bad token");
+	}
+}
+class tt9_Tokenstream {
+public:
+	Token get() {
+		if (full) {
+			full = false;
+			return buffer;
+		}
+		char ch = 0;
+		if (!(cin >> ch))
+			throw runtime_error("no input");
+		switch (ch) {
+		case ';': case 'q': case '(': case ')': case '+': case '-': case '*': case '/':
+			return Token{ ch };
+		case '.': case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+		{
+			cin.putback(ch);
+			double val = 0;
+			cin >> val;
+			return Token{ '8',val };
+		}
+		default:
+			throw runtime_error("Bad Token");
+		}
+	}
+	void putback(Token t) {
+		if (full)
+			throw runtime_error("putback() into a full buffer");
+		buffer = t;
+		full = true;
+	}
+private:
+	bool full = false;
+	Token buffer;
+};
+tt9_Tokenstream tt9_ts;
+double tt9_term();
+double tt9_primary();
+double tt9_expression() {
+	double left = tt9_term();
+	Token t = tt9_ts.get();
+	while (true) {
+		switch (t.kind) {
+		case '+':
+			left += tt9_term();
+			t = tt9_ts.get();
+			break;
+		case '-':
+			left -= tt9_term();
+			t = tt9_ts.get();
+			break;
+		default:
+			tt9_ts.putback(t);
+			return left;
+		}
+	}
+}
+double tt9_term() {
+	double left = tt9_primary();
+	Token t = tt9_ts.get();
+	while (true) {
+		switch (t.kind) {
+		case '*':
+			left *= tt9_primary();
+			t = tt9_ts.get();
+			break;
+		case '/':
+		{
+			double d = tt9_primary();
+			if (d == 0)
+				throw runtime_error("Divide by zero");
+			left /= d;
+			t = tt9_ts.get();
+			break;
+		}
+		default:
+			tt9_ts.putback(t);
+			return left;
+		}
+	}
+}
+double tt9_primary() {
+	Token t = tt9_ts.get();
+	switch (t.kind) {
+	case '(': //handle '(' expression ')'
+	{
+		double d = tt9_expression();
+		t = tt9_ts.get();
+		if (t.kind != ')')
+			throw runtime_error("')' expected.");
+		return d;
+	}
+	case '8':
+		return t.value;
+	default:
+		throw runtime_error("Primary expected.");
+	}
+}
 void TryThis9() {
-	TryThis6();
+	try {
+		double val = 0;
+		while (cin) {
+			Token t = tt9_ts.get();
+			if (t.kind == 'q')
+				break;
+			if (t.kind == ';')
+				cout << "=" << val << '\n';
+			else
+				tt9_ts.putback(t);
+			val = tt9_expression();
+		}
+	}
+	catch (exception& e) {
+		cerr << e.what() << '\n';
+		return;
+	}
+	catch (...) {
+		cerr << "unhandled exception..\n";
+		return;
+	}
 }
 
 ///Drill
@@ -125,6 +264,6 @@ void TryThis9() {
 ///Exercises
 
 int main() {
-	TryThis9();
+	TryThis9(); // awaiting tt9 testing
 	return 0;
 }
