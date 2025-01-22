@@ -238,12 +238,198 @@ void TryThis9() {
 }
 
 ///Drill
+class dToken{ //missing 'c' in class
+public:
+	char kind;        // what kind of token
+	double value;     // for numbers: a value 
+	dToken(char ch)    // make a Token from a char
+		:kind(ch), value(0) {}
+	dToken(char ch, double val)     // make a Token from a char and a double
+		:kind(ch), value(val) {}
+};
+
+//------------------------------------------------------------------------------
+
+class dToken_stream {
+public:
+	dToken_stream();   // make a Token_stream that reads from cin
+	dToken get();      // get a Token (get() is defined elsewhere)
+	void putback(dToken t);    // put a Token back
+private:
+	bool full;        // is there a Token in the buffer?
+	dToken buffer;     // here is where we keep a Token put back using putback()
+};
+
+//------------------------------------------------------------------------------
+
+// The constructor just sets full to indicate that the buffer is empty:
+dToken_stream::dToken_stream()
+	:full(false), buffer(0)    // no Token in buffer
+{}
+
+//------------------------------------------------------------------------------
+
+// The putback() member function puts its argument back into the Token_stream's buffer:
+void dToken_stream::putback(dToken t)
+{
+	if (full) throw runtime_error("putback() into a full buffer");
+	buffer = t;       // copy t to buffer
+	full = true;      // buffer is now full
+}
+
+//------------------------------------------------------------------------------
+
+dToken dToken_stream::get() //missing Token_stream scope for get's definition
+{
+	if (full) {       // do we already have a Token ready?
+		// remove token from buffer
+		full = false;
+		return buffer;
+	}
+
+	char ch;
+	cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
+
+	switch (ch) {
+	case ';':    // for "print"
+	case 'q':    // for "quit"
+	case '(': case ')': case '+': case '-': case '*': case '/':
+		return dToken(ch);        // let each character represent itself
+	case '.':
+	case '0': case '1': case '2': case '3': case '4':
+	case '5': case '6': case '7': case '8': case '9': //missing case '8' or token_stream::get()
+	{
+		cin.putback(ch);         // put digit back into the input stream
+		double val;
+		cin >> val;              // read a floating-point number
+		return dToken('8', val);   // let '8' represent "a number"
+	}
+	default:
+		throw runtime_error("Bad token");
+	}
+}
+
+//------------------------------------------------------------------------------
+
+dToken_stream ts;        // provides get() and putback() 
+
+//------------------------------------------------------------------------------
+
+double dexpression();    // declaration so that primary() can call expression()
+
+//------------------------------------------------------------------------------
+
+// deal with numbers and parentheses
+double dprimary()
+{
+	dToken t = ts.get();
+	switch (t.kind) {
+	case '(':    // handle '(' expression ')'
+	{
+		double d = dexpression();
+		t = ts.get();
+		if (t.kind != ')')
+			throw runtime_error("')' expected"); //missing closing '"' for string literal in throw for ')' expected
+				return d;
+	}
+	case '8':            // we use '8' to represent a number
+		return t.value;  // return the number's value
+	default:
+		throw runtime_error("primary expected");
+	}
+}
+
+//------------------------------------------------------------------------------
+
+// deal with *, /, and %
+double dterm()
+{
+	double left = dprimary();
+	dToken t = ts.get();        // get the next token from token stream
+
+	while (true) {
+		switch (t.kind) {
+		case '*':
+			left *= dprimary();
+			t = ts.get();
+		case '/':
+		{
+			double d = dprimary();
+			if (d == 0) throw runtime_error("divide by zero");
+			left /= d;
+			t = ts.get();
+			break;
+		}
+		default:
+			ts.putback(t);     // put t back into the token stream
+			return left;
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+
+// deal with + and -
+double dexpression()
+{ //missing closing paranthesis for start of expression()'s first call to term()
+	double left = dterm();      // read and evaluate a Term
+	dToken t = ts.get();        // get the next token from token stream
+
+	while (true) {
+		switch (t.kind) {
+		case '+':
+			left += dterm();    // evaluate Term and add
+			t = ts.get();
+			break;
+		case '-':
+			left += dterm();    // evaluate Term and subtract
+			t = ts.get();
+			break;
+		default:
+			ts.putback(t);     // put t back into the token stream
+			return left;       // finally: no more + or -: return the answer
+		}
+	}
+}
+
+//------------------------------------------------------------------------------
+
+int Drill()
+//missing 'c' in class Token
+//missing Token_stream scope for get's definition
+//missing closing '"' for string literal in throw for ')' expected
+//missing closing paranthesis for start of expression()'s first call to term()
+//missing definition of val in main
+
+//missing case '8' or token_stream::get()
+try
+{
+	double val;
+	while (cin) {
+		dToken t = ts.get();
+
+		if (t.kind == 'q') break; // 'q' for quit
+		if (t.kind == ';')        // ';' for "print now"
+			cout << "=" << val << '\n';
+		else
+			ts.putback(t);
+		val = dexpression();
+	}
+}
+catch (exception& e) {
+	cerr << "error: " << e.what() << '\n';
+	return 1;
+}
+catch (...) {
+	cerr << "Oops: unknown exception!\n";
+	return 2;
+}
 
 ///Review
 
 ///Exercises
 
 int main() {
-	TryThis9(); // awaiting tt9 testing
+	Drill(); // awaiting tt9 testing
 	return 0;
 }
