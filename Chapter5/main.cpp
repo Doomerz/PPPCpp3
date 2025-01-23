@@ -1,4 +1,4 @@
-import std;
+﻿import std;
 using namespace std;
 
 void TryThis3_4() {
@@ -247,9 +247,6 @@ public:
 	dToken(char ch, double val)     // make a Token from a char and a double
 		:kind(ch), value(val) {}
 };
-
-//------------------------------------------------------------------------------
-
 class dToken_stream {
 public:
 	dToken_stream();   // make a Token_stream that reads from cin
@@ -259,26 +256,15 @@ private:
 	bool full;        // is there a Token in the buffer?
 	dToken buffer;     // here is where we keep a Token put back using putback()
 };
-
-//------------------------------------------------------------------------------
-
-// The constructor just sets full to indicate that the buffer is empty:
 dToken_stream::dToken_stream()
 	:full(false), buffer(0)    // no Token in buffer
 {}
-
-//------------------------------------------------------------------------------
-
-// The putback() member function puts its argument back into the Token_stream's buffer:
 void dToken_stream::putback(dToken t)
 {
 	if (full) throw runtime_error("putback() into a full buffer");
 	buffer = t;       // copy t to buffer
 	full = true;      // buffer is now full
 }
-
-//------------------------------------------------------------------------------
-
 dToken dToken_stream::get() //missing Token_stream scope for get's definition
 {
 	if (full) {       // do we already have a Token ready?
@@ -291,8 +277,8 @@ dToken dToken_stream::get() //missing Token_stream scope for get's definition
 	cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
 
 	switch (ch) {
-	case ';':    // for "print"
-	case 'q':    // for "quit"
+	case '=':    // for "print"
+	case 'x':    // for "quit"
 	case '(': case ')': case '+': case '-': case '*': case '/':
 		return dToken(ch);        // let each character represent itself
 	case '.':
@@ -308,29 +294,19 @@ dToken dToken_stream::get() //missing Token_stream scope for get's definition
 		throw runtime_error("Bad token");
 	}
 }
-
-//------------------------------------------------------------------------------
-
-dToken_stream ts;        // provides get() and putback() 
-
-//------------------------------------------------------------------------------
-
+dToken_stream dts;        // provides get() and putback() 
 double dexpression();    // declaration so that primary() can call expression()
-
-//------------------------------------------------------------------------------
-
-// deal with numbers and parentheses
 double dprimary()
 {
-	dToken t = ts.get();
+	dToken t = dts.get();
 	switch (t.kind) {
 	case '(':    // handle '(' expression ')'
 	{
 		double d = dexpression();
-		t = ts.get();
+		t = dts.get();
 		if (t.kind != ')')
 			throw runtime_error("')' expected"); //missing closing '"' for string literal in throw for ')' expected
-				return d;
+		return d;
 	}
 	case '8':            // we use '8' to represent a number
 		return t.value;  // return the number's value
@@ -338,62 +314,52 @@ double dprimary()
 		throw runtime_error("primary expected");
 	}
 }
-
-//------------------------------------------------------------------------------
-
-// deal with *, /, and %
 double dterm()
 {
 	double left = dprimary();
-	dToken t = ts.get();        // get the next token from token stream
+	dToken t = dts.get();        // get the next token from token stream
 
 	while (true) {
 		switch (t.kind) {
 		case '*':
 			left *= dprimary();
-			t = ts.get();
+			t = dts.get();
+			break; //missing break for '*' case
 		case '/':
 		{
 			double d = dprimary();
 			if (d == 0) throw runtime_error("divide by zero");
 			left /= d;
-			t = ts.get();
+			t = dts.get();
 			break;
 		}
 		default:
-			ts.putback(t);     // put t back into the token stream
+			dts.putback(t);     // put t back into the token stream
 			return left;
 		}
 	}
 }
-
-//------------------------------------------------------------------------------
-
-// deal with + and -
 double dexpression()
 { //missing closing paranthesis for start of expression()'s first call to term()
 	double left = dterm();      // read and evaluate a Term
-	dToken t = ts.get();        // get the next token from token stream
+	dToken t = dts.get();        // get the next token from token stream
 
 	while (true) {
 		switch (t.kind) {
 		case '+':
 			left += dterm();    // evaluate Term and add
-			t = ts.get();
+			t = dts.get();
 			break;
 		case '-':
-			left += dterm();    // evaluate Term and subtract
-			t = ts.get();
+			left -= dterm();    // evaluate Term and subtract
+			t = dts.get(); //used += instead of -= for '-' case in expression
 			break;
 		default:
-			ts.putback(t);     // put t back into the token stream
+			dts.putback(t);     // put t back into the token stream
 			return left;       // finally: no more + or -: return the answer
 		}
 	}
 }
-
-//------------------------------------------------------------------------------
-
 int Drill()
 //missing 'c' in class Token
 //missing Token_stream scope for get's definition
@@ -402,17 +368,28 @@ int Drill()
 //missing definition of val in main
 
 //missing case '8' or token_stream::get()
+//missing break for '*' case
+//used += instead of -= for '-' case in expression
+
+///drill pt2: replace 'q' with 'x' for main and Token_stream::get()
+///drill pt3: replace ';' with '=' same places as pt2
+///drill pt4: add opening cout in main:
+///drill pt5: including operator details and how to print and exit.
 try
 {
 	double val;
+	cout << "Welcome to our simple calculator.\nPlease enter expressions using floating-point numbers.\n"
+		<< "available operators: +,-,*,/,and ()\n"
+		<< "to finish a statement and evaluate delimit with '='\n"
+		<< "to exit enter 'x'\n";
 	while (cin) {
-		dToken t = ts.get();
+		dToken t = dts.get();
 
-		if (t.kind == 'q') break; // 'q' for quit
-		if (t.kind == ';')        // ';' for "print now"
+		if (t.kind == 'x') break; // 'q' for quit
+		if (t.kind == '=')        // ';' for "print now"
 			cout << "=" << val << '\n';
 		else
-			ts.putback(t);
+			dts.putback(t);
 		val = dexpression();
 	}
 }
@@ -427,9 +404,249 @@ catch (...) {
 
 ///Review
 
+///What do we mean by “Programming is understanding”?
+///
+///The chapter details the creation of a calculator program.Write a short analysis of what the calculator should be able to do.
+///
+///How do you break a problem up into smaller manageable parts ?
+///
+///Why is creating a small, limited version of a program a good idea ?
+///
+///Why is feature creep a bad idea ?
+///
+///What are the three main phases of software development ?
+///
+///What is a “use case” ?
+///
+///What is the purpose of testing ?
+///
+///According to the outline in the chapter, describe the difference between a Term, an Expression, a Number, and a Primary.
+///
+///In the chapter, an input was broken down into its components : Terms, Expressions, Primarys, and Numbers.Do this for (17 + 4) / (5−1).
+///
+///Why does the program not have a function called number() ?
+///
+///What is a token ?
+///
+///What is a grammar ? A grammar rule ?
+///
+///What is a class ? What do we use classes for ?
+///
+///How can we provide a default value for a member of a class ?
+///
+///In the expression function, why is the default for the switch - statement to “put back” the token ?
+///
+///What is “look - ahead” ?
+///
+///What does putback() do and why is it useful ?
+///
+///Why is the remainder(modulus) operation, %, difficult to implement in the term() ?
+///
+///What do we use the two data members of the Token class for ?
+///
+///Why do we(sometimes) split a class’s members into private and public members ?
+///
+///What happens in the Token_stream class when there is a token in the buffer and the get() function is called ?
+///
+///Why were the ';' and 'q' characters added to the switch - statement in the get() function of the Token_stream class ?
+///
+///When should we start testing our program ?
+///
+///What is a “user - defined type” ? Why would we want one ?
+///
+///What is the interface to a C++ “user - defined type” ?
+///
+///Why do we want to rely on libraries of code ?
+///
+
 ///Exercises
+int factorial(int n);
+//EX1 complete
+//Current Calculator
+///Token is above
+class Token_stream {
+public:
+	Token_stream();   // make a Token_stream that reads from cin
+	Token get();      // get a Token (get() is defined elsewhere)
+	void putback(Token t);    // put a Token back
+private:
+	bool full;        // is there a Token in the buffer?
+	Token buffer;     // here is where we keep a Token put back using putback()
+};
+Token_stream::Token_stream()
+	:full(false), buffer(0)    // no Token in buffer
+{
+}
+void Token_stream::putback(Token t)
+{
+	if (full) throw runtime_error("putback() into a full buffer");
+	buffer = t;       // copy t to buffer
+	full = true;      // buffer is now full
+}
+Token Token_stream::get()
+{
+	if (full) {       // do we already have a Token ready?
+		// remove token from buffer
+		full = false;
+		return buffer;
+	}
+
+	char ch;
+	cin >> ch;    // note that >> skips whitespace (space, newline, tab, etc.)
+
+	switch (ch) {
+	case '=':    // for "print"
+	case 'x':    // for "quit"
+	case '(': case ')': case '+': case '-': case '*': case '/':
+	case '{': case '}': case '!':
+		return Token(ch);        // let each character represent itself
+	case '.':
+	case '0': case '1': case '2': case '3': case '4':
+	case '5': case '6': case '7': case '8': case '9':
+	{
+		cin.putback(ch);         // put digit back into the input stream
+		double val;
+		cin >> val;              // read a floating-point number
+		return Token('8', val);   // let '8' represent "a number"
+	}
+	default:
+		throw runtime_error("Bad token");
+	}
+}
+Token_stream ts;        // provides get() and putback() 
+double expression();    // declaration so that primary() can call expression()
+double primary()
+{
+	double d{}; //adjustment for adding factorial
+	Token t = ts.get();
+	switch (t.kind) {
+	case '(':    // handle '(' expression ')'
+		d = expression();
+		t = ts.get();
+		if (t.kind != ')')
+			throw runtime_error("')' expected");
+		break;
+	case '{': //handle '{' expr '}'
+		d = expression();
+		t = ts.get();
+		if (t.kind != '}')
+			throw runtime_error("'}' expected");
+		break;
+	case '8':            // we use '8' to represent a number
+		d = t.value;  // return the number's value
+		break;
+	default:
+		throw runtime_error("primary expected");
+	}
+	t = ts.get();
+	if (t.kind == '!') {
+		if (d != floor(d))
+			throw runtime_error("Can't factorial non-int numbers");
+		d = factorial(static_cast<int>(d));
+	}
+	else
+		ts.putback(t);
+	return d;
+}
+double term()
+{
+	double left = primary();
+	Token t = ts.get();        // get the next token from token stream
+
+	while (true) {
+		switch (t.kind) {
+		case '*':
+			left *= primary();
+			t = ts.get();
+			break;
+		case '/':
+		{
+			double d = primary();
+			if (d == 0) throw runtime_error("divide by zero");
+			left /= d;
+			t = ts.get();
+			break;
+		}
+		default:
+			ts.putback(t);     // put t back into the token stream
+			return left;
+		}
+	}
+}
+double expression()
+{
+	double left = term();      // read and evaluate a Term
+	Token t = ts.get();        // get the next token from token stream
+
+	while (true) {
+		switch (t.kind) {
+		case '+':
+			left += term();    // evaluate Term and add
+			t = ts.get();
+			break;
+		case '-':
+			left -= term();    // evaluate Term and subtract
+			t = ts.get();
+			break;
+		default:
+			ts.putback(t);     // put t back into the token stream
+			return left;       // finally: no more + or -: return the answer
+		}
+	}
+}
+int Calc()
+try
+{
+	double val;
+	cout << "Welcome to our simple calculator.\nPlease enter expressions using floating-point numbers.\n"
+		<< "available operators: +,-,*,/,and ()\n"
+		<< "to finish a statement and evaluate delimit with '='\n"
+		<< "to exit enter 'x'\n";
+	while (cin) {
+		Token t = ts.get();
+
+		if (t.kind == 'x') break;
+		if (t.kind == '=')
+			cout << "=" << val << '\n';
+		else
+			ts.putback(t);
+		val = expression();
+	}
+	return 0;
+}
+catch (exception& e) {
+	cerr << "error: " << e.what() << '\n';
+	return 1;
+}
+catch (...) {
+	cerr << "Oops: unknown exception!\n";
+	return 2;
+}
+void c5e2() {
+	Calc();
+	//add {} functionality
+}
+int factorial(int n) { //warning! not overflow safe!
+	if (n < 0) throw runtime_error("Cannot factorial negative integers");
+	if (n == 0 || n == 1) return 1;
+	return n * factorial(n - 1);
+}
+void c5e3() {
+	Calc();
+	//add factorial functionality
+}
+class Name_value {
+public:
+	string s{};
+	double v{};
+};
+void c5e4() {
+	//make a name_value class that holds a string and a value.
+	//rework c3e20 to use vector<Name_value> instead of two vectors
+	//
+}
 
 int main() {
-	Drill(); // awaiting tt9 testing
+	c5e4();
 	return 0;
 }
