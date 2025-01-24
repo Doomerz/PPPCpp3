@@ -637,16 +637,132 @@ void c5e3() {
 }
 class Name_value {
 public:
-	string s{};
-	double v{};
+	string name{};
+	int value{};
+
+	Name_value(string s, int v)
+		: name{ s }, value{ v } {}
 };
+void c3e20() {
+	vector<string> names;
+	vector<int> scores;
+	string str;
+	int x;
+	bool found;
+
+	cout << "Enter a user name followed by score separated by a space. Terminate with input: \"NoName 0\"\n";
+
+	while (true) {
+		//get string
+		if (!(cin >> str)) {
+			cout << "unexpected end of file";
+			return;
+		}
+		//get int
+		if (!(cin >> x)) {
+			cout << "bad input detected. closing application.";
+			return;
+		}
+		//check for end
+		if (str == "NoName" && x == 0)
+			break;
+		//check for duplicate
+		for (auto s : names) {
+			if (s == str) {
+				cout << "Duplicate detected. closing application.";
+				return;
+			}
+		}
+		names.push_back(str);
+		scores.push_back(x);
+	}
+	cout << "input complete\nwhat score would you like to know who got it?\n";
+	while (true) {
+		found = false;
+		cout << ">>";
+		if (!(cin >> x)) {
+			cout << "invalid input.";
+			return;
+		}
+		for (int i{}; i < names.size(); i++) {
+			if (scores[i] == x) {
+				if (found)
+					cout << ", ";
+				found = true;
+				cout << names[i];
+			}
+		}
+		if (!found) {
+			cout << "none";
+		}
+		cout << endl;
+	}
+}
 void c5e4() {
 	//make a name_value class that holds a string and a value.
 	//rework c3e20 to use vector<Name_value> instead of two vectors
-	//
+	vector<Name_value> v;
+	string str;
+	int x;
+	bool found;
+
+	cout << "Enter a user name followed by score separated by a space. Terminate with input: \"NoName 0\"\n";
+
+	while (true) {
+		//get string
+		if (!(cin >> str)) {
+			cout << "unexpected end of file";
+			return;
+		}
+		//get int
+		if (!(cin >> x)) {
+			cout << "bad input detected. closing application.";
+			return;
+		}
+		//check for end
+		if (str == "NoName" && x == 0)
+			break;
+		//check for duplicate
+		for (auto s : v) {
+			if (s.name == str) {
+				cout << "Duplicate detected. closing application.";
+				return;
+			}
+		}
+		Name_value n{ str,x };
+		v.push_back(n);
+	}
+	cout << "input complete\nwhat score would you like to know who got it?\n";
+	while (true) {
+		found = false;
+		cout << ">>";
+		if (!(cin >> x)) {
+			cout << "invalid input.";
+			return;
+		}
+		for (int i{}; i < v.size(); i++) {
+			if (v[i].value == x) {
+				if (found)
+					cout << ", ";
+				found = true;
+				cout << v[i].name;
+			}
+		}
+		if (!found) {
+			cout << "none";
+		}
+		cout << endl;
+	}
+}
+void c5e5() {
+	//write grammar for bitwise logical expressions
+	//!,~,&,|,^
+	//^ before |
+	//& before ^
+	//! and ~ are unary like - before a number
 }
 
 int main() {
-	c5e4();
+	c5e5();
 	return 0;
 }
