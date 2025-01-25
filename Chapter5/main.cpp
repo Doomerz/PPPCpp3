@@ -760,6 +760,184 @@ void c5e5() {
 	//^ before |
 	//& before ^
 	//! and ~ are unary like - before a number
+
+	//Expression:
+	// Term
+	// Expression "|" term
+	//Term:
+	// Primary
+	// Term "^" Primary
+	//Primary:
+	// Value
+	// Primary "&" Value
+	//Value:
+	// Number
+	// "!" Value
+	// "~" Value
+	// "(" Expression ")"
+	//Number:
+	// Integer Literal
+	cout << "see source";
+}
+void c4e12() {
+	default_random_engine e;
+	uniform_int_distribution<int> dist(0, 9);
+	e.seed(chrono::system_clock::now().time_since_epoch().count());
+
+	vector<int> answer{ dist(e),dist(e),dist(e),dist(e) };
+
+	cout << "Welcome to bulls and cows!\nThere are 4 numbers 0-9 and you gotta guess 'em!\nIf you get a number right but it is in the wrong place, that's a cow\nGet a number right where it needs to be, that's a bull. You want 4 bulls.\n";
+	for (int moves{ 1 }; true; moves++) {
+		string input{};
+		bool chk = false;
+		cout << ">> ";
+		getline(cin, input);
+		if (input.size() != 4) {
+			cout << "Bad input length!\n";
+			moves--;
+			continue;
+		}
+		for (auto& c : input) {
+			if (c < '0' || c > '9') {
+				chk = true;
+				break;
+			}
+		}
+		if (chk) {
+			cout << "Bad input value!\n";
+			moves--;
+			continue;
+		}
+		//eval bulls and cows
+		vector<bool> bulls{ false,false,false,false }, cow;
+		uint8_t bullc{}, cows{};
+		for (int i{}; i < answer.size(); i++) {
+			if (input[i] == answer[i] + '0') {
+				bulls[i] = true;
+			}
+		}
+		for (const auto& i : bulls)
+			if (i)
+				bullc++;
+		cow = bulls;
+		for (int i{}; i < answer.size(); i++) {
+			if (bulls[i])
+				continue;
+			for (int k{}; k < answer.size(); k++) {
+				if (bulls[k])
+					continue;
+				if (input[i] == answer[k] + '0') {
+					if (!cow[k]) {
+						cow[k] = true;
+						cows++;
+					}
+				}
+			}
+		}
+		if (bullc == 4) {
+			cout << "Congratulations! You got it in only " << moves << " move" << (moves == 1 ? "" : "s") << "!\n";
+			break;
+		}
+		cout << "You have " << bullc << " Bulls and " << cows << " Cows.\n";
+	}
+	//cows and bulls
+	//bulls is right
+	//cows is right num, wrong place.
+}
+void c5e6() {
+	default_random_engine e;
+	uniform_int_distribution<int> dist(0, 25);
+	e.seed(chrono::system_clock::now().time_since_epoch().count());
+
+	vector<int> answer{ dist(e),dist(e),dist(e),dist(e) };
+
+	cout << "Welcome to bulls and cows!\nThere are 4 lowercase letters a-z and you gotta guess 'em!\nIf you get a letter right but it is in the wrong place, that's a cow\nGet a letter right where it needs to be, that's a bull. You want 4 bulls.\n";
+	for (int moves{ 1 }; true; moves++) {
+		string input{};
+		bool chk = false;
+		cout << ">> ";
+		getline(cin, input);
+		if (input.size() != 4) {
+			cout << "Bad input length!\n";
+			moves--;
+			continue;
+		}
+		for (auto& c : input) {
+			if (c < 'a' || c > 'z') {
+				chk = true;
+				break;
+			}
+		}
+		if (chk) {
+			cout << "Bad input value!\n";
+			moves--;
+			continue;
+		}
+		//eval bulls and cows
+		vector<bool> bulls{ false,false,false,false }, cow;
+		uint8_t bullc{}, cows{};
+		for (int i{}; i < answer.size(); i++) {
+			if (input[i] == answer[i] + 'a') {
+				bulls[i] = true;
+			}
+		}
+		for (const auto& i : bulls)
+			if (i)
+				bullc++;
+		cow = bulls;
+		for (int i{}; i < answer.size(); i++) {
+			if (bulls[i])
+				continue;
+			for (int k{}; k < answer.size(); k++) {
+				if (bulls[k])
+					continue;
+				if (input[i] == answer[k] + 'a') {
+					if (!cow[k]) {
+						cow[k] = true;
+						cows++;
+					}
+				}
+			}
+		}
+		if (bullc == 4) {
+			cout << "Congratulations! You got it in only " << moves << " move" << (moves == 1 ? "" : "s") << "!\n";
+			break;
+		}
+		cout << "You have " << bullc << " Bulls and " << cows << " Cows.\n";
+	}
+	//cows and bulls
+	//bulls is right
+	//cows is right num, wrong place.
+}
+void c5e7() {
+	cout << "enter up to a four digit integer" << endl;
+	char c;
+	int total{}, temp{};
+	for (int i{}; i < 4; i++) {
+		cin >> c;
+		if (c < '0' || c > '9') {
+			//TODO
+		}
+	}
+
+	//results
+	cout << total << "is ";
+	temp = total / 1000;
+	if (temp) {
+		cout << temp << " thousand and ";
+	}
+	total -= temp * 1000;
+	temp = total / 100;
+	if (temp) {
+		cout << temp << " hundred and ";
+	}
+	total -= temp * 100;
+	temp = total / 10;
+	if (temp) {
+		cout << temp << " tens and ";
+	}
+	total -= temp * 10;
+	cout << total << " ones.";
 }
 
 int main() {
