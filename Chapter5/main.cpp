@@ -914,7 +914,11 @@ void c5e7() {
 	char c;
 	int total{}, temp{};
 	for (int i{}; i < 4; i++) {
-		cin >> c;
+		if (!(cin >> c)) {
+			if (i)
+				break;
+			throw runtime_error("Unexpected eof");
+		}
 		if (c < '0' || c > '9') {
 			//TODO
 		}
