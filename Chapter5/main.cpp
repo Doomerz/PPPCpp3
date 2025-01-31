@@ -913,19 +913,30 @@ void c5e7() {
 	cout << "enter up to a four digit integer" << endl;
 	char c;
 	int total{}, temp{};
+
+	//gather
+	cin >> noskipws;
 	for (int i{}; i < 4; i++) {
 		if (!(cin >> c)) {
 			if (i)
 				break;
 			throw runtime_error("Unexpected eof");
 		}
+		if (c == '\n')
+			break;
 		if (c < '0' || c > '9') {
-			//TODO
+			throw runtime_error("non-digit character detected.");
+		}
+		total = total * 10 + (c - '0');
+	}
+	if (cin >> c) {
+		if (c != '\n') {
+			cout << "entered more than 4 digits, we'll only take the first 4.\n";
 		}
 	}
 
 	//results
-	cout << total << "is ";
+	cout << total << " is ";
 	temp = total / 1000;
 	if (temp) {
 		cout << temp << " thousand and ";
@@ -943,8 +954,35 @@ void c5e7() {
 	total -= temp * 10;
 	cout << total << " ones.";
 }
+void c5e8() {
+	//P(a,b) = (a!)/((a-b)!)
+	//C(a,b) = (P(a,b))/(b!)
+	//ask two nums, decide perm or comb, print result
 
-int main() {
-	c5e5();
+	//analyze the reqs
+	//then design
+	//write pseudo code
+	//break it down
+	//error checks
+	//handle erroneous inputs with good error msgs
+
+	//comput-token t = get_input()
+	//result res = calc-token(t)
+	//cout << res
+
+	CToken t = get_input();
+	int res = calc_perm(t);
+	if (t.type == 'c') {
+		res /= factorial(t.b);
+	}
+	e8output(t, res);
+}
+
+int main() try {
+	c5e7();
 	return 0;
+}
+catch (exception& e) {
+	cerr << e.what();
+	return -1;
 }
