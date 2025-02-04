@@ -954,6 +954,39 @@ void c5e7() {
 	total -= temp * 10;
 	cout << total << " ones.";
 }
+class CToken {
+public:
+	char type;
+	int a, b;
+
+	CToken(char c, int lv, int rv)
+		: type{ static_cast<char>(tolower(c)) },a { lv }, b{ rv }
+	{
+		if (type != 'p' && type != 'c')
+			throw runtime_error("CToken bad type");
+	}
+};
+CToken get_input() {
+	bool valid = true;
+	char c;
+	int a, b;
+	do {
+		cout << "Enter left hand integer followed by the right hand integer separated by a ','\nEnd with 'c' for combination or 'p' for permutation.\n>";
+		//get lv
+		if (!(cin >> a)) {
+			cerr << "bad cin >> lv\n";
+		}
+		cout << a << endl;
+		system("pause");
+		//expect ','
+		//get rv
+		//get type
+		//try CToken
+		//if (valid) return token
+	} while (true);
+}
+int calc_perm(const CToken& t);
+void e8output(const CToken& t, const int& result);
 void c5e8() {
 	//P(a,b) = (a!)/((a-b)!)
 	//C(a,b) = (P(a,b))/(b!)
@@ -979,7 +1012,7 @@ void c5e8() {
 }
 
 int main() try {
-	c5e7();
+	c5e8();
 	return 0;
 }
 catch (exception& e) {
