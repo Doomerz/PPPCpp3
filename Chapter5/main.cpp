@@ -964,29 +964,59 @@ public:
 	{
 		if (type != 'p' && type != 'c')
 			throw runtime_error("CToken bad type");
+		if (lv < 1)
+			throw runtime_error("lv < 1");
+		if (rv < 1)
+			throw runtime_error("rv < 1");
+		if (lv < rv)
+			throw runtime_error("lv > rv");
 	}
 };
 CToken get_input() {
 	bool valid = true;
-	char c;
-	int a, b;
+	char c{};
+	int a{}, b{};
 	do {
 		cout << "Enter left hand integer followed by the right hand integer separated by a ','\nEnd with 'c' for combination or 'p' for permutation.\n>";
 		//get lv
 		if (!(cin >> a)) {
-			cerr << "bad cin >> lv\n";
+			throw runtime_error("bad cin >> lv\n");
 		}
-		cout << a << endl;
-		system("pause");
 		//expect ','
+		if (!(cin >> c)) {
+			throw runtime_error("bad cin >> char\n");
+		}
+		if (c != ',') {
+			cerr << "Expected ','. try again.\n";
+			continue;
+		}
 		//get rv
+		if (!(cin >> b)) {
+			throw runtime_error("bad cin >> rv\n");
+		}
 		//get type
-		//try CToken
-		//if (valid) return token
+		if (!(cin >> c)) {
+			throw runtime_error("bad cin >> char\n");
+		}
+		//try token creation
+		try {
+			return CToken(c, a, b);
+		}
+		catch (exception& e) {
+			cerr << e.what() << ". try again\n";
+		}
 	} while (true);
 }
-int calc_perm(const CToken& t);
-void e8output(const CToken& t, const int& result);
+int calc_perm(const CToken& t) {
+	return factorial(t.a) / factorial(t.a - t.b);
+}
+void e8output(const CToken& t, const int& result) {
+	if (t.type == 'c')
+		cout << "C(";
+	else
+		cout << "P(";
+	cout << t.a << ',' << t.b << ") = " << result << endl;
+}
 void c5e8() {
 	//P(a,b) = (a!)/((a-b)!)
 	//C(a,b) = (P(a,b))/(b!)
