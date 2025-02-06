@@ -3,9 +3,14 @@ using namespace std;
 
 constexpr char calcnumber = '8',
 calcquit = 'q',
-calcprint = ';';
+calcprint = ';',
+calclet = 'L',
+calcname = 'a';
 constexpr string_view calcprompt = "> ",
-calcresult = "= "; // at pg254
+calcresult = "= ",
+declkey = "let";
+
+double define_name(string, double);
 
 //c5calc
 int factorial(int n) { //warning! not overflow safe!
@@ -187,10 +192,33 @@ catch (...) {
 }
 
 ///TryThis/Reading
+class Variable {
+public:
+	string name;
+	double value;
+};
+vector<Variable> var_table;
+double get_value(string s) {
+	for (const Variable& v : var_table)
+		if (v.name == s)
+			return v.value;
+	throw runtime_error("Trying to read undefined variable " + s);
+}
+void set_value(string s, double d) {
+	for (Variable& v : var_table) {
+		if (v.name == s) {
+			v.value = d;
+			return;
+		}
+	}
+	throw runtime_error("Trying to write undefined variable " + s);
+}
+
 class Token {
 public:
 	char kind;
 	double value;
+	string name;
 	Token()
 		: kind{}, value{} {
 	}
@@ -200,12 +228,16 @@ public:
 	Token(char k, double v)
 		: kind{ k }, value{ v } {
 	}
+	Token(char k, string n)
+		: kind{ k }, name{ n } {
+	}
 };
 class Token_stream {
 public:
 	Token_stream();   // make a Token_stream that reads from cin
 	Token get();      // get a Token (get() is defined elsewhere)
 	void putback(Token t);    // put a Token back
+	void ignore(char c);	//discard characters up to and including a c
 private:
 	bool full;        // is there a Token in the buffer?
 	Token buffer;     // here is where we keep a Token put back using putback()
@@ -219,6 +251,19 @@ void Token_stream::putback(Token t)
 	if (full) throw runtime_error("putback() into a full buffer");
 	buffer = t;       // copy t to buffer
 	full = true;      // buffer is now full
+}
+void Token_stream::ignore(char c) {
+	if (full && c == buffer.kind) {
+		full = false;
+		return;
+	}
+	full = false;
+
+	//now search input:
+	char ch = 0;
+	while (cin >> ch)
+		if (ch == c)
+			return;
 }
 Token Token_stream::get()
 {
@@ -235,10 +280,11 @@ Token Token_stream::get()
 	case calcprint:    // for "print"
 	case calcquit:    // for "quit"
 	case '(': case ')':
+	case '{': case '}':
 	case '+': case '-':
 	case '*': case '/':
-	case '{': case '}':
-	case '!': case '%':
+	case '!':
+	case '%':
 		return Token(ch);        // let each character represent itself
 	case '.':
 	case '0': case '1': case '2': case '3': case '4':
@@ -250,6 +296,16 @@ Token Token_stream::get()
 		return Token(calcnumber, val);   // let '8' represent "a number"
 	}
 	default:
+		if (isalpha(ch)) {
+			string s;
+			s+=ch;
+			while (cin.get(ch) && (isalpha(ch) || isdigit(ch)))
+				s += ch;
+			cin.putback(ch);
+			if (s == declkey)
+				return Token{ calclet };
+			return Token{ calcname,s };
+		}
 		throw runtime_error("Bad token");
 	}
 }
@@ -347,25 +403,38 @@ double expression()
 		}
 	}
 }
-int Calc()
-try
-{
-	double val;
-	cout << "Welcome to our simple calculator.\nPlease enter expressions using floating-point numbers.\n"
-		<< "available operators: +,-,*,/,and ()\n"
-		<< "to finish a statement and evaluate delimit with '='\n"
-		<< "to exit enter 'x'\n";
-	while (cin) {
-		cout << "> ";
+void clear_all() {
+	ts.ignore(calcprint);
+}
+double statement();
+void calculate() {
+	while (cin) try {
+		cout << calcprompt;
 
 		Token t = ts.get();
 		while (t.kind == calcprint)
 			t = ts.get();		//eat calcprints
 		if (t.kind == calcquit)
-			return 0;
+			return;
 		ts.putback(t);
-		cout << "= " << expression() << '\n';
+		cout << calcresult << statement() << '\n';
 	}
+	catch (exception& e) {
+		cerr << e.what() << '\n';
+		clear_all();
+	}
+}
+int Calc()
+try
+{
+	cout << "Welcome to our simple calculator.\nPlease enter expressions using floating-point numbers.\n"
+		<< "available operators: +,-,*,/,and ()\n"
+		<< "to finish a statement and evaluate delimit with " << calcprint << "\n"
+		<< "to exit enter " << calcquit << "\n";
+	define_name("pi", 3.1415926535);
+	define_name("e", 2.7182818284);
+
+	calculate();
 	return 0;
 }
 catch (exception& e) {
@@ -377,12 +446,75 @@ catch (...) {
 	return 2;
 }
 //reading
+void clean_up_mess_bad() {
+	while (true) {
+		Token t = ts.get();
+		if (t.kind == calcprint)
+			return;
+	}
+}
+
+/*
+Grammar:::
+
+Calculation:
+	Statement
+	Print
+	Quit
+	Calculation Statement
+
+Statement:
+	Declaration
+	Expression
+Declaration:
+	"let" Name "=" Expression
+*/
+
+//on page 267
+bool is_declared(string var) {
+	for (const Variable& v : var_table)
+		if (v.name == var)
+			return true;
+	return false;
+}
+double define_name(string var, double val) {
+	if (is_declared(var))
+		throw runtime_error(var + " declared twice");
+	var_table.push_back(Variable{ var,val });
+	return val;
+}
+double declaration()
+// assume we have seen "let"
+// handle: name = expression
+// declare a variable called "name" with the initial value "Expression"
+{
+	Token t = ts.get();
+	if (t.kind != calcname)
+		throw runtime_error("Name expected in declaration");
+
+	Token t2 = ts.get();
+	if (t2.kind != '=')
+		throw runtime_error("= missing in declaration of " + t.name);
+	double d = expression();
+	define_name(t.name, d);
+	return d;
+
+}
+double statement() {
+	Token t = ts.get();
+	switch (t.kind) {
+	case calclet:
+		return declaration();
+	default:
+		ts.putback(t);
+		return expression();
+	}
+}
 
 //trythis
 void TryThis3() {
 	//exercise
 }
-void TryThis();
 
 ///Drill
 
@@ -391,7 +523,7 @@ void TryThis();
 ///Exercises
 
 int main() try {
-	TryThis3();
+	Calc();
 	return 0;
 }
 catch (exception& e) {
