@@ -470,7 +470,6 @@ Declaration:
 	"let" Name "=" Expression
 */
 
-//on page 267
 bool is_declared(string var) {
 	for (const Variable& v : var_table)
 		if (v.name == var)
