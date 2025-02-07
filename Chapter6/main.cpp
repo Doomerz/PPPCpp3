@@ -807,44 +807,44 @@ namespace drill {
 }
 
 ///Review
-///What is the purpose of working on the program after the first version works ? Give a list of reasons.
-///
-///Why does 1 + 2; q typed into the calculator not quit after it receives an error ?
-///
-///Why did we choose to make a constant character called number ?
-///
-///We split main() into two separate functions.What does the new function do and why did we split main() ?
-///
-///Why do we split code into multiple functions ? State principles.
-///
-///What is the purpose of commenting ?
-///
-///What is the use of symbolic constants ?
-///
-///Why do we care about code layout ?
-///
-///How do we handle % (remainder)of floating - point numbers ?
-///
-///What does is_declared() do and how does it work ?
-///
-///The input representation for let is more than one character.How is it accepted as a single token in the modified code ?
-///
-///What are the rules for what names can and cannot be in a calculator program ?
-///
-///Why is it a good idea to build a program incrementally ?
-///
-///When do you start to test ?
-///
-///When do you retest ?
-///
-///How do you decide what should be a separate function ?
-///
-///How do you choose names for variables and functions ? List possible reasons.
-///
-///What should be in comments and what should not?
-///
-///When do we consider a program finished ?
-///
+//What is the purpose of working on the program after the first version works ? Give a list of reasons.
+//
+//Why does 1 + 2; q typed into the calculator not quit after it receives an error ?
+//
+//Why did we choose to make a constant character called number ?
+//
+//We split main() into two separate functions.What does the new function do and why did we split main() ?
+//
+//Why do we split code into multiple functions ? State principles.
+//
+//What is the purpose of commenting ?
+//
+//What is the use of symbolic constants ?
+//
+//Why do we care about code layout ?
+//
+//How do we handle % (remainder)of floating - point numbers ?
+//
+//What does is_declared() do and how does it work ?
+//
+//The input representation for let is more than one character.How is it accepted as a single token in the modified code ?
+//
+//What are the rules for what names can and cannot be in a calculator program ?
+//
+//Why is it a good idea to build a program incrementally ?
+//
+//When do you start to test ?
+//
+//When do you retest ?
+//
+//How do you decide what should be a separate function ?
+//
+//How do you choose names for variables and functions ? List possible reasons.
+//
+//What should be in comments and what should not?
+//
+//When do we consider a program finished ?
+//
 
 ///Exercises
 
