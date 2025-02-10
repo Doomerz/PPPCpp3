@@ -553,8 +553,12 @@ namespace drill {
 	const char print = ';';
 	const char number = '8';
 	const char name = 'a';
-	const string declvar = "let";
-	const string quitstr = "quit";
+	const char constant = 'C';
+	const string declvar = "#"; //let
+	const string quitstr = "exit";
+	const string sqrtstr = "sqrt";
+	const string powstr = "pow";
+	const string conststr = "const";
 
 	void Token_stream::putback(Token t) {
 		if (full) throw runtime_error("Token_stream::putback already full buffer");
@@ -575,7 +579,8 @@ namespace drill {
 		case '/':
 		case '%':
 		case print:
-		case '=':
+		case '=': //for declaration and assignment
+		case ',': //for func arguments
 			return Token(ch);
 		case '.':
 		case '0':
@@ -594,14 +599,17 @@ namespace drill {
 			cin >> val;
 			return Token(number, val);
 		}
+		case '#': //special let as #
+			return Token(let);
 		default:
-			if (isalpha(ch)) {
+			if (isalpha(ch) || ch == '_') {
 				string s;
 				s += ch;
-				while (cin.get(ch) && (isalpha(ch) || isdigit(ch))) s += ch;
+				while (cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_')) s += ch;
 				cin.unget();
-				if (s == declvar) return Token(let);
+				if (s == declvar) return Token(let); //won't occur because !isalpha('#')
 				if (s == quitstr) return Token(quit);
+				if (s == conststr) return Token(constant);
 				return Token(name, s);
 			}
 			throw runtime_error("Bad token");
@@ -625,7 +633,9 @@ namespace drill {
 	struct Variable {
 		string name;
 		double value;
-		Variable(string n, double v) :name(n), value(v) {}
+		const bool constant;
+		Variable(string n, double v) :name(n), value(v), constant(false) {}
+		Variable(string n, double v, bool cnst) :name(n), value(v), constant(cnst) {}
 	};
 
 	vector<Variable> names;
@@ -642,6 +652,7 @@ namespace drill {
 	{
 		for (int i = 0; i < names.size(); ++i)
 			if (names[i].name == s) {
+				if (names[i].constant) throw runtime_error("can't set a constant variable " + s);
 				names[i].value = d;
 				return;
 			}
@@ -675,6 +686,32 @@ namespace drill {
 		case number:
 			return t.value;
 		case name:
+			if (t.name == sqrtstr) { //handle sqrt
+				char c;
+				c = cin.peek(); //doesn't skip whitespace
+				if (c != '(') {
+					return get_value(t.name);
+				}
+				double d = primary();
+				if (d <= 0) throw runtime_error("can't sqrt <= 0");
+				return sqrt(d);
+			}
+			if (t.name == powstr) { //handle power of (pow)
+				char c;
+				c = cin.peek();
+				if (c != '(') {
+					return get_value(t.name);
+				}
+				t = ts.get();
+				double d = primary();
+				t = ts.get();
+				if (t.kind != ',') throw runtime_error("expected ',' in pow(x,i)");
+				double i = primary();
+				t = ts.get();
+				if (t.kind != ')') throw runtime_error("expected ')' to end pow(x,i)");
+				if (i != floor(i)) throw runtime_error("i in pow(x,i) must be an integer");
+				return pow(d, i);
+			}
 			return get_value(t.name);
 		default:
 			throw runtime_error("primary expected");
@@ -725,15 +762,27 @@ namespace drill {
 
 	double declaration()
 	{
+		bool cnst = false;
 		Token t = ts.get();
+		if (t.kind == constant) {
+			cnst = true;
+			t = ts.get();
+		}
 		if (t.kind != name) throw runtime_error("name expected in declaration");
 		string name = t.name;
 		if (is_declared(name)) throw runtime_error(name + " declared twice");
 		Token t2 = ts.get();
 		if (t2.kind != '=') throw runtime_error("= missing in declaration of " + name);
 		double d = expression();
-		names.push_back(Variable(name, d));
+		names.push_back(Variable(name, d, cnst));
 		return d;
+	}
+
+	double assignment(string name) {
+		Token t = ts.get();
+		if (!is_declared(name)) throw runtime_error(name + " not yet declared");
+		if (t.kind != '=') throw runtime_error("assignment called without '='");
+		set_value(name, expression());
 	}
 
 	double statement()
@@ -742,6 +791,16 @@ namespace drill {
 		switch (t.kind) {
 		case let:
 			return declaration();
+		case name:
+		{
+			char c;
+			if (!(cin.get(c))) throw runtime_error("unexpected eof");
+			cin.unget();
+			if (c == '=') {
+				return assignment(t.name);
+			}
+			//intentional fall through.
+		}
 		default:
 			ts.putback(t);
 			return expression();
@@ -758,7 +817,6 @@ namespace drill {
 
 	void calculate()
 	{
-		names.push_back(Variable("k", 1000));
 		while (true) try {
 			cout << prompt;
 			Token t = ts.get();
@@ -775,6 +833,7 @@ namespace drill {
 
 	int Calc()
 	try {
+		names.push_back(Variable("k", 1000, true));
 		calculate();
 		return 0;
 	}
@@ -804,7 +863,17 @@ namespace drill {
 	//ex. 4&5
 	// skipped
 	//ex. 6
-	// 
+	// added 'k' init Main (Calc)
+	//ex. 7
+	// added sqrt handling to primary
+	//ex. 8
+	// added sqrt error handling in primary
+	//ex. 9
+	// added pow handling into primary
+	//ex. 10
+	// updated let to #
+	//ex. 11
+	// changed quit to exit
 }
 
 ///Review
@@ -848,6 +917,10 @@ namespace drill {
 //
 
 ///Exercises
+//ex1: added underscores to drill::calc
+//ex2: added assignment, beware giving the ability to assign within expression!
+//ex3: added *let* const var = expr logic
+//ex4: //TODO
 
 int main() try {
 	drill::Calc();
@@ -857,3 +930,5 @@ catch (exception& e) {
 	cerr << e.what();
 	return -1;
 }
+
+//resume 7.4.8 but all TT need to be done
