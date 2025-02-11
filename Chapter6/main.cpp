@@ -535,7 +535,6 @@ namespace drill {
 		Token(char ch, double val) :kind(ch), value(val) {}
 		Token(char ch, string n) :kind(ch), name(n) {}
 	};
-
 	class Token_stream {
 		bool full;
 		Token buffer;
@@ -569,7 +568,10 @@ namespace drill {
 	{
 		if (full) { full = false; return buffer; }
 		char ch;
-		if (!(cin >> ch)) throw runtime_error("Unexpected end of file in Token_stream");
+		do {
+			cin.get(ch);
+			if (ch == '\n') return Token(print);
+		} while (isspace(ch));
 		switch (ch) {
 		case '(':
 		case ')':
@@ -615,7 +617,6 @@ namespace drill {
 			throw runtime_error("Bad token");
 		}
 	}
-
 	void Token_stream::ignore(char c)
 	{
 		if (full && c == buffer.kind) {
@@ -637,35 +638,86 @@ namespace drill {
 		Variable(string n, double v) :name(n), value(v), constant(false) {}
 		Variable(string n, double v, bool cnst) :name(n), value(v), constant(cnst) {}
 	};
+	struct Symbol_table {
+		double get(string n);
+		void set(string n, double v);
+		bool is_declared(string n);
+		void declare(string n, double v, bool constant);
+		void reset();
 
-	vector<Variable> names;
-
-	double get_value(string s)
-	{
-		for (int i = 0; i < names.size(); ++i)
-			if (names[i].name == s)
-				return names[i].value;
-		throw runtime_error("get: undefined name " + s);
+		Symbol_table() {
+			set_default();
+		}
+	private:
+		void clear();
+		void set_default();
+		vector<Variable> var_table;
+	};
+	Symbol_table symbols;
+	double Symbol_table::get(string n) {
+		for (const Variable& v : var_table)
+			if (v.name == n)
+				return v.value;
+		throw runtime_error("get: undefined name " + n);
 	}
-
-	void set_value(string s, double d)
-	{
-		for (int i = 0; i < names.size(); ++i)
-			if (names[i].name == s) {
-				if (names[i].constant) throw runtime_error("can't set a constant variable " + s);
-				names[i].value = d;
+	void Symbol_table::set(string n, double v) {
+		for (Variable& var : var_table) {
+			if (var.name == n) {
+				if (var.constant) throw runtime_error(n + " is constant and can't be changed");
+				var.value = v;
 				return;
 			}
-		throw runtime_error("set: undefined name " + s);
+		}
+		throw runtime_error("set: undefined name " + n);
 	}
-
-	bool is_declared(string s)
-	{
-		for (int i = 0; i < names.size(); ++i)
-			if (names[i].name == s)
+	bool Symbol_table::is_declared(string n) {
+		for (const Variable& v : var_table)
+			if (v.name == n)
 				return true;
 		return false;
 	}
+	void Symbol_table::declare(string n, double v, bool constant = false) {
+		if (!is_declared(n))
+			throw runtime_error(n + " already declared");
+		var_table.push_back(Variable(n, v, constant));
+	}
+	void Symbol_table::reset() {
+		clear();
+		set_default();
+	}
+	void Symbol_table::clear() {
+		var_table = vector<Variable>();
+	}
+	void Symbol_table::set_default() {
+		var_table.push_back(Variable("k", 1000, true));
+	}
+
+	//double get_value(string s)
+	//{
+	//	for (int i = 0; i < names.size(); ++i)
+	//		if (names[i].name == s)
+	//			return names[i].value;
+	//	throw runtime_error("get: undefined name " + s);
+	//}
+	//
+	//void set_value(string s, double d)
+	//{
+	//	for (int i = 0; i < names.size(); ++i)
+	//		if (names[i].name == s) {
+	//			if (names[i].constant) throw runtime_error("can't set a constant variable " + s);
+	//			names[i].value = d;
+	//			return;
+	//		}
+	//	throw runtime_error("set: undefined name " + s);
+	//}
+	//
+	//bool is_declared(string s)
+	//{
+	//	for (int i = 0; i < names.size(); ++i)
+	//		if (names[i].name == s)
+	//			return true;
+	//	return false;
+	//}
 
 	Token_stream ts;
 
@@ -690,7 +742,7 @@ namespace drill {
 				char c;
 				c = cin.peek(); //doesn't skip whitespace
 				if (c != '(') {
-					return get_value(t.name);
+					return symbols.get(t.name);
 				}
 				double d = primary();
 				if (d <= 0) throw runtime_error("can't sqrt <= 0");
@@ -700,7 +752,7 @@ namespace drill {
 				char c;
 				c = cin.peek();
 				if (c != '(') {
-					return get_value(t.name);
+					return symbols.get(t.name);
 				}
 				t = ts.get();
 				double d = primary();
@@ -712,7 +764,7 @@ namespace drill {
 				if (i != floor(i)) throw runtime_error("i in pow(x,i) must be an integer");
 				return pow(d, i);
 			}
-			return get_value(t.name);
+			return symbols.get(t.name);
 		default:
 			throw runtime_error("primary expected");
 		}
@@ -770,19 +822,17 @@ namespace drill {
 		}
 		if (t.kind != name) throw runtime_error("name expected in declaration");
 		string name = t.name;
-		if (is_declared(name)) throw runtime_error(name + " declared twice");
 		Token t2 = ts.get();
 		if (t2.kind != '=') throw runtime_error("= missing in declaration of " + name);
 		double d = expression();
-		names.push_back(Variable(name, d, cnst));
+		symbols.declare(name, d, cnst);
 		return d;
 	}
 
 	double assignment(string name) {
 		Token t = ts.get();
-		if (!is_declared(name)) throw runtime_error(name + " not yet declared");
 		if (t.kind != '=') throw runtime_error("assignment called without '='");
-		set_value(name, expression());
+		symbols.set(name, expression());
 	}
 
 	double statement()
@@ -809,6 +859,7 @@ namespace drill {
 
 	void clean_up_mess()
 	{
+		symbols.reset();
 		ts.ignore(print);
 	}
 
@@ -833,7 +884,6 @@ namespace drill {
 
 	int Calc()
 	try {
-		names.push_back(Variable("k", 1000, true));
 		calculate();
 		return 0;
 	}
@@ -920,7 +970,12 @@ namespace drill {
 //ex1: added underscores to drill::calc
 //ex2: added assignment, beware giving the ability to assign within expression!
 //ex3: added *let* const var = expr logic
-//ex4: //TODO
+//ex4: defined Symbol_table and replaced var_table
+//ex5: //TODO verify-- modify ts.get() to return Token(print) when it sees a newline. isspace(ch) might be helpful
+
+namespace C6Calculator {
+	//
+} //namespace C6Calculator
 
 int main() try {
 	drill::Calc();
@@ -931,4 +986,5 @@ catch (exception& e) {
 	return -1;
 }
 
+//finish chapter's completed calc
 //resume 7.4.8 but all TT need to be done
