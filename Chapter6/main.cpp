@@ -971,7 +971,8 @@ namespace drill {
 //ex2: added assignment, beware giving the ability to assign within expression!
 //ex3: added *let* const var = expr logic
 //ex4: defined Symbol_table and replaced var_table
-//ex5: //TODO verify-- modify ts.get() to return Token(print) when it sees a newline. isspace(ch) might be helpful
+//ex5: modify ts.get() to return Token(print) when it sees a newline.
+//ex6: //TODO 
 
 namespace C6Calculator {
 	//
