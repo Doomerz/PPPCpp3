@@ -427,8 +427,7 @@ namespace c6reading {
 		}
 	}
 	int Calc()
-		try
-	{
+	try	{
 		cout << "Welcome to our simple calculator.\nPlease enter expressions using floating-point numbers.\n"
 			<< "available operators: +,-,*,/,and ()\n"
 			<< "to finish a statement and evaluate delimit with " << calcprint << "\n"
@@ -558,6 +557,11 @@ namespace drill {
 	const string sqrtstr = "sqrt";
 	const string powstr = "pow";
 	const string conststr = "const";
+	bool is_help_token(const Token& t) {
+		if (t.kind != name) return false;
+		if (t.name == "h" || t.name == "H") return true;
+		return false;
+	}
 
 	void Token_stream::putback(Token t) {
 		if (full) throw runtime_error("Token_stream::putback already full buffer");
@@ -862,6 +866,15 @@ namespace drill {
 		symbols.reset();
 		ts.ignore(print);
 	}
+	void print_help() {
+		cout << "Welcome to our PPP calculator!\n"
+			<< "available operators: +,-,*,/,%, and ()\n"
+			<< "to finish a statement and evaluate delimit with " << calcprint << "\n"
+			<< "to exit enter " << calcquit << "\n";
+		//supported operations
+		//controls
+		cout << endl;
+	}
 
 	const string prompt = "> ";
 	const string result = "= ";
@@ -873,6 +886,20 @@ namespace drill {
 			Token t = ts.get();
 			while (t.kind == print) t = ts.get();
 			if (t.kind == quit) return;
+			//help; this can be easier if we could putback a couple tokens and we just check help then print
+			if (is_help_token(t)) {
+				char c;
+				do {
+					cin.get(c);
+					if (c == '\n')
+						break;
+				} while (isspace(c));
+				if (c == '\n' || c == print) {
+					print_help();
+					continue;
+				}
+				cin.unget();
+			}
 			ts.putback(t);
 			cout << result << statement() << endl;
 		}
@@ -972,7 +999,7 @@ namespace drill {
 //ex3: added *let* const var = expr logic
 //ex4: defined Symbol_table and replaced var_table
 //ex5: modify ts.get() to return Token(print) when it sees a newline.
-//ex6: //TODO 
+//ex6: //TODO made "h\n" and "H\n" result in help info
 
 namespace C6Calculator {
 	//
