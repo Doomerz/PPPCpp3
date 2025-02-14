@@ -557,9 +557,10 @@ namespace drill {
 	const string sqrtstr = "sqrt";
 	const string powstr = "pow";
 	const string conststr = "const";
+	const string helpstr = "help";
 	bool is_help_token(const Token& t) {
 		if (t.kind != name) return false;
-		if (t.name == "h" || t.name == "H") return true;
+		if (t.name == helpstr) return true;
 		return false;
 	}
 
@@ -837,6 +838,7 @@ namespace drill {
 		Token t = ts.get();
 		if (t.kind != '=') throw runtime_error("assignment called without '='");
 		symbols.set(name, expression());
+		return symbols.get(name);
 	}
 
 	double statement()
@@ -869,8 +871,10 @@ namespace drill {
 	void print_help() {
 		cout << "Welcome to our PPP calculator!\n"
 			<< "available operators: +,-,*,/,%, and ()\n"
-			<< "to finish a statement and evaluate delimit with " << calcprint << "\n"
-			<< "to exit enter " << calcquit << "\n";
+			<< "to finish a statement and evaluate delimit with " << print << " or press enter\n"
+			<< "to exit enter " << quit << "\n"
+			<< "To define a constant variable use: const # <var_name> = <expression>\n"
+			<< "To define a mutable variable drop the const; you can re-assign these variables with <var_name> = <new_expression>\n";
 		//supported operations
 		//controls
 		cout << endl;
@@ -881,6 +885,7 @@ namespace drill {
 
 	void calculate()
 	{
+		cout << "Enter " << helpstr << " for help." << endl;
 		while (true) try {
 			cout << prompt;
 			Token t = ts.get();
@@ -894,7 +899,7 @@ namespace drill {
 					if (c == '\n')
 						break;
 				} while (isspace(c));
-				if (c == '\n' || c == print) {
+				if (c == '\n') { //not taking print tokens, it has to be helpstr\n
 					print_help();
 					continue;
 				}
@@ -999,9 +1004,482 @@ namespace drill {
 //ex3: added *let* const var = expr logic
 //ex4: defined Symbol_table and replaced var_table
 //ex5: modify ts.get() to return Token(print) when it sees a newline.
-//ex6: //TODO made "h\n" and "H\n" result in help info
+//ex6: made "h\n" and "H\n" result in help info
+//ex7: make ex6 a helpstr.
+//ex8: 
+
+// Calculation:
+// quit
+// help
+// Statement
+// 
+// Statement:
+// Declaration
+// Assignment
+// Expression
+// 
+// Declaration:
+// const # var = Expression
+// # var = Expression
+// 
+// Assignment:
+// var = Expression
+// 
+// Expression:
+// Term
+// Term + Expression
+// Term - Expression
+// 
+// Term:
+// Primary
+// Term * Primary
+// Term / Primary
+// Term % Primary
+// 
+// Primary:
+// Number
+// Function
+// ( Expression )
+// -Primary
+// +Primary
+// 
+// Function:
+// sqrt ( Expression )
+// pow ( Expression , Expression )
+// 
+// Number:
+// floating-point-literal
+// 
+
+//ex9: exercise for reader.
+//ex10: //TODO make calc for just ints
+namespace c6CalcINT {
+	struct Token {
+		char kind;
+		double value;
+		string name;
+		Token(char ch) :kind(ch), value(0) {}
+		Token(char ch, double val) :kind(ch), value(val) {}
+		Token(char ch, string n) :kind(ch), name(n) {}
+	};
+	class Token_stream {
+		bool full;
+		Token buffer;
+	public:
+		Token_stream() :full(0), buffer(0) {}
+
+		Token get();
+		void putback(Token t);
+
+		void ignore(char);
+	};
+
+	const char let = 'L';
+	const char quit = 'Q';
+	const char print = ';';
+	const char number = '8';
+	const char name = 'a';
+	const char constant = 'C';
+	const string declvar = "#"; //let
+	const string quitstr = "exit";
+	const string sqrtstr = "sqrt";
+	const string powstr = "pow";
+	const string conststr = "const";
+	const string helpstr = "help";
+	bool is_help_token(const Token& t) {
+		if (t.kind != name) return false;
+		if (t.name == helpstr) return true;
+		return false;
+	}
+
+	void Token_stream::putback(Token t) {
+		if (full) throw runtime_error("Token_stream::putback already full buffer");
+		buffer = t;
+		full = true;
+	}
+	Token Token_stream::get()
+	{
+		if (full) { full = false; return buffer; }
+		char ch;
+		do {
+			cin.get(ch);
+			if (ch == '\n') return Token(print);
+		} while (isspace(ch));
+		switch (ch) {
+		case '(':
+		case ')':
+		case '+':
+		case '-':
+		case '*':
+		case '/':
+		case '%':
+		case print:
+		case '=': //for declaration and assignment
+		case ',': //for func arguments
+			return Token(ch);
+		case '.':
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+		{
+			cin.unget();
+			double val;
+			cin >> val;
+			return Token(number, val);
+		}
+		case '#': //special let as #
+			return Token(let);
+		default:
+			if (isalpha(ch) || ch == '_') {
+				string s;
+				s += ch;
+				while (cin.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_')) s += ch;
+				cin.unget();
+				if (s == declvar) return Token(let); //won't occur because !isalpha('#')
+				if (s == quitstr) return Token(quit);
+				if (s == conststr) return Token(constant);
+				return Token(name, s);
+			}
+			throw runtime_error("Bad token");
+		}
+	}
+	void Token_stream::ignore(char c)
+	{
+		if (full && c == buffer.kind) {
+			full = false;
+			return;
+		}
+		full = false;
+
+		char ch;
+		while (cin >> ch)
+			if (ch == c)
+				return;
+	}
+
+	struct Variable {
+		string name;
+		double value;
+		const bool constant;
+		Variable(string n, double v) :name(n), value(v), constant(false) {}
+		Variable(string n, double v, bool cnst) :name(n), value(v), constant(cnst) {}
+	};
+	struct Symbol_table {
+		double get(string n);
+		void set(string n, double v);
+		bool is_declared(string n);
+		void declare(string n, double v, bool constant);
+		void reset();
+
+		Symbol_table() {
+			set_default();
+		}
+	private:
+		void clear();
+		void set_default();
+		vector<Variable> var_table;
+	};
+	Symbol_table symbols;
+	double Symbol_table::get(string n) {
+		for (const Variable& v : var_table)
+			if (v.name == n)
+				return v.value;
+		throw runtime_error("get: undefined name " + n);
+	}
+	void Symbol_table::set(string n, double v) {
+		for (Variable& var : var_table) {
+			if (var.name == n) {
+				if (var.constant) throw runtime_error(n + " is constant and can't be changed");
+				var.value = v;
+				return;
+			}
+		}
+		throw runtime_error("set: undefined name " + n);
+	}
+	bool Symbol_table::is_declared(string n) {
+		for (const Variable& v : var_table)
+			if (v.name == n)
+				return true;
+		return false;
+	}
+	void Symbol_table::declare(string n, double v, bool constant = false) {
+		if (!is_declared(n))
+			throw runtime_error(n + " already declared");
+		var_table.push_back(Variable(n, v, constant));
+	}
+	void Symbol_table::reset() {
+		clear();
+		set_default();
+	}
+	void Symbol_table::clear() {
+		var_table = vector<Variable>();
+	}
+	void Symbol_table::set_default() {
+		var_table.push_back(Variable("k", 1000, true));
+	}
+
+	Token_stream ts;
+
+	int expression();
+
+	int primary()
+	{
+		Token t = ts.get();
+		switch (t.kind) {
+		case '(':
+		{
+			double d = expression();
+			t = ts.get();
+			if (t.kind != ')') throw runtime_error("')' expected");
+		}
+		case '-':
+			return -primary();
+		case number:
+			return t.value;
+		case name:
+			if (t.name == sqrtstr) { //handle sqrt
+				char c;
+				c = cin.peek(); //doesn't skip whitespace
+				if (c != '(') {
+					return symbols.get(t.name);
+				}
+				double d = primary();
+				if (d <= 0) throw runtime_error("can't sqrt <= 0");
+				return sqrt(d);
+			}
+			if (t.name == powstr) { //handle power of (pow)
+				char c;
+				c = cin.peek();
+				if (c != '(') {
+					return symbols.get(t.name);
+				}
+				t = ts.get();
+				double d = primary();
+				t = ts.get();
+				if (t.kind != ',') throw runtime_error("expected ',' in pow(x,i)");
+				double i = primary();
+				t = ts.get();
+				if (t.kind != ')') throw runtime_error("expected ')' to end pow(x,i)");
+				if (i != floor(i)) throw runtime_error("i in pow(x,i) must be an integer");
+				return pow(d, i);
+			}
+			return symbols.get(t.name);
+		default:
+			throw runtime_error("primary expected");
+		}
+	}
+
+	int term()
+	{
+		double left = primary();
+		while (true) {
+			Token t = ts.get();
+			switch (t.kind) {
+			case '*':
+				left *= primary();
+				break;
+			case '/':
+			{
+				double d = primary();
+				if (d == 0) throw runtime_error("divide by zero");
+				left /= d;
+				break;
+			}
+			default:
+				ts.putback(t);
+				return left;
+			}
+		}
+	}
+
+	int expression()
+	{
+		double left = term();
+		while (true) {
+			Token t = ts.get();
+			switch (t.kind) {
+			case '+':
+				left += term();
+				break;
+			case '-':
+				left -= term();
+				break;
+			default:
+				ts.putback(t);
+				return left;
+			}
+		}
+	}
+
+	int declaration()
+	{
+		bool cnst = false;
+		Token t = ts.get();
+		if (t.kind == constant) {
+			cnst = true;
+			t = ts.get();
+		}
+		if (t.kind != name) throw runtime_error("name expected in declaration");
+		string name = t.name;
+		Token t2 = ts.get();
+		if (t2.kind != '=') throw runtime_error("= missing in declaration of " + name);
+		double d = expression();
+		symbols.declare(name, d, cnst);
+		return d;
+	}
+
+	int assignment(string name) {
+		Token t = ts.get();
+		if (t.kind != '=') throw runtime_error("assignment called without '='");
+		symbols.set(name, expression());
+		return symbols.get(name);
+	}
+
+	int statement()
+	{
+		Token t = ts.get();
+		switch (t.kind) {
+		case let:
+			return declaration();
+		case name:
+		{
+			char c;
+			if (!(cin.get(c))) throw runtime_error("unexpected eof");
+			cin.unget();
+			if (c == '=') {
+				return assignment(t.name);
+			}
+			//intentional fall through.
+		}
+		default:
+			ts.putback(t);
+			return expression();
+		}
+	}
+
+	void clean_up_mess()
+	{
+		symbols.reset();
+		ts.ignore(print);
+	}
+	void print_help() {
+		cout << "Welcome to our PPP integer calculator!\n"
+			<< "available operators: +,-,*,/,%, and ()\n"
+			<< "to finish a statement and evaluate delimit with " << print << " or press enter\n"
+			<< "to exit enter " << quit << "\n"
+			<< "To define a constant variable use: const # <var_name> = <expression>\n"
+			<< "To define a mutable variable drop the const; you can re-assign these variables with <var_name> = <new_expression>\n";
+		//supported operations
+		//controls
+		cout << endl;
+	}
+
+	const string prompt = "> ";
+	const string result = "= ";
+
+	void calculate()
+	{
+		cout << "Enter " << helpstr << " for help." << endl;
+		while (true) try {
+			cout << prompt;
+			Token t = ts.get();
+			while (t.kind == print) t = ts.get();
+			if (t.kind == quit) return;
+			//help; this can be easier if we could putback a couple tokens and we just check help then print
+			if (is_help_token(t)) {
+				char c;
+				do {
+					cin.get(c);
+					if (c == '\n')
+						break;
+				} while (isspace(c));
+				if (c == '\n') { //not taking print tokens, it has to be helpstr\n
+					print_help();
+					continue;
+				}
+				cin.unget();
+			}
+			ts.putback(t);
+			cout << result << statement() << endl;
+		}
+		catch (runtime_error& e) {
+			cerr << e.what() << endl;
+			clean_up_mess();
+		}
+	}
+
+	int Calc()
+		try {
+		calculate();
+		return 0;
+	}
+	catch (exception& e) {
+		cerr << "exception: " << e.what() << endl;
+		char c;
+		while (cin >> c && c != print);
+		return 1;
+	}
+	catch (...) {
+		cerr << "unhandled exception\n";
+		char c;
+		while (cin >> c && c != print);
+		return 2;
+	}
+} //namespace c6CalcINT
+
+//ex11: exercise for reader.
+//ex12: //TODO make Calc take any istream
 
 namespace C6Calculator {
+///Grammar
+// Calculation:
+// quit
+// help
+// Statement
+// 
+// Statement:
+// Declaration
+// Assignment
+// Expression
+// 
+// Declaration:
+// const # var = Expression
+// # var = Expression
+// 
+// Assignment:
+// var = Expression
+// 
+// Expression:
+// Term
+// Term + Expression
+// Term - Expression
+// 
+// Term:
+// Primary
+// Term * Primary
+// Term / Primary
+// Term % Primary
+// 
+// Primary:
+// Number
+// Function
+// ( Expression )
+// -Primary
+// +Primary
+// 
+// Function:
+// sqrt ( Expression )
+// pow ( Expression , Expression )
+// 
+// Number:
+// floating-point-literal
 	//
 } //namespace C6Calculator
 
