@@ -1056,10 +1056,10 @@ namespace drill {
 namespace c6CalcINT {
 	struct Token {
 		char kind;
-		double value;
+		int value;
 		string name;
 		Token(char ch) :kind(ch), value(0) {}
-		Token(char ch, double val) :kind(ch), value(val) {}
+		Token(char ch, int val) :kind(ch), value(val) {}
 		Token(char ch, string n) :kind(ch), name(n) {}
 	};
 	class Token_stream {
@@ -1117,7 +1117,7 @@ namespace c6CalcINT {
 		case '=': //for declaration and assignment
 		case ',': //for func arguments
 			return Token(ch);
-		case '.':
+		//case '.':
 		case '0':
 		case '1':
 		case '2':
@@ -1130,7 +1130,7 @@ namespace c6CalcINT {
 		case '9':
 		{
 			cin.unget();
-			double val;
+			int val;
 			cin >> val;
 			return Token(number, val);
 		}
@@ -1166,16 +1166,16 @@ namespace c6CalcINT {
 
 	struct Variable {
 		string name;
-		double value;
+		int value;
 		const bool constant;
-		Variable(string n, double v) :name(n), value(v), constant(false) {}
-		Variable(string n, double v, bool cnst) :name(n), value(v), constant(cnst) {}
+		Variable(string n, int v) :name(n), value(v), constant(false) {}
+		Variable(string n, int v, bool cnst) :name(n), value(v), constant(cnst) {}
 	};
 	struct Symbol_table {
-		double get(string n);
-		void set(string n, double v);
+		int get(string n);
+		void set(string n, int v);
 		bool is_declared(string n);
-		void declare(string n, double v, bool constant);
+		void declare(string n, int v, bool constant);
 		void reset();
 
 		Symbol_table() {
@@ -1187,13 +1187,13 @@ namespace c6CalcINT {
 		vector<Variable> var_table;
 	};
 	Symbol_table symbols;
-	double Symbol_table::get(string n) {
+	int Symbol_table::get(string n) {
 		for (const Variable& v : var_table)
 			if (v.name == n)
 				return v.value;
 		throw runtime_error("get: undefined name " + n);
 	}
-	void Symbol_table::set(string n, double v) {
+	void Symbol_table::set(string n, int v) {
 		for (Variable& var : var_table) {
 			if (var.name == n) {
 				if (var.constant) throw runtime_error(n + " is constant and can't be changed");
@@ -1209,7 +1209,7 @@ namespace c6CalcINT {
 				return true;
 		return false;
 	}
-	void Symbol_table::declare(string n, double v, bool constant = false) {
+	void Symbol_table::declare(string n, int v, bool constant = false) {
 		if (!is_declared(n))
 			throw runtime_error(n + " already declared");
 		var_table.push_back(Variable(n, v, constant));
@@ -1235,7 +1235,7 @@ namespace c6CalcINT {
 		switch (t.kind) {
 		case '(':
 		{
-			double d = expression();
+			int d = expression();
 			t = ts.get();
 			if (t.kind != ')') throw runtime_error("')' expected");
 		}
@@ -1250,7 +1250,7 @@ namespace c6CalcINT {
 				if (c != '(') {
 					return symbols.get(t.name);
 				}
-				double d = primary();
+				int d = primary();
 				if (d <= 0) throw runtime_error("can't sqrt <= 0");
 				return sqrt(d);
 			}
@@ -1261,10 +1261,10 @@ namespace c6CalcINT {
 					return symbols.get(t.name);
 				}
 				t = ts.get();
-				double d = primary();
+				int d = primary();
 				t = ts.get();
 				if (t.kind != ',') throw runtime_error("expected ',' in pow(x,i)");
-				double i = primary();
+				int i = primary();
 				t = ts.get();
 				if (t.kind != ')') throw runtime_error("expected ')' to end pow(x,i)");
 				if (i != floor(i)) throw runtime_error("i in pow(x,i) must be an integer");
@@ -1278,7 +1278,7 @@ namespace c6CalcINT {
 
 	int term()
 	{
-		double left = primary();
+		int left = primary();
 		while (true) {
 			Token t = ts.get();
 			switch (t.kind) {
@@ -1287,7 +1287,7 @@ namespace c6CalcINT {
 				break;
 			case '/':
 			{
-				double d = primary();
+				int d = primary();
 				if (d == 0) throw runtime_error("divide by zero");
 				left /= d;
 				break;
@@ -1301,7 +1301,7 @@ namespace c6CalcINT {
 
 	int expression()
 	{
-		double left = term();
+		int left = term();
 		while (true) {
 			Token t = ts.get();
 			switch (t.kind) {
@@ -1330,7 +1330,7 @@ namespace c6CalcINT {
 		string name = t.name;
 		Token t2 = ts.get();
 		if (t2.kind != '=') throw runtime_error("= missing in declaration of " + name);
-		double d = expression();
+		int d = expression();
 		symbols.declare(name, d, cnst);
 		return d;
 	}
@@ -1438,6 +1438,8 @@ namespace c6CalcINT {
 //ex12: //TODO make Calc take any istream
 
 namespace C6Calculator {
+//Documentation
+
 ///Grammar
 // Calculation:
 // quit
@@ -1480,17 +1482,418 @@ namespace C6Calculator {
 // 
 // Number:
 // floating-point-literal
-	//
+	bool cout, cin, cerr;
+//Assignments
+	const char quit = 'q';
+	const char help = 'h';
+	const char print = '\n';
+	const char number = '1';
+	const char name = 'a';
+	const char let = '#';
+	const char assign = '=';
+	const char constant = 'c';
+	const string helpstr = "help";
+	const string prompt = "> ";
+	const string result = "= ";
+	const string quitstr = "exit";
+	const string conststr = "const";
+	//features
+	const string sqrtstr = "sqrt";
+	const string powstr = "pow";
+//Asserts
+
+//Documentation
+//Implementation
+	//classes
+	struct Token {
+		char kind;
+		double value;
+		string name;
+		Token(char ch) :kind(ch), value(0) {}
+		Token(char ch, double val) :kind(ch), value(val) {}
+		Token(char ch, string n) :kind(ch), name(n) {}
+	};
+	class Token_stream {
+		istream& input;
+		ostream& output;
+		bool full;
+		Token buffer;
+	public:
+		Token_stream(istream& is, ostream& os) :input(is), output(os), full(0), buffer(0) {}
+
+		Token get();
+		void putback(Token t);
+
+		void ignore(char);
+		void reset();
+	};
+	struct IO_Core {
+		istream& input;
+		ostream& output;
+		Token_stream ts;
+
+		IO_Core(istream& is, ostream& os)
+			: input(is), output(os), ts(is,os) {}
+	};
+	typedef IO_Core& ioc;
+	struct Variable {
+		string name;
+		double value;
+		const bool constant;
+		Variable(string n, double v) :name(n), value(v), constant(false) {}
+		Variable(string n, double v, bool cnst) :name(n), value(v), constant(cnst) {}
+	};
+	struct Symbol_table {
+		double get(string n);
+		void set(string n, double v);
+		bool is_declared(string n);
+		void declare(string n, double v, bool constant);
+		void reset();
+
+		Symbol_table() {
+			set_default();
+		}
+	private:
+		void clear();
+		void set_default();
+		vector<Variable> var_table;
+	};
+	//class implementation
+	void Token_stream::putback(Token t) {
+		if (full) throw runtime_error("Token_stream::putback already full buffer");
+		buffer = t;
+		full = true;
+	}
+	Token Token_stream::get()
+	{
+		if (full) { full = false; return buffer; }
+		char ch;
+		do {
+			input.get(ch);
+			if (ch == print) return Token(print);
+		} while (isspace(ch));
+		switch (ch) {
+		case '(':
+		case ')':
+		case '+':
+		case '-':
+		case '*':
+		case '/':
+		case '%':
+		case print:
+		case '=': //for declaration and assignment
+		case ',': //for func arguments
+			return Token(ch);
+		case '.':
+		case '0':
+		case '1':
+		case '2':
+		case '3':
+		case '4':
+		case '5':
+		case '6':
+		case '7':
+		case '8':
+		case '9':
+		{
+			input.unget();
+			double val;
+			input >> val;
+			return Token(number, val);
+		}
+		case let:
+			return Token(let);
+		default:
+			if (isalpha(ch) || ch == '_') {
+				string s;
+				s += ch;
+				while (input.get(ch) && (isalpha(ch) || isdigit(ch) || ch == '_')) s += ch;
+				input.unget();
+				//if (s == declvar) return Token(let); //won't occur because !isalpha('#')
+				if (s == quitstr) return Token(quit);
+				if (s == conststr) return Token(constant);
+				if (s == helpstr) return Token(help);
+				return Token(name, s);
+			}
+			throw runtime_error("Bad token");
+		}
+	}
+	void Token_stream::ignore(char c)
+	{
+		if (full && c == buffer.kind) {
+			full = false;
+			return;
+		}
+		full = false;
+
+		char ch;
+		while (input >> ch)
+			if (ch == c)
+				return;
+	}
+	void Token_stream::reset() {
+		ignore(print);
+	}
+	double Symbol_table::get(string n) {
+		for (const Variable& v : var_table)
+			if (v.name == n)
+				return v.value;
+		throw runtime_error("get: undefined name " + n);
+	}
+	void Symbol_table::set(string n, double v) {
+		for (Variable& var : var_table) {
+			if (var.name == n) {
+				if (var.constant) throw runtime_error(n + " is constant and can't be changed");
+				var.value = v;
+				return;
+			}
+		}
+		throw runtime_error("set: undefined name " + n);
+	}
+	bool Symbol_table::is_declared(string n) {
+		for (const Variable& v : var_table)
+			if (v.name == n)
+				return true;
+		return false;
+	}
+	void Symbol_table::declare(string n, double v, bool constant = false) {
+		if (!is_declared(n))
+			throw runtime_error(n + " already declared");
+		var_table.push_back(Variable(n, v, constant));
+	}
+	void Symbol_table::reset() {
+		clear();
+		set_default();
+	}
+	void Symbol_table::clear() {
+		var_table = vector<Variable>();
+	}
+	void Symbol_table::set_default() {
+		var_table.push_back(Variable("k", 1000, true));
+		var_table.push_back(Variable("pi", 3.1415926535, true));
+		var_table.push_back(Variable("e", 2.7182818284, true));
+	}
+
+	//Globals
+	Symbol_table symbols;
+
+	//Functions
+	int factorial(int n) { //warning! not overflow safe!
+		if (n < 0) throw runtime_error("Cannot factorial negative integers");
+		if (n == 0 || n == 1) return 1;
+		return n * factorial(n - 1);
+	}
+	void print_help(ioc io) {
+		io.output << "Welcome to our PPP integer calculator!\n"
+			<< "available operators: +,-,*,/,%, and ()\n"
+			<< "to finish a statement and evaluate delimit by pressing enter\n"
+			<< "to exit enter " << quitstr << "\n"
+			<< "To define a constant variable use: " << conststr << " " << let << " <var_name> " << assign << " <expression>\n"
+			<< "To define a mutable variable drop the " << conststr << " you can re-assign these variables with <var_name> = <new_expression>\n";
+		//supported operations
+		//controls
+		io.output << endl;
+	}
+	void clean_up_mess(ioc io)
+	{
+		symbols.reset();
+		io.ts.reset();
+	}
+	double expression(ioc io);
+	double primary(ioc io)
+	{
+		double d{};
+		char c{};
+		Token t = io.ts.get();
+		switch (t.kind) {
+		case '(':
+		{
+			d = expression(io);
+			t = io.ts.get();
+			if (t.kind != ')') throw runtime_error("')' expected");
+			break;
+		}
+		case '-':
+			d = -primary(io);
+			break;
+		case number:
+			d = t.value;
+			break;
+		case name:
+			if (t.name == sqrtstr) { //handle sqrt
+				c = io.input.peek(); //doesn't skip whitespace
+				if (c != '(') {
+					return symbols.get(t.name);
+				}
+				d = primary(io);
+				if (d <= 0) throw runtime_error("can't sqrt <= 0");
+				d = sqrt(d);
+				break;
+			}
+			if (t.name == powstr) { //handle power of (pow)
+				c = io.input.peek();
+				if (c != '(') {
+					return symbols.get(t.name);
+				}
+				t = io.ts.get();
+				d = primary(io);
+				t = io.ts.get();
+				if (t.kind != ',') throw runtime_error("expected ',' in pow(x,i)");
+				double i = primary(io);
+				t = io.ts.get();
+				if (t.kind != ')') throw runtime_error("expected ')' to end pow(x,i)");
+				if (i != floor(i)) throw runtime_error("i in pow(x,i) must be an integer");
+				d = pow(d, i);
+				break;
+			}
+			d = symbols.get(t.name);
+			break;
+		default:
+			throw runtime_error("primary expected");
+		}
+		c = io.input.peek();
+		if (c == '!') {
+			if (d != floor(d))
+				throw runtime_error("Can't factorial non-int numbers");
+			d = factorial(static_cast<int>(d));
+		}
+		return d;
+	}
+	double term(ioc io)
+	{
+		double left = primary(io);
+		while (true) {
+			Token t = io.ts.get();
+			switch (t.kind) {
+			case '*':
+				left *= primary(io);
+				break;
+			case '/':
+			{
+				double d = primary(io);
+				if (d == 0) throw runtime_error("divide by zero");
+				left /= d;
+				break;
+			}
+			default:
+				io.ts.putback(t);
+				return left;
+			}
+		}
+	}
+	double expression(ioc io)
+	{
+		double left = term(io);
+		while (true) {
+			Token t = io.ts.get();
+			switch (t.kind) {
+			case '+':
+				left += term(io);
+				break;
+			case '-':
+				left -= term(io);
+				break;
+			default:
+				io.ts.putback(t);
+				return left;
+			}
+		}
+	}
+	double assignment(ioc io, string name) {
+		Token t = io.ts.get();
+		if (t.kind != assign) throw runtime_error("assignment called without '='");
+		symbols.set(name, expression(io));
+		return symbols.get(name);
+	}
+	double declaration(ioc io)
+	{
+		bool cnst = false;
+		Token t = io.ts.get();
+		if (t.kind == constant) {
+			cnst = true;
+			t = io.ts.get();
+		}
+		if (t.kind != name) throw runtime_error("name expected in declaration");
+		string name = t.name;
+		Token t2 = io.ts.get();
+		if (t2.kind != assign) throw runtime_error(to_string(assign) + " missing in declaration of " + name);
+		double d = expression(io);
+		symbols.declare(name, d, cnst);
+		return d;
+	}
+	double statement(ioc io)
+	{
+		Token t = io.ts.get();
+		switch (t.kind) {
+		case let:
+			return declaration(io);
+		case name:
+		{
+			char c;
+			c = io.input.peek();
+			if (!io.input) throw runtime_error("unexpected eof");
+			if (c == assign) {
+				return assignment(io, t.name);
+			}
+			//intentional fall through.
+		}
+		//intentional fall through.
+		default:
+			io.ts.putback(t);
+			return expression(io);
+		}
+	}
+	void calculator(ioc io)
+	{
+		io.output << "Enter " << helpstr << " for help." << endl;
+		while (true) try {
+			io.output << prompt;
+			Token t = io.ts.get();
+			while (t.kind == print) t = io.ts.get(); //consume empty statements
+			if (t.kind == quit) return; //is this quit?
+			//help; this can be easier if we could putback a couple tokens and we just check help then print
+			if (t.kind == help) {
+				char c;
+				do {
+					io.input.get(c);
+					if (c == print)
+						break;
+				} while (isspace(c));
+				if (c == print) { //not taking print tokens, it has to be helpstr\n
+					print_help(io);
+					continue;
+				}
+				io.input.unget();
+			}
+			io.ts.putback(t);
+			io.output << result << statement(io) << endl;
+		}
+		catch (runtime_error& e) {
+			io.output << e.what() << endl;
+			clean_up_mess(io);
+		}
+	}
+	int Calc(istream& input_stream, ostream& output_stream)
+		try {
+		IO_Core io(input_stream, output_stream);
+		calculator(io);
+		return 0;
+	}
+	catch (exception& e) {
+		output_stream << "exception: " << e.what() << endl;
+		return 1;
+	}
+	catch (...) {
+		output_stream << "exception" << endl;
+		return 2;
+	}
 } //namespace C6Calculator
 
 int main() try {
-	drill::Calc();
+	C6Calculator::Calc(cin,cout);
 	return 0;
 }
 catch (exception& e) {
 	cerr << e.what();
 	return -1;
 }
-
-//finish chapter's completed calc
-//resume 7.4.8 but all TT need to be done
