@@ -2,38 +2,38 @@ import std;
 using namespace std;
 
 ///TryThis
-int f(int);
+int f(int) { return 1; }
 void TryThis2() {
 	int i = 7;
 	std::cout << f(i) << '\n';
 }
 namespace TryThis3 {
-	struct X {
-		void f(int x) {
-			struct Y {
-				int f() { return 1; }
-				int m; //does nothing
-			};
-			int m; //never used?
-			m = x; //never used?
-			Y m2;
-			return f(m2.f()); //simply loops infinitely
-		}
-		int m; //still not used
-		void g(int m) {
-			if (0 < m)
-				f(m + 2); //just loops
-			else {
-				g(m + 2.3); //loops until m > 0 then infinitely loops
-			}
-		}
-		X() {} //m not initialized
-		int m3() {} //never used
-		void main() {
-			X a; //makes another struct of itself when main is called?
-			a.f(2);
-		}
-	};
+	//struct X {
+	//	void f(int x) {
+	//		struct Y {
+	//			int f() { return 1; }
+	//			int m; //does nothing
+	//		};
+	//		int m; //never used?
+	//		m = x; //never used?
+	//		Y m2;
+	//		return f(m2.f()); //simply loops infinitely
+	//	}
+	//	int m; //still not used
+	//	void g(int m) {
+	//		if (0 < m)
+	//			f(m + 2); //just loops
+	//		else {
+	//			g(m + 2.3); //loops until m > 0 then infinitely loops
+	//		}
+	//	}
+	//	X() {} //m not initialized
+	//	int m3() {} //never used
+	//	void main() {
+	//		X a; //makes another struct of itself when main is called?
+	//		a.f(2);
+	//	}
+	//};
 }
 void TryThis4_7() {
 	double y = 1001; //7.7; 'x';
@@ -55,37 +55,76 @@ void TryThis4_7() {
 }
 
 ///Drill
+void d3test();
+void d4test();
 namespace Drill {
 	void swap_v(int a, int b) { int temp; temp = a, a = b; b = temp; }
 	void swap_r(int& a, int& b) { int temp; temp = a, a = b; b = temp; }
-	void swap_cr(const int& a, const int& b) { int temp; temp = a, a = b; b = temp; }
+	//void swap_cr(const int& a, const int& b) { int temp; temp = a, a = b; b = temp; } //always throws compiler error, can't swap const
 
 	void Drill1() {
 		//TODO
 		int x = 7;
 		int y = 9;
-		//swap_v(x, y);
-		//swap_v(7, 9);
-		//swap_r(x, y);
-		//swap_r(7, 9);
-		//swap_cr(x, y);
-		//swap_cr(7, 9);
+		//swap_v(x, y); //7|9
+		//swap_v(7, 9); //compiles but nothing happens
+		//swap_r(x, y); //9|7 works!
+		//swap_r(7, 9); //cannot convert argument from literal int to int&
+		//swap_cr(x, y); //never compiles
+		//swap_cr(7, 9); //never compiles
+		cout << x << '|' << y << endl;
 		const int cx = 7;
 		const int cy = 9;
-		//swap_v(cx, cy);
-		//swap_v(7.7, 9.9);
-		//swap_r(x, y);
-		//swap_r(7, 9);
-		//swap_cr(x, y);
-		//swap_cr(7, 9);
+		//swap_v(cx, cy); //7|9
+		//swap_v(7.7, 9.9); //compiles but nothing happens
+		//swap_r(cx, cy); //cannot convert argument from const int to int&
+		//swap_r(7.7, 9.9); //cannot convert argument from literal int to int&
+		//swap_cr(x, y); //never compiles
+		//swap_cr(7.7, 9.9); //never compiles
+		cout << cx << '|' << cy << endl;
 		double dx = 7.7;
 		double dy = 9.9;
-		//swap_v(dx, dy);
-		//swap_v(7.7, 9.9);
-		//swap_r(x, y);
-		//swap_r(7, 9);
-		//swap_cr(x, y);
-		//swap_cr(7, 9);
+		//swap_v(dx, dy); //7.7|9.9 //not even narrowed!?
+		//swap_v(7.7, 9.9); //compiles but nothing happens
+		//swap_r(dx, dy); //cannot convert argument from double to int&
+		//swap_r(7.7, 9.9); //cannot convert argument from literal int to int&
+		//swap_cr(x, y); //never compiles
+		//swap_cr(7.7, 9.9); //never compiles
+		cout << dx << '|' << dy << endl;
+	}
+
+	namespace X {
+		int var;
+		void print() { cout << var << endl; }
+	}
+	namespace Y {
+		int var;
+		void print() { cout << var << endl; }
+	}
+	namespace Z {
+		int var;
+		void print() { cout << var << endl; }
+	}
+	void Drill2() {
+		X::var = 7;
+		X::print(); // print X’s var
+		using namespace Y;
+		var = 9;
+		print(); // print Y’s var
+		{
+			using Z::var;
+			using Z::print;
+			var = 11;
+			print(); // print Z’s var
+		}
+		print(); // print Y’s var
+		X::print(); // print X’s var
+	}
+	void Drill3() {
+		d3test();
+	}
+	void Drill4() {
+		d4test();
 	}
 } //namespace Drill
 
@@ -598,11 +637,32 @@ namespace C7Calculator {
 	}
 } //namespace C6Calculator
 //ex2:
-
+void c7e2print(const string& label, const vector<int>& data) {
+	cout << "Dataset: " << label << endl;
+	for (const int& i : data)
+		cout << ' ' << i << '\n';
+}
+//ex3:
+void fibonacci(const int& x, const int& y,vector<int>& v,const unsigned int& n) {
+	if (v.size() != 0) throw runtime_error("Expected empty vector");
+	if (n > 0) v.push_back(x);
+	if (n > 1) v.push_back(y);
+	for (int i{ 2 }; i < n; i++)
+		v.push_back(v[i-1] + v[i - 2]);
+}
+void c7e3() {
+	int x = 1, y = 1;
+	unsigned int n = 15;
+	vector<int> v;
+	fibonacci(x, y, v, n);
+	c7e2print("fib" + to_string(x) + "," + to_string(y) + "w/" + to_string(n), v);
+}
+//TODO test
+//ex4:
 
 ///Main
 int main() try {
-	Drill::Drill1();
+	Drill::Drill4();
 	return 0;
 }
 catch (exception& e) {
