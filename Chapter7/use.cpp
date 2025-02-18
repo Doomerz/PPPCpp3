@@ -10,6 +10,6 @@ void d3test() {
 }
 
 void d4test() {
-	print_foo();
-	print(2);
+	fooh::print_foo();
+	fooh::print(2);
 }

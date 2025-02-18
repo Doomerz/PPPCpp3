@@ -645,6 +645,7 @@ void c7e2print(const string& label, const vector<int>& data) {
 //ex3:
 void fibonacci(const int& x, const int& y,vector<int>& v,const unsigned int& n) {
 	if (v.size() != 0) throw runtime_error("Expected empty vector");
+	v.reserve(n);
 	if (n > 0) v.push_back(x);
 	if (n > 1) v.push_back(y);
 	for (int i{ 2 }; i < n; i++)
@@ -652,17 +653,96 @@ void fibonacci(const int& x, const int& y,vector<int>& v,const unsigned int& n) 
 }
 void c7e3() {
 	int x = 1, y = 1;
-	unsigned int n = 15;
+	unsigned int n = 20;
 	vector<int> v;
 	fibonacci(x, y, v, n);
 	c7e2print("fib" + to_string(x) + "," + to_string(y) + "w/" + to_string(n), v);
 }
-//TODO test
 //ex4:
+void c7e4() {
+	vector<int> v;
+	int i{ 1 };
+	v.reserve(64);
+	v.push_back(1);
+	v.push_back(1);
+	cout << "1\t\t1\n2\t\t1\n";
+	while (v[v.size() - 1] < numeric_limits<int>::max() / 2) {
+		i++;
+		v.push_back(v[v.size() - 1] + v[v.size() - 2]);
+		cout << i << "\t\t" << v[v.size() - 1] << endl;
+	}
+	cout << "Max fib=" << i << '|' << v[v.size() - 1] << endl;
+	//max is 45@1134903170
+}
+vector<int> e5newreverse(const vector<int>& v) {
+	vector<int> res;
+	res.reserve(v.size());
+	for (int i = v.size() - 1; i >= 0; i--)
+		res.emplace_back(v[i]);
+	return res;
+}
+void e5swapreverse(vector<int>& v) {
+	for (int i{}, k = v.size() - 1; i < k; i++, k--)
+		swap(v[i], v[k]);
+}
+void c7e5() {
+	vector<int> v = { 1,3,5,7,9 };
+	c7e2print("starting", v);
+	c7e2print("result of e5newreverse", e5newreverse(v));
+	e5swapreverse(v);
+	c7e2print("after e5swapreverse", v);
+}
+vector<string> e6newreverse(const vector<string>& v) {
+	vector<string> res;
+	res.reserve(v.size());
+	for (int i = v.size() - 1; i >= 0; i--)
+		res.emplace_back(v[i]);
+	return res;
+}
+void e6swapreverse(vector<string>& v) {
+	for (int i{}, k = v.size() - 1; i < k; i++, k--)
+		swap(v[i], v[k]);
+}
+void e6print(string label, const vector<string>& data) {
+	cout << label << endl;
+	for (const string& i : data)
+		cout << ' ' << i << '\n';
+}
+void c7e6() {
+	vector<string> v = { "1","3","5","7","9" };
+	e6print("starting", v);
+	e6print("result of e5newreverse", e6newreverse(v));
+	e6swapreverse(v);
+	e6print("after e5swapreverse", v);
+}
+vector<string> e7input(bool use_default) {
+	if (use_default) {
+		return vector<string>{"a", "b", "c", "d", "e"};
+	}
+	vector<string> res;
+	res.reserve(5);
+	cout << "Enter 5 names:\n";
+	while (res.size() < 5) {
+		string input;
+		cin >> input;
+		cout << "added " << input << endl;
+		res.push_back(input);
+	}
+	cout << "\n\n";
+	return res;
+}
+void c7e7() {
+	//read 5 names into a vec<str> name;
+	//prompt for ages of each and store ages in a vector of doubles (age)
+	//print out the 5 name/age pairs, sort the name/age pairs (std::sort) and then print
+	//hint: make a copy before sorting and use that to order the age vector
+	vector<string> e7input(true);
+	//TODO
+}
 
 ///Main
 int main() try {
-	Drill::Drill4();
+	c7e6();
 	return 0;
 }
 catch (exception& e) {
