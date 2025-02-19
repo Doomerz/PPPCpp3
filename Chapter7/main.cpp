@@ -715,7 +715,7 @@ void c7e6() {
 	e6swapreverse(v);
 	e6print("after e5swapreverse", v);
 }
-vector<string> e7input(bool use_default) {
+vector<string> e7input(bool use_default = false) {
 	if (use_default) {
 		return vector<string>{"a", "b", "c", "d", "e"};
 	}
@@ -736,7 +736,22 @@ void c7e7() {
 	//prompt for ages of each and store ages in a vector of doubles (age)
 	//print out the 5 name/age pairs, sort the name/age pairs (std::sort) and then print
 	//hint: make a copy before sorting and use that to order the age vector
-	vector<string> e7input(true);
+	vector<string> name = e7input(true);
+	vector<double> age = e7ages(name, true);
+	cout << "Our list is: \n";
+	for (int i{}; i < name.size(); i++) {
+		cout << name[i] << ": " << age[i] << endl;
+	}
+	vector<string> temp = name;
+	sort(name.begin(), name.end());
+	
+	for (int i{}; i < name.size(); i++) {
+		for (int k{}; k < temp.size(); k++) {
+			if (name[i] != temp[k]) continue;
+			if (i == k) break;
+			for (int q{}; )
+		}
+	}
 	//TODO
 }
 
