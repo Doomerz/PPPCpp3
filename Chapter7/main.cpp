@@ -717,7 +717,7 @@ void c7e6() {
 }
 vector<string> e7input(bool use_default = false) {
 	if (use_default) {
-		return vector<string>{"a", "b", "c", "d", "e"};
+		return vector<string>{"b", "a", "c", "e", "d"};
 	}
 	vector<string> res;
 	res.reserve(5);
@@ -731,13 +731,54 @@ vector<string> e7input(bool use_default = false) {
 	cout << "\n\n";
 	return res;
 }
-void c7e7() {
+double e7getage(const string& name) {
+	double res;
+	string s;
+	size_t idx;
+	bool valid = false;
+	while (!valid) {
+		cout << "Please enter a valid age for\n" << name << ": ";
+		try {
+			getline(cin, s);
+			res = stod(s, &idx);
+			if (idx != s.size())
+				throw runtime_error("Entry contained additional characters after number");
+			else if (res < 0) {
+				throw runtime_error("Age cannot be < 0");
+			}
+			else
+				valid = true;
+		}
+		catch (exception& e) {
+			string err;
+			if (e.what() == "invalid stod argument")
+				err = "Entry not a number.";
+			else if (e.what() == "stod argument out of range")
+				err = "Entry does not fit in double.";
+			else
+				err = e.what();
+			cerr << "Invalid input: " << e.what() << "\nTry again:\n";
+		}
+	}
+	return res;
+}
+vector<double> e7ages(const vector<string>& name, bool use_default = false) {
+	if (use_default)
+		return vector<double>{2, 1, 3, 5, 4};
+	vector<double> res;
+	res.reserve(name.size());
+	for (const string& n : name) {
+		res.push_back(e7getage(n));
+	}
+	return res;
+}
+void c7e7(bool use_default = true) {
 	//read 5 names into a vec<str> name;
 	//prompt for ages of each and store ages in a vector of doubles (age)
 	//print out the 5 name/age pairs, sort the name/age pairs (std::sort) and then print
 	//hint: make a copy before sorting and use that to order the age vector
-	vector<string> name = e7input(true);
-	vector<double> age = e7ages(name, true);
+	vector<string> name = e7input(use_default);
+	vector<double> age = e7ages(name, use_default);
 	cout << "Our list is: \n";
 	for (int i{}; i < name.size(); i++) {
 		cout << name[i] << ": " << age[i] << endl;
@@ -746,18 +787,105 @@ void c7e7() {
 	sort(name.begin(), name.end());
 	
 	for (int i{}; i < name.size(); i++) {
-		for (int k{}; k < temp.size(); k++) {
+		for (int k{i+1}; k < temp.size(); k++) {
 			if (name[i] != temp[k]) continue;
 			if (i == k) break;
-			for (int q{}; )
+			swap(age[i], age[k]);
+			swap(temp[i], temp[k]);
 		}
 	}
-	//TODO
+	cout << "Our sorted list is: \n";
+	for (int i{}; i < name.size(); i++)
+		cout << name[i] << ": " << age[i] << endl;
 }
+vector<string> e8input(bool use_default = false) {
+	if (use_default) {
+		return vector<string>{"b", "a", "c", "e", "d"};
+	}
+	vector<string> res;
+	cout << "Enter names, end with ';':\n";
+	while (true) {
+		string input;
+		cin >> input;
+		if (input == ";")
+			break;
+		cout << "added " << input << endl;
+		res.push_back(input);
+	}
+	cout << "\n\n";
+	return res;
+}
+double e8getage(const string& name) {
+	double res;
+	string s;
+	size_t idx;
+	bool valid = false;
+	while (!valid) {
+		cout << "Please enter a valid age for\n" << name << ": ";
+		try {
+			getline(cin, s);
+			res = stod(s, &idx);
+			if (idx != s.size())
+				throw runtime_error("Entry contained additional characters after number");
+			else if (res < 0) {
+				throw runtime_error("Age cannot be < 0");
+			}
+			else
+				valid = true;
+		}
+		catch (exception& e) {
+			string err;
+			if (e.what() == "invalid stod argument")
+				err = "Entry not a number.";
+			else if (e.what() == "stod argument out of range")
+				err = "Entry does not fit in double.";
+			else
+				err = e.what();
+			cerr << "Invalid input: " << e.what() << "\nTry again:\n";
+		}
+	}
+	return res;
+}
+vector<double> e8ages(const vector<string>& name, bool use_default = false) {
+	if (use_default)
+		return vector<double>{2, 1, 3, 5, 4};
+	vector<double> res;
+	res.reserve(name.size());
+	for (const string& n : name) {
+		res.push_back(e8getage(n));
+	}
+	return res;
+}
+void c7e8(bool use_default = false) {
+	//read names into a vec<str> name;
+	//prompt for ages of each and store ages in a vector of doubles (age)
+	//print out the 5 name/age pairs, sort the name/age pairs (std::sort) and then print
+	//hint: make a copy before sorting and use that to order the age vector
+	vector<string> name = e8input(use_default);
+	vector<double> age = e8ages(name, use_default);
+	cout << "Our list is: \n";
+	for (int i{}; i < name.size(); i++) {
+		cout << name[i] << ": " << age[i] << endl;
+	}
+	vector<string> temp = name;
+	sort(name.begin(), name.end());
+
+	for (int i{}; i < name.size(); i++) {
+		for (int k{ i + 1 }; k < temp.size(); k++) {
+			if (name[i] != temp[k]) continue;
+			if (i == k) break;
+			swap(age[i], age[k]);
+			swap(temp[i], temp[k]);
+		}
+	}
+	cout << "Our sorted list is: \n";
+	for (int i{}; i < name.size(); i++)
+		cout << name[i] << ": " << age[i] << endl;
+} //TODO
 
 ///Main
 int main() try {
-	c7e6();
+	c7e8();
 	return 0;
 }
 catch (exception& e) {
