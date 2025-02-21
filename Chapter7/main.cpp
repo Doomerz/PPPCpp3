@@ -674,6 +674,7 @@ void c7e4() {
 	cout << "Max fib=" << i << '|' << v[v.size() - 1] << endl;
 	//max is 45@1134903170
 }
+//ex5:
 vector<int> e5newreverse(const vector<int>& v) {
 	vector<int> res;
 	res.reserve(v.size());
@@ -692,6 +693,7 @@ void c7e5() {
 	e5swapreverse(v);
 	c7e2print("after e5swapreverse", v);
 }
+//ex6:
 vector<string> e6newreverse(const vector<string>& v) {
 	vector<string> res;
 	res.reserve(v.size());
@@ -715,6 +717,7 @@ void c7e6() {
 	e6swapreverse(v);
 	e6print("after e5swapreverse", v);
 }
+//ex7:
 vector<string> e7input(bool use_default = false) {
 	if (use_default) {
 		return vector<string>{"b", "a", "c", "e", "d"};
@@ -798,16 +801,17 @@ void c7e7(bool use_default = true) {
 	for (int i{}; i < name.size(); i++)
 		cout << name[i] << ": " << age[i] << endl;
 }
+//ex8:
 vector<string> e8input(bool use_default = false) {
 	if (use_default) {
 		return vector<string>{"b", "a", "c", "e", "d"};
 	}
 	vector<string> res;
-	cout << "Enter names, end with ';':\n";
+	cout << "Enter names, end by entering an empty string:\n";
 	while (true) {
 		string input;
-		cin >> input;
-		if (input == ";")
+		getline(cin, input);
+		if (input == "")
 			break;
 		cout << "added " << input << endl;
 		res.push_back(input);
@@ -857,10 +861,7 @@ vector<double> e8ages(const vector<string>& name, bool use_default = false) {
 	return res;
 }
 void c7e8(bool use_default = false) {
-	//read names into a vec<str> name;
-	//prompt for ages of each and store ages in a vector of doubles (age)
-	//print out the 5 name/age pairs, sort the name/age pairs (std::sort) and then print
-	//hint: make a copy before sorting and use that to order the age vector
+	//make e7 take arbitrary number of names
 	vector<string> name = e8input(use_default);
 	vector<double> age = e8ages(name, use_default);
 	cout << "Our list is: \n";
@@ -881,11 +882,174 @@ void c7e8(bool use_default = false) {
 	cout << "Our sorted list is: \n";
 	for (int i{}; i < name.size(); i++)
 		cout << name[i] << ": " << age[i] << endl;
-} //TODO
+}
+//ex9:
+double e9index(const vector<double>& price, const vector<double>& weight) {
+	if (price.size() != weight.size())
+		throw runtime_error("vector sizes do not match e9index");
+	double sum{};
+	for (int i{}; i < price.size(); i++) {
+		sum += price[i] * weight[i];
+	}
+	return sum;
+}
+void c7e9() {
+	//write func that given two vec<double> (price and weight) compute the sum of all price*weight elements
+	//ensure vector sizes match
+	vector<double> price{ 5,10,15,20 },
+		weight{ 4,3,2,1 };
+	cout << "index of default for e9 is: " << e9index(price, weight) << endl;
+}
+//ex10:
+template<typename T>
+T maxv(vector<T> v) {
+	if (v.size() == 0)
+		throw runtime_error("maxv: vector size cannot be 0");
+	if (v.size() == 1)
+		return v[0];
+	int max;
+	max = 0;
+	for (int i{1}; i < v.size(); i++)
+		if (v[max] < v[i])
+			max = i;
+	return v[max];
+}
+void c7e10() {
+	//write func maxv() that returns the largest element of a vector
+	vector<int> v{ 1,2,3,4,5,6,7,8,9 };
+	cout << "max of c7e10 default is " << maxv(v) << endl;
+}
+//ex11:
+template<typename T>
+void vecstat_ref(const vector<T>& v, T& max, T& min, T& mean, T& median) {
+	if (v.size() == 0)
+		throw runtime_error("vecstat can't use empty vector");
+	max = v[0];
+	min = v[0];
+	if (v.size() == 1) {
+		median = v[0];
+		mean = v[0];
+		return;
+	}
+	vector<T> x = v;
+	sort(x.begin(), x.end());
+	median = x[x.size() / 2];
+	max = x[x.size() - 1];
+	min = x[0];
+	mean = 0;
+	for (const T& e : v) {
+		mean += e;
+	}
+	mean /= v.size();
+	return;
+}
+template<typename T>
+struct e11struct {
+	T max, min, mean, median;
+};
+template<typename T>
+e11struct<T> vecstat_struct(const vector<T>& v) {
+	e11struct<T> res;
+	vecstat_ref(v, res.max, res.min, res.mean, res.median);
+	return res;
+}
+void c7e11() {
+	//write a func that finds the smallest and largest element of a vec
+	//also computer the mean and median
+	//do not use globals
+	//
+	// Comments:
+	// by ref makes writing and composing functions a bit messy
+	// however returning a struct can bloat a lot of different structs, but only takes additional work within the function using it.
+	vector<int> data{ 1,2,3,4,5,6,7,8,9 };
+	e11struct<int> ans = vecstat_struct(data);
+	cout << "our data is: 1,2,3,4,5,6,7,8,9\n"
+		<< "max = " << ans.max
+		<< "\nmin = " << ans.min
+		<< "\nmean = " << ans.mean
+		<< "\nmedian = " << ans.median << endl;
+}
+//ex12:
+void print_until(vector<string> v, string quit) {
+	for (string s : v) {
+		if (s == quit)
+			return;
+		cout << s << '\n';
+	}
+}
+void print_until_s(const vector<string>& v, const string& quit) {
+	for (const string& s : v) {
+		if (s == quit)
+			return;
+		cout << s << '\n';
+	}
+}
+void print_until_ss(const vector<string>& v, const string& quit) {
+	bool second = false;
+	for (const string& s : v) {
+		if (s == quit) {
+			if (second)
+				return;
+			second = true;
+		}
+		cout << s << '\n';
+	}
+}
+void c7e12() {
+	//improve print_until_s from 7.4.2
+	//test it, what makes a good set of test cases?
+	//write print_until_ss that prints until it hits a second occurance of the quit argument
+}
+//ex13:
+void c7e13() {
+	//write a func that takes vec<str> and returns vec<int> containing number of char in each str.
+	// find longest and shortest str and lexicographically first and last str.
+	// how many separate funcs would we use for these tasks and why
+	vector<string> vs{ "There", "is", "no", "one", "who", "loves", "pain", "itself,", "who", "seeks", "after", "it", "and", "wants", "to", "have", "it,", "simply", "because", "it", "is", "pain..." };
+	vector<int> vi;
+	string longest{vs[0]}, shortest{ vs[0] }, first{ vs[0] }, last{ vs[0] };
+	vi.reserve(vs.size());
+	vi.push_back(vs[0].size());
+	for (int i{1}; i < vs.size(); i++) {
+		vi.push_back(vs[i].size());
+		if (vs[i].size() > longest.size())
+			longest = vs[i];
+		else if (vs[i].size() < shortest.size())
+			shortest = vs[i];
+		if (vs[i] < first)
+			first = vs[i];
+		else if (vs[i] > last)
+			last = vs[i];
+	}
+	cout << "our vectors are:\n";
+	for (int i{}; i < vs.size(); i++)
+		cout << vi[i] << "|" << vs[i] << endl;
+	cout << "longest@" << longest.size() << "|" << longest << endl
+		<< "shortest@" << shortest.size() << "|" << shortest << endl
+		<< "first=" << first << endl
+		<< "last =" << last << endl;
+	//just needed the one function otherwise we'd have to iterate through the vector a lot more and the logic for each step wasn't so complex as to not be readable in line.
+	//if we needed to evaluate lexicographical order with case-insensitive then we'd likely have a function to evaluate that.
+}
+//ex14:
+void fe14(const int x) {
+	cout << x << endl;
+}
+void c7e14() {
+	//can we declare a non-ref func arg const (void f(const int);)
+	// what might that mean?
+	// why might we want to do that?
+	// why don't people do that often?
+	// 
+	// it means copy the value, but don't allow it to change in the function
+	// we might do that to ensure that the root copy that is passed to sub-functions doesn't change as it is passed to subsequent sub-functions.
+	// Since the value is just a copy the original passed value is not changed anyways. At this point we might as well make it a const-reference and save the trouble of copying it unnecessarily.
+	fe14(2);
+}
 
 ///Main
 int main() try {
-	c7e8();
+	c7e14();
 	return 0;
 }
 catch (exception& e) {
@@ -896,5 +1060,3 @@ catch (...) {
 	cout << "unhandled exception" << endl;
 	return -2;
 }
-
-//resume 7.4.8 but all TT need to be done pg 308
