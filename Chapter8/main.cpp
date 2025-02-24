@@ -2,38 +2,135 @@ import std;
 using namespace std;
 
 ///TryThis
-namespace TT {
+namespace TT4 {
 	//Date class
 	class Date {
 	public:
+		Date(int yy, int mm, int dd)
+			:y{yy}, m{mm}, d{dd} { }
+
 		int year() { return y; }
 		int month() { return m; }
 		int day() { return d; }
+
+		void add_day(int n);
 	private:
-		int y;
-		int m;
-		int d;
+		int y, m, d;
 	};
 	ostream& operator<<(ostream& os, Date d) {
 		return os << d.year() << '/' << d.month() << '/' << d.day();
 	}
 }
 void TryThis4_4() {
-	//get date so far to run
+	TT4::Date christmas{ 2025,12,25 };
+	cout << christmas;
+}
+namespace TT6 {
+	//Date class
+	class Date {
+	public:
+		class Invalid {};
+		enum class Month { jan = 1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec };
+		enum class Day { monday = 1, tuesday, wednesday, thursday, friday, saturday, sunday };
+		Date(int yy, int mm, int dd)
+			:y{ yy }, m{ mm }, d{ dd }
+		{
+			if (!is_valid())
+				throw Invalid{};
+		}
+
+		int year() { return y; }
+		Month month() { return m; }
+		int day() { return d; }
+
+		bool is_valid();
+		void add_day(int n);
+	private:
+		int y;
+		Month m;
+		int d;
+	};
+	int to_int(Date::Month m) { return static_cast<int>(m); }
+	int to_int(Date::Day d) { return static_cast<int>(d); }
+	vector<string> month_tbl = { "Not a month", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+	ostream& operator<<(ostream& os, Date::Month m) { return os << month_tbl[to_int(m)]; }
+	vector<string> day_tbl = { "Not a day", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+	ostream& operator<<(ostream& os, Date::Day d) { return os << day_tbl[to_int(d)]; }
+	ostream& operator<<(ostream& os, Date d) {
+		return os << d.year() << '/' << d.month() << '/' << d.day();
+	}
+	bool Date::is_valid() { return 0 < to_int(m) && to_int(m) < 13; }
+	Date::Month operator++(Date::Month& m) {
+		m = (m == Date::Month::dec) ? Date::Month::jan : Date::Month{ to_int(m) + 1 };
+		return m;
+	}
+	Date::Month int_to_month(int x) {
+		if (x < to_int(Date::Month::jan) || to_int(Date::Month::dec) < x)
+			throw runtime_error("bad month");
+		return Date::Month{ x };
+	}
+	Date::Day int_to_day(int x) {
+		if (x < to_int(Date::Day::monday) || to_int(Date::Day::sunday) < x)
+			throw runtime_error("bad day");
+		return Date::Day{ x };
+	}
 }
 void TryThis6() {
 	//write and compile and run a small example using ++ and << for month
+	TT6::Date::Month amonth{ TT6::Date::Month::dec };
+	cout << "last month was: " << amonth << ", this month is: " << ++amonth;
 }
 
 ///Drill
 
+//write Day, Month, and their associated functions per chapter. complete a final version of Date.
+//Date must have:
+// default constructor
+// is_valid()
+// Month
+// Year
+//define a date called today at feb 2, 2020; then define one called tomorrow and give it a value by
+// copying today into it and increasing day by one using add_day()
+//output today and tomorrow using a << (per 9.6 and 9.7
+//check for a valid date can ignore leap years; make sure month is range checked as well as day
+namespace Drill {
+	//
+} //namespace Drill
+
 ///Review
+//What are the two parts of a class, as described in the chapter ?
+// 
+//What is the difference between the interface and the implementation in a class ?
+// 
+//What are the limitations and problems of the struct Date from §8.4.1 ?
+// 
+//Why is a constructor used for the Date type instead of an init_day() function ?
+// 
+//What is an invariant ? Give examples.
+// 
+//When should functions be put in the class definition, and when should they be defined outside the class ? Why ?
+// 
+//What is a default constructor and when do we need one ?
+// 
+//What is a default member initializer ?
+// 
+//When should operator overloading be used in a program ? Give a list of operators that you might want to overload(each with a reason).Which ones can you define in C++ ?
+// 
+//Why should the public interface to a class be as small as possible ?
+// 
+//What does adding const to a member function do ?
+// 
+//Why are “helper functions” best placed outside the class definition ?
+// 
+//How does an enum class differ from a “plain” enum ?
+//
 
 ///Exercises
+//ex1:
 
 ///Main
 int main() try {
-	TryThis4_4();
+	TryThis6();
 	return 0;
 }
 catch (exception& e) {
