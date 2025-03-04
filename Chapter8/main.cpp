@@ -112,18 +112,103 @@ void TryThis6() {
 namespace Drill {
 	class Date {
 	public:
-		enum class Month {jan=1,feb,mar,apr,jun,jul,aug,sep,oct,nov,dec};
+		class Invalid {};
+		enum class Month {jan=1,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec};
+		enum class WeekDay {monday=1, tuesday, wednesday, thursday, friday, saturday, sunday};
 		Date(const int& year, const Month& month, const unsigned int& day)
 			:y{ year }, m{ month }, d{ day }
-		{ }
+		{ 
+			if (!is_valid(*this))
+				throw Invalid{};
+		}
 
+		unsigned int day() const { return d; }
+		Month month() const { return m; }
+		int year() const { return y; }
+
+		void add_day(unsigned int n);
 	private:
 		int y;
 		Month m;
 		unsigned int d;
 	};
+	void Date::add_day(unsigned int n) {
+		while (n) {
+			unsigned int dim = days_in_month(m);
+			if (n + d <= dim) {
+				d += n;
+				return;
+			}
+			else {
+				n -= dim - d + 1; //go to day 1 of next month
+				d = 1;
+				++m;
+				if (m == Month::jan) y++;
+			}
+		}
+	}
+	bool is_valid(const Date& date) {
+		//TODO FIX WITH DAYSINMONTH
+		return !(date.day() < 1 || date.day() > 31 || to_int(date.month()) < 1 || to_int(date.month()) > 12);
+	}
+	unsigned int to_int(const Date::Month& m) { return static_cast<unsigned int>(m); }
+	unsigned int to_int(const Date::WeekDay& d) { return static_cast<unsigned int>(d); }
+	vector<string> month_tbl = { "Not a month", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+	ostream& operator<<(ostream& os, const Date::Month& m) { return os << month_tbl[to_int(m)]; }
+	vector<string> day_tbl = { "Not a day", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+	ostream& operator<<(ostream& os, const Date::WeekDay& d) { return os << day_tbl[to_int(d)]; }
+	ostream& operator<<(ostream& os, const Date& d) { return os << d.year() << '/' << d.month() << '/' << d.day(); }
+	Date::Month operator++(Date::Month& m) {
+		m = (m == Date::Month::dec) ? Date::Month::jan : Date::Month{ to_int(m) + 1 };
+		return m;
+	}
+	Date::Month int_to_month(const unsigned int& x) {
+		if (x < to_int(Date::Month::jan) || to_int(Date::Month::dec) < x)
+			throw runtime_error("bad month");
+		return Date::Month{ x };
+	}
+	Date::WeekDay int_to_day(const unsigned int& x) {
+		if (x < to_int(Date::WeekDay::monday) || to_int(Date::WeekDay::sunday) < x)
+			throw runtime_error("bad weekday");
+		return Date::WeekDay{ x };
+	}
+	bool is_leapyear(int year) {
+		//TODO need logic.
+		return false;
+	}
+	unsigned int days_in_month(const Date& date) {
+		switch (date.month()) {
+		case Date::Month::jan:
+			return 31;
+		case Date::Month::feb:
+			if (is_leapyear(date.year())) return 29;
+			return 28;
+		case Date::Month::mar:
+			return 31;
+		case Date::Month::apr:
+			return 30;
+		case Date::Month::may:
+			return 31;
+		case Date::Month::jun:
+			return 30;
+		case Date::Month::jul:
+			return 31;
+		case Date::Month::aug:
+			return 31;
+		case Date::Month::sep:
+			return 30;
+		case Date::Month::oct:
+			return 31;
+		case Date::Month::nov:
+			return 30;
+		case Date::Month::dec:
+			return 31;
+		default:
+			throw runtime_error("bad month in days_in_month");
+		}
+	}
 } //namespace Drill
-void Drill() {
+void drill() {
 	//TODO
 	return;
 }
@@ -161,7 +246,7 @@ void Drill() {
 
 ///Main
 int main() try {
-	Drill();
+	drill();
 	return 0;
 }
 catch (exception& e) {
