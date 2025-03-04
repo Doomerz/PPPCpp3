@@ -31,7 +31,7 @@ namespace TT6 {
 	public:
 		class Invalid {};
 		enum class Month { jan = 1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec };
-		enum class Day { monday = 1, tuesday, wednesday, thursday, friday, saturday, sunday };
+		enum class WeekDay { monday = 1, tuesday, wednesday, thursday, friday, saturday, sunday };
 		Date(int yy, int mm, int dd)
 			:y{ yy }, m{ mm }, d{ dd }
 		{
@@ -44,18 +44,34 @@ namespace TT6 {
 		int day() { return d; }
 
 		bool is_valid();
-		void add_day(int n);
+		void add_day(unsigned int n);
 	private:
 		int y;
 		Month m;
 		int d;
 	};
+	void Date::add_day(unsigned int n) {
+		while (n > 0) {
+			if (n < 31 - d) {
+				d += n;
+				n = 0;
+			}
+			else {
+				n -= 31 - d+1; //assumes 31 day months
+				d = 1;
+				++m;
+				if (m == Month::jan)
+					y++;
+			}
+		}
+	}
+
 	int to_int(Date::Month m) { return static_cast<int>(m); }
-	int to_int(Date::Day d) { return static_cast<int>(d); }
+	int to_int(Date::WeekDay d) { return static_cast<int>(d); }
 	vector<string> month_tbl = { "Not a month", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 	ostream& operator<<(ostream& os, Date::Month m) { return os << month_tbl[to_int(m)]; }
 	vector<string> day_tbl = { "Not a day", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
-	ostream& operator<<(ostream& os, Date::Day d) { return os << day_tbl[to_int(d)]; }
+	ostream& operator<<(ostream& os, Date::WeekDay d) { return os << day_tbl[to_int(d)]; }
 	ostream& operator<<(ostream& os, Date d) {
 		return os << d.year() << '/' << d.month() << '/' << d.day();
 	}
@@ -69,10 +85,10 @@ namespace TT6 {
 			throw runtime_error("bad month");
 		return Date::Month{ x };
 	}
-	Date::Day int_to_day(int x) {
-		if (x < to_int(Date::Day::monday) || to_int(Date::Day::sunday) < x)
-			throw runtime_error("bad day");
-		return Date::Day{ x };
+	Date::WeekDay int_to_day(int x) {
+		if (x < to_int(Date::WeekDay::monday) || to_int(Date::WeekDay::sunday) < x)
+			throw runtime_error("bad weekday");
+		return Date::WeekDay{ x };
 	}
 }
 void TryThis6() {
@@ -94,8 +110,23 @@ void TryThis6() {
 //output today and tomorrow using a << (per 9.6 and 9.7
 //check for a valid date can ignore leap years; make sure month is range checked as well as day
 namespace Drill {
-	//
+	class Date {
+	public:
+		enum class Month {jan=1,feb,mar,apr,jun,jul,aug,sep,oct,nov,dec};
+		Date(const int& year, const Month& month, const unsigned int& day)
+			:y{ year }, m{ month }, d{ day }
+		{ }
+
+	private:
+		int y;
+		Month m;
+		unsigned int d;
+	};
 } //namespace Drill
+void Drill() {
+	//TODO
+	return;
+}
 
 ///Review
 //What are the two parts of a class, as described in the chapter ?
@@ -130,7 +161,7 @@ namespace Drill {
 
 ///Main
 int main() try {
-	TryThis6();
+	Drill();
 	return 0;
 }
 catch (exception& e) {
