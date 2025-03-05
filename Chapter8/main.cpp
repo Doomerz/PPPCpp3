@@ -50,21 +50,6 @@ namespace TT6 {
 		Month m;
 		int d;
 	};
-	void Date::add_day(unsigned int n) {
-		while (n > 0) {
-			if (n < 31 - d) {
-				d += n;
-				n = 0;
-			}
-			else {
-				n -= 31 - d+1; //assumes 31 day months
-				d = 1;
-				++m;
-				if (m == Month::jan)
-					y++;
-			}
-		}
-	}
 
 	int to_int(Date::Month m) { return static_cast<int>(m); }
 	int to_int(Date::WeekDay d) { return static_cast<int>(d); }
@@ -89,6 +74,21 @@ namespace TT6 {
 		if (x < to_int(Date::WeekDay::monday) || to_int(Date::WeekDay::sunday) < x)
 			throw runtime_error("bad weekday");
 		return Date::WeekDay{ x };
+	}
+	void Date::add_day(unsigned int n) {
+		while (n > 0) {
+			if (n < 31 - d) {
+				d += n;
+				n = 0;
+			}
+			else {
+				n -= 31 - d + 1; //assumes 31 day months
+				d = 1;
+				++m;
+				if (m == Month::jan)
+					y++;
+			}
+		}
 	}
 }
 void TryThis6() {
@@ -115,12 +115,7 @@ namespace Drill {
 		class Invalid {};
 		enum class Month {jan=1,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec};
 		enum class WeekDay {monday=1, tuesday, wednesday, thursday, friday, saturday, sunday};
-		Date(const int& year, const Month& month, const unsigned int& day)
-			:y{ year }, m{ month }, d{ day }
-		{ 
-			if (!is_valid(*this))
-				throw Invalid{};
-		}
+		Date(const int& year, const Month& month, const unsigned int& day);
 
 		unsigned int day() const { return d; }
 		Month month() const { return m; }
@@ -132,25 +127,6 @@ namespace Drill {
 		Month m;
 		unsigned int d;
 	};
-	void Date::add_day(unsigned int n) {
-		while (n) {
-			unsigned int dim = days_in_month(m);
-			if (n + d <= dim) {
-				d += n;
-				return;
-			}
-			else {
-				n -= dim - d + 1; //go to day 1 of next month
-				d = 1;
-				++m;
-				if (m == Month::jan) y++;
-			}
-		}
-	}
-	bool is_valid(const Date& date) {
-		//TODO FIX WITH DAYSINMONTH
-		return !(date.day() < 1 || date.day() > 31 || to_int(date.month()) < 1 || to_int(date.month()) > 12);
-	}
 	unsigned int to_int(const Date::Month& m) { return static_cast<unsigned int>(m); }
 	unsigned int to_int(const Date::WeekDay& d) { return static_cast<unsigned int>(d); }
 	vector<string> month_tbl = { "Not a month", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
@@ -159,21 +135,29 @@ namespace Drill {
 	ostream& operator<<(ostream& os, const Date::WeekDay& d) { return os << day_tbl[to_int(d)]; }
 	ostream& operator<<(ostream& os, const Date& d) { return os << d.year() << '/' << d.month() << '/' << d.day(); }
 	Date::Month operator++(Date::Month& m) {
-		m = (m == Date::Month::dec) ? Date::Month::jan : Date::Month{ to_int(m) + 1 };
+		m = (m == Date::Month::dec) ? Date::Month::jan : Date::Month( to_int(m) + 1 );
 		return m;
 	}
 	Date::Month int_to_month(const unsigned int& x) {
 		if (x < to_int(Date::Month::jan) || to_int(Date::Month::dec) < x)
 			throw runtime_error("bad month");
-		return Date::Month{ x };
+		return Date::Month(x);
 	}
-	Date::WeekDay int_to_day(const unsigned int& x) {
+	Date::WeekDay int_to_weekday(const unsigned int& x) {
 		if (x < to_int(Date::WeekDay::monday) || to_int(Date::WeekDay::sunday) < x)
 			throw runtime_error("bad weekday");
-		return Date::WeekDay{ x };
+		return Date::WeekDay(x);
 	}
 	bool is_leapyear(int year) {
-		//TODO need logic.
+		//if year divisible 4
+		//but not if year is divisble by 100
+		//unless also divisible by 400
+		if (!(year % 400))
+			return true;
+		if (!(year % 100))
+			return false;
+		if (!(year % 4))
+			return true;
 		return false;
 	}
 	unsigned int days_in_month(const Date& date) {
@@ -181,7 +165,8 @@ namespace Drill {
 		case Date::Month::jan:
 			return 31;
 		case Date::Month::feb:
-			if (is_leapyear(date.year())) return 29;
+			if (is_leapyear(date.year()))
+				return 29;
 			return 28;
 		case Date::Month::mar:
 			return 31;
@@ -207,10 +192,39 @@ namespace Drill {
 			throw runtime_error("bad month in days_in_month");
 		}
 	}
+	bool is_valid(const Date& date) {
+		return !(to_int(date.month()) < 1 || to_int(date.month()) > 12 || date.day() < 1 || date.day() > days_in_month(date));
+	}
+	Date::Date(const int& year, const Month& month, const unsigned int& day)
+		:y{ year }, m{ month }, d{ day }
+	{
+		if (!is_valid(*this))
+			throw Invalid{};
+	}
+	void Date::add_day(unsigned int n) {
+		while (n) {
+			unsigned int dim = days_in_month(*this);
+			if (n + d <= dim) {
+				d += n;
+				return;
+			}
+			else {
+				n -= dim - d + 1; //go to day 1 of next month
+				d = 1;
+				++m;
+				if (m == Month::jan) y++;
+			}
+		}
+	}
 } //namespace Drill
 void drill() {
-	//TODO
-	return;
+	//write day, month and their associated funcs
+	// is_valid(), Month, Year, etc. define a date called today init to feb 2, 2020
+	// then def tomorrow by copy today and .add_day(); output today and tomorrow using a <<
+	Drill::Date today{ 2020,Drill::Date::Month::feb,2 };
+	Drill::Date tomorrow = today;
+	tomorrow.add_day(1);
+	cout << "Today: " << today << '\n' << "Tomorrow: " << tomorrow << endl;
 }
 
 ///Review
@@ -243,6 +257,97 @@ void drill() {
 
 ///Exercises
 //ex1:
+//exercise for reader
+//ex2:
+//design and implement a name_pairs class holding name,age pairs. <string,double>
+//represent with a vector for each
+//provide and input operation (read_names()) that reads names, then use read_ages() to get ages for each name
+//provide a print() operation that prints out the values pair in each in the order determined by the name vector
+//provide a sort operation taht sorts the name vector in alphabetical order and reorganizes the age vector to matach.
+//implement all as member functions
+namespace ex2 {
+	class Name_pairs {
+	public:
+		string print() const;
+
+		void read_names();
+		void read_ages();
+		void sort();
+	private:
+		vector<string> names;
+		vector<double> ages;
+	};
+	ostream& operator<<(ostream& os, const Name_pairs& np) {
+		os << np.print();
+	}
+	string read_line() {
+		string res;
+		getline(cin, res);
+		return res;
+	}
+	double read_age(const string& name) {
+		size_t i;
+		while (true) {
+			cout << name << "'s age is: ";
+			string inp = read_line();
+			try {
+				double res = stod(inp,&i);
+				if (i != inp.size())
+					throw runtime_error("Entry contained additional characters after number");
+				else if (res < 0)
+					throw runtime_error("Age cannot be < 0");
+				else
+					return res;
+			}
+			catch (exception& e) {
+				string err;
+				if (e.what() == "invalid stod argument")
+					err = "Entry not a number.";
+				else if (e.what() == "stod argument out of range")
+					err = "Entry does not fit in double.";
+				else
+					err = e.what();
+				cerr << "Invalid input: " << e.what() << "\nTry again:\n";
+			}
+		}
+	}
+	string Name_pairs::print() const {
+		if (ages.size()!=names.size()) return "ages not initialized";
+		string res;
+		for (int i = 0; i < names.size(); i++)
+			res += names[i] + ":" + to_string(ages[i]);
+		return res;
+	}
+	void Name_pairs::read_names() {
+		const string quit = "done";
+		cout << "Enter names one line at a time, enter \"" << quit << "\" to conclude\n";
+		while (true) {
+			string res = read_line();
+			if (res == quit)
+				break;
+			names.push_back(res);
+		}
+	}
+	void Name_pairs::read_ages() {
+		cout << "Enter ages for respective name\n";
+		for (int i = 0; i < names.size(); i++) {
+			double res = read_age(names[i]);
+			ages.push_back(res);
+		}
+	}
+	void Name_pairs::sort() {
+		vector<string> temp = names;
+		std::sort(names.begin(), names.end());
+		for (int i = 0; i < names.size(); i++) {
+			if (names[i] == temp[i]) continue;
+			for (int k = i + 1; k < names.size(); k++) {
+				//can we verify in get_names that there are no duplicates?
+			}
+		}
+		//TODO
+		return 0;
+	}
+}
 
 ///Main
 int main() try {
