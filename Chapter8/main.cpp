@@ -265,6 +265,8 @@ void drill() {
 //provide a print() operation that prints out the values pair in each in the order determined by the name vector
 //provide a sort operation taht sorts the name vector in alphabetical order and reorganizes the age vector to matach.
 //implement all as member functions
+//ex3:
+//replace name_pairs::print() with a global operator << and define == and !=
 namespace ex2 {
 	class Name_pairs {
 	public:
@@ -279,6 +281,13 @@ namespace ex2 {
 	};
 	ostream& operator<<(ostream& os, const Name_pairs& np) {
 		os << np.print();
+	}
+	bool operator==(const Name_pairs& a, const Name_pairs& b) {
+		if (a.print() == b.print())
+			return true;
+	}
+	bool operator!=(const Name_pairs& a, const Name_pairs& b) {
+		return !(a == b);
 	}
 	string read_line() {
 		string res;
@@ -322,10 +331,18 @@ namespace ex2 {
 		const string quit = "done";
 		cout << "Enter names one line at a time, enter \"" << quit << "\" to conclude\n";
 		while (true) {
+			bool contains = false;
 			string res = read_line();
 			if (res == quit)
 				break;
-			names.push_back(res);
+			for (const string& s : names) {
+				if (res == s) {
+					contains = true;
+					break;
+				}
+			}
+			if (!contains)
+				names.push_back(res);
 		}
 	}
 	void Name_pairs::read_ages() {
@@ -336,18 +353,124 @@ namespace ex2 {
 		}
 	}
 	void Name_pairs::sort() {
+		//assumes there are no duplicate names
 		vector<string> temp = names;
 		std::sort(names.begin(), names.end());
 		for (int i = 0; i < names.size(); i++) {
 			if (names[i] == temp[i]) continue;
 			for (int k = i + 1; k < names.size(); k++) {
-				//can we verify in get_names that there are no duplicates?
+				if (names[i] == temp[k]) {
+					swap(temp[i], temp[k]);
+					swap(ages[i], ages[k]);
+					break;
+				}
 			}
 		}
-		//TODO
-		return 0;
 	}
 }
+//ex4:
+//implement Name_pairs using a Name_pair class
+namespace ex4 {
+	class Name_pair {
+	public:
+		string print() const;
+		string get_name() const;
+		double get_age() const;
+
+		void set();
+		void set(const string& n, const string& a);
+		void read_name();
+		void read_age(const string& name);
+	private:
+		string name;
+		double age = -1;
+	};
+	class Name_pairs {
+	public:
+		string print() const;
+
+		void read_names();
+		void read_ages();
+		void sort();
+	private:
+		vector<Name_pair> pairs;
+	};
+	ostream& operator<<(ostream& os, const Name_pair& np);
+	ostream& operator<<(ostream& os, const Name_pairs& nps);
+	bool operator==(const Name_pair& a, const Name_pair& b);
+	bool operator==(const Name_pairs& a, const Name_pairs& b);
+	bool operator!=(const Name_pair& a, const Name_pair& b);
+	bool operator!=(const Name_pairs& a, const Name_pairs& b);
+	void Name_pair::read_age(const string& name);
+	void Name_pair::read_name();
+}
+//ex5:
+//design and implement a Book class such as for a library.
+//Book should have members for the ISBN, Title, Author, and Copyright Date
+//store data on whether or not the book is checked out.
+//create functions for returning these values
+//create funcs for checking a book in and out
+//do simple validation of data entered
+//ISBNs only of the form n-n-n-x where n is an int and x is a digit or letter. (store as string)
+//ex6:
+//add operators for the Book class, have the == operator check whether the ISBN numbers are the same for two books
+//have != also compare
+//have << print out the title, author and ISBN on separate lines
+//ex7:
+//create an enumerated type for the Book class called Genre
+//have fiction,nonfiction, periodical, biography, and children
+//ex8:
+//create a Patron class for the library
+//the class will have the user's name, library card number, library fees (if owed)
+//have funcs that access this data as well as a function to set the fee of the user.
+//have a helper that returns a boolean depending on whether the user owes fees
+//ex9:
+//create a library class
+//include vectors of books and patrons
+//include a struct called transaction to record when a book is checked out
+//have it include a book, patron, and date
+//make a vector of transactions
+//create funcs to add books to the lirary, add patrons, and chckout books
+//when checking out, library checks if user and book are in the library, if not report error.
+//then check if the user oews fees. if so report an error
+//otherwise create a transaction and add to respective vector.
+//write a function that will return a vector that contains the names of all patrons who owe fees.
+namespace Library {
+	//
+}
+//ex10:
+//completed
+//ex11:
+//design and implement a set of useful helper functions for the date class
+//next_workday() (!saturday && !sunday), week_of_year()
+//ex12:
+//change the representation of a date to be the number of days since jan 1,1970.
+//represent as a long int
+// reimplement the date member funcs in 8.4.2
+//be sure to reject dates outside the range
+//ex13:
+//design and implement a rational number class, Rational.
+//numerator and a denominator
+//provide assignment, addition, subtraction, multiplication, division, and equality operators
+//provide a conversion ot double.
+//ex14:
+//design and implement a Money class
+//4/5 rounding rule, accurate to the last cent
+//rep as a long int of cents
+//don't worry about numeric limits
+//ex15:
+//refine Money class by adding a currency (given as a constructor arg)
+//accept a floating point initializer as long as it can be exactly represented as a long int
+//don't accept illegal operations
+//money*money doesn't make sense
+//the USD1.23+DKK5.00 makes sense if you provide a conversion table definint the conversion factor.
+//ex16:
+//Define an input operator>> that reads monetary amounts with currency denominations into Money
+//define << too
+//ex17:
+//example where a rational gives a mathematically better result than Money
+//ex18:
+//example where Rational gives a better result than double
 
 ///Main
 int main() try {

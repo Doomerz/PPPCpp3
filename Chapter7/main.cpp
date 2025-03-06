@@ -790,7 +790,7 @@ void c7e7(bool use_default = true) {
 	sort(name.begin(), name.end());
 	
 	for (int i{}; i < name.size(); i++) {
-		for (int k{i+1}; k < temp.size(); k++) {
+		for (int k{i+1}; k < temp.size(); k++) { //not best
 			if (name[i] != temp[k]) continue;
 			if (i == k) break;
 			swap(age[i], age[k]);
