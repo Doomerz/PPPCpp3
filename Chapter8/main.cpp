@@ -378,7 +378,7 @@ namespace ex4 {
 		double get_age() const;
 
 		void set();
-		void set(const string& n, const string& a);
+		void set(const string& n, const double& a);
 		void read_name();
 		void read_age(const string& name);
 	private:
@@ -388,20 +388,57 @@ namespace ex4 {
 	class Name_pairs {
 	public:
 		string print() const;
+		Name_pair get(size_t index) const;
 
-		void read_names();
-		void read_ages();
+
+		void read_pairs();
 		void sort();
 	private:
 		vector<Name_pair> pairs;
 	};
-	ostream& operator<<(ostream& os, const Name_pair& np);
-	ostream& operator<<(ostream& os, const Name_pairs& nps);
-	bool operator==(const Name_pair& a, const Name_pair& b);
-	bool operator==(const Name_pairs& a, const Name_pairs& b);
-	bool operator!=(const Name_pair& a, const Name_pair& b);
-	bool operator!=(const Name_pairs& a, const Name_pairs& b);
-	void Name_pair::read_age(const string& name);
+	ostream& operator<<(ostream& os, const Name_pair& np) { os << np.print(); }
+	ostream& operator<<(ostream& os, const Name_pairs& nps) { os << nps.print(); }
+	bool operator==(const Name_pair& a, const Name_pair& b) {
+		if (a.get_name() == b.get_name() && a.get_age() == b.get_age())
+			return true;
+		return false;
+	}
+	bool operator==(const Name_pairs& a, const Name_pairs& b) {
+		if (a.print() == b.print())
+			return true;
+		return false;
+	}
+	bool operator!=(const Name_pair& a, const Name_pair& b) { return !(a == b); }
+	bool operator!=(const Name_pairs& a, const Name_pairs& b) { return !(a == b); }
+	void Name_pair::read_age(const string& name) {
+		size_t i;
+		while (true) {
+			cout << name << "'s age is: ";
+			string inp;
+			getline(cin, inp);
+			try {
+				double res = stod(inp, &i);
+				if (i != inp.size())
+					throw runtime_error("Entry contained additional characters after number");
+				else if (res < 0)
+					throw runtime_error("Age cannot be < 0");
+				else {
+					age = res;
+					return;
+				}
+			}
+			catch (exception& e) {
+				string err;
+				if (e.what() == "invalid stod argument")
+					err = "Entry not a number.";
+				else if (e.what() == "stod argument out of range")
+					err = "Entry does not fit in double.";
+				else
+					err = e.what();
+				cerr << "Invalid input: " << e.what() << "\nTry again:\n";
+			}
+		}
+	}
 	void Name_pair::read_name();
 }
 //ex5:
