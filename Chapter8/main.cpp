@@ -328,7 +328,7 @@ namespace ex2 {
 		return res;
 	}
 	void Name_pairs::read_names() {
-		const string quit = "done";
+		const string quit = "done"; //probably should have just done an empty string = done
 		cout << "Enter names one line at a time, enter \"" << quit << "\" to conclude\n";
 		while (true) {
 			bool contains = false;
@@ -368,19 +368,27 @@ namespace ex2 {
 		}
 	}
 }
+void ex3() {
+	ex2::Name_pairs nps;
+	nps.read_names();
+	nps.read_ages();
+	cout << nps << "\n\n";
+	nps.sort();
+	cout << "sorted:\n\n" << nps;
+}
 //ex4:
 //implement Name_pairs using a Name_pair class
-namespace ex4 {
+namespace e4 {
 	class Name_pair {
 	public:
+		Name_pair(const string& n, const double& a) : name{ n }, age{ a } {}
+
 		string print() const;
 		string get_name() const;
 		double get_age() const;
 
-		void set();
 		void set(const string& n, const double& a);
-		void read_name();
-		void read_age(const string& name);
+		//can't check for duplicates unless we pass in a vector or just handle on the caller side.
 	private:
 		string name;
 		double age = -1;
@@ -388,7 +396,7 @@ namespace ex4 {
 	class Name_pairs {
 	public:
 		string print() const;
-		Name_pair get(size_t index) const;
+		Name_pair get(const size_t& index) const;
 
 
 		void read_pairs();
@@ -410,37 +418,67 @@ namespace ex4 {
 	}
 	bool operator!=(const Name_pair& a, const Name_pair& b) { return !(a == b); }
 	bool operator!=(const Name_pairs& a, const Name_pairs& b) { return !(a == b); }
-	void Name_pair::read_age(const string& name) {
-		size_t i;
+	void Name_pair::set(const string& n, const double& a) { name = n; age = a; }
+	double Name_pair::get_age() const { return age; }
+	string Name_pair::get_name() const { return name; }
+	string Name_pair::print() const { return name + ":" + to_string(age); }
+	void Name_pairs::sort() { std::sort(pairs.begin(), pairs.end()); }
+	void Name_pairs::read_pairs() {
 		while (true) {
-			cout << name << "'s age is: ";
-			string inp;
-			getline(cin, inp);
-			try {
-				double res = stod(inp, &i);
-				if (i != inp.size())
-					throw runtime_error("Entry contained additional characters after number");
-				else if (res < 0)
-					throw runtime_error("Age cannot be < 0");
-				else {
-					age = res;
-					return;
+			string name, age;
+			double x;
+			cout << "Enter name or leave empty to exit";
+			getline(cin, name);
+			if (name.size() == 0) break;
+			while (true) {
+				size_t i;
+				cout << "Enter " << name << "'s age: ";
+				getline(cin, age);
+				try {
+					double res = stod(age, &i);
+					if (i != age.size())
+						throw runtime_error("Entry contained additional characters after number");
+					else if (res < 0)
+						throw runtime_error("Age cannot be < 0");
+					else {
+						x = res;
+						break;
+					}
+				}
+				catch (exception& e) {
+					string err;
+					if (e.what() == "invalid stod argument")
+						err = "Entry not a number.";
+					else if (e.what() == "stodargument out of range")
+						err = "Entry does not fit in double.";
+					else
+						err = e.what();
+					cerr << "Invalid input: " << err << "\nTry again:\n";
 				}
 			}
-			catch (exception& e) {
-				string err;
-				if (e.what() == "invalid stod argument")
-					err = "Entry not a number.";
-				else if (e.what() == "stod argument out of range")
-					err = "Entry does not fit in double.";
-				else
-					err = e.what();
-				cerr << "Invalid input: " << e.what() << "\nTry again:\n";
-			}
+			pairs.push_back(Name_pair{ name,x });
 		}
 	}
-	void Name_pair::read_name();
+	Name_pair Name_pairs::get(const size_t& index) const {
+		if (index < 0) throw runtime_error("index out of range (index<0)");
+		if (index >= pairs.size()) throw runtime_error("index out of range (index >= size)");
+		return pairs[index];
+	}
+	string Name_pairs::print() const {
+		string res;
+		for (const auto& np : pairs) {
+			res += np.print();
+		}
+		return res;
+	}
 }
+void ex4() {
+	e4::Name_pairs nps;
+	nps.read_pairs();
+	cout << nps << "\n\n";
+	nps.sort();
+	cout << "sorted:\n\n" << nps;
+} //TODO TEST EX3 AND EX4
 //ex5:
 //design and implement a Book class such as for a library.
 //Book should have members for the ISBN, Title, Author, and Copyright Date
@@ -511,7 +549,7 @@ namespace Library {
 
 ///Main
 int main() try {
-	drill();
+	ex3();
 	return 0;
 }
 catch (exception& e) {
