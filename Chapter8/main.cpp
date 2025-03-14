@@ -280,7 +280,7 @@ namespace ex2 {
 		vector<double> ages;
 	};
 	ostream& operator<<(ostream& os, const Name_pairs& np) {
-		os << np.print();
+		return os << np.print();
 	}
 	bool operator==(const Name_pairs& a, const Name_pairs& b) {
 		if (a.print() == b.print())
@@ -404,8 +404,8 @@ namespace e4 {
 	private:
 		vector<Name_pair> pairs;
 	};
-	ostream& operator<<(ostream& os, const Name_pair& np) { os << np.print(); }
-	ostream& operator<<(ostream& os, const Name_pairs& nps) { os << nps.print(); }
+	ostream& operator<<(ostream& os, const Name_pair& np) { return os << np.print(); }
+	ostream& operator<<(ostream& os, const Name_pairs& nps) { return os << nps.print(); }
 	bool operator==(const Name_pair& a, const Name_pair& b) {
 		if (a.get_name() == b.get_name() && a.get_age() == b.get_age())
 			return true;
@@ -418,6 +418,9 @@ namespace e4 {
 	}
 	bool operator!=(const Name_pair& a, const Name_pair& b) { return !(a == b); }
 	bool operator!=(const Name_pairs& a, const Name_pairs& b) { return !(a == b); }
+	bool operator<(const Name_pair& a, const Name_pair& b) {
+		return a.get_name() < b.get_name();
+	}
 	void Name_pair::set(const string& n, const double& a) { name = n; age = a; }
 	double Name_pair::get_age() const { return age; }
 	string Name_pair::get_name() const { return name; }
@@ -427,7 +430,7 @@ namespace e4 {
 		while (true) {
 			string name, age;
 			double x;
-			cout << "Enter name or leave empty to exit";
+			cout << "Enter name or leave empty to exit\n";
 			getline(cin, name);
 			if (name.size() == 0) break;
 			while (true) {
@@ -478,7 +481,7 @@ void ex4() {
 	cout << nps << "\n\n";
 	nps.sort();
 	cout << "sorted:\n\n" << nps;
-} //TODO TEST EX3 AND EX4
+}
 //ex5:
 //design and implement a Book class such as for a library.
 //Book should have members for the ISBN, Title, Author, and Copyright Date
@@ -511,7 +514,64 @@ void ex4() {
 //otherwise create a transaction and add to respective vector.
 //write a function that will return a vector that contains the names of all patrons who owe fees.
 namespace Library {
-	//
+	struct Book {
+		Book(const string& isbn, const string& title, const string& author, const string& cpyr_date, const bool& avail = true)
+			: ISBN{ isbn }, Title{ title }, Author{ author }, Copyright_date{ cpyr_date }, available{ avail }
+		{
+			if (!valid_isbn(isbn)) throw runtime_error("Book::Book: isbn not valid");
+			if (!valid_cpyr_date(cpyr_date)) throw runtime_error("Book::Book: cpyr_date not valid");
+		}
+		Book() = delete;
+
+		//getters
+		bool avail() const { return available; }
+		string isbn() const { return ISBN; }
+		string title() const { return Title; }
+		string author() const { return Author; }
+		string copyright_date() const { return Copyright_date; }
+
+		//setters
+		void avail(const bool& is_avail) { available = is_avail; }
+		//TODO
+	private:
+		bool available;
+		string ISBN,
+			Title,
+			Author,
+			Copyright_date;
+	};
+	//validation
+	
+	//make Book class
+	// ISBN, Title, Author, copyright date
+	// bool stocked
+	// set/getter
+	// validation checks
+	// n-n-n-x store as strings.
+	// 
+	//add operators for Book
+	// == | check whether the SIBN numbers are the same
+	// !=
+	// << print out title, author, and ISBN on separate lines
+	// 
+	//create an enumerated type for the Book class called Genre
+	// fiction, nonfiction, periodical, biography, and children
+	// 
+	//create a Patron class
+	// username, libcard number, libfees
+	// set/getters
+	// helper return bool if (libfees) return true;
+	// 
+	// create library class
+	// include vec of Books and Patrons
+	// include struct called transaction to record book being checked out,etc.
+	// .include a book, patron, and date
+	// make a vec of transactions
+	// create funcs to add books to the library, add patrons, and checkout books
+	// report error if trying to check out a book that is already checked out.
+	// if the user owes fees report error as well.
+	// func that will return a vec containing the names of all patrons who owe fees.
+	//TODO
 }
 //ex10:
 //completed
@@ -549,7 +609,7 @@ namespace Library {
 
 ///Main
 int main() try {
-	ex3();
+	ex5();
 	return 0;
 }
 catch (exception& e) {
