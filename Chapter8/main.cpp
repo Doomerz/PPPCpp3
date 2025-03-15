@@ -532,7 +532,10 @@ namespace Library {
 
 		//setters
 		void avail(const bool& is_avail) { available = is_avail; }
-		//TODO
+		void isbn(const string& isbn) { if (!valid_isbn(isbn)) throw runtime_error("isbn not valid"); ISBN = isbn; }
+		//void title(const string& title) { Title = title; }
+		//void author(const string& author) { Author = author; }
+		//void cpyr_date(const string& cpyr) { if (!valid_cpyr_date) throw runtime_error("cpyr not valid"); Copyright_date = cpyr; }
 	private:
 		bool available;
 		string ISBN,
@@ -541,6 +544,8 @@ namespace Library {
 			Copyright_date;
 	};
 	//validation
+	bool valid_isbn(const string& isbn);
+	bool valid_cpyr_date(const string& cpyr_date);
 	
 	//make Book class
 	// ISBN, Title, Author, copyright date
