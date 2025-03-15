@@ -515,8 +515,10 @@ void ex4() {
 //write a function that will return a vector that contains the names of all patrons who owe fees.
 namespace Library {
 	struct Book {
-		Book(const string& isbn, const string& title, const string& author, const string& cpyr_date, const bool& avail = true)
-			: ISBN{ isbn }, Title{ title }, Author{ author }, Copyright_date{ cpyr_date }, available{ avail }
+		enum class Genre { fiction, nonfiction, periodical, biography, children };
+
+		Book(const string& isbn, const string& title, const string& author, const string& cpyr_date, const Genre& genre, const bool& avail = true)
+			: ISBN{ isbn }, Title{ title }, Author{ author }, Copyright_date{ cpyr_date }, genre_{genre}, available { avail }
 		{
 			if (!valid_isbn(isbn)) throw runtime_error("Book::Book: isbn not valid");
 			if (!valid_cpyr_date(cpyr_date)) throw runtime_error("Book::Book: cpyr_date not valid");
@@ -529,6 +531,7 @@ namespace Library {
 		string title() const { return Title; }
 		string author() const { return Author; }
 		string copyright_date() const { return Copyright_date; }
+		Genre genre() const { return genre_; }
 
 		//setters
 		void avail(const bool& is_avail) { available = is_avail; }
@@ -536,32 +539,57 @@ namespace Library {
 		//void title(const string& title) { Title = title; }
 		//void author(const string& author) { Author = author; }
 		//void cpyr_date(const string& cpyr) { if (!valid_cpyr_date) throw runtime_error("cpyr not valid"); Copyright_date = cpyr; }
+		//void genre(const Genre& g) { genre_ = g; }
 	private:
 		bool available;
+		Genre genre_;
 		string ISBN,
 			Title,
 			Author,
 			Copyright_date;
 	};
 	//validation
-	bool valid_isbn(const string& isbn);
-	bool valid_cpyr_date(const string& cpyr_date);
-	
-	//make Book class
-	// ISBN, Title, Author, copyright date
-	// bool stocked
-	// set/getter
-	// validation checks
-	// n-n-n-x store as strings.
-	// 
-	//add operators for Book
-	// == | check whether the SIBN numbers are the same
-	// !=
-	// << print out title, author, and ISBN on separate lines
-	// 
-	//create an enumerated type for the Book class called Genre
-	// fiction, nonfiction, periodical, biography, and children
-	// 
+	bool valid_isbn(const string& isbn) {
+		if (isbn.size() != 13)
+			return false;
+		if (!isdigit(isbn[0]) || isbn[11] != '-' || !isalnum(isbn[12]))
+			return false;
+		for (int i{ 1 }; i < isbn.size() - 1; i++) {
+			if (!isdigit(isbn[i]) && isbn[i] != '-')
+				return false;
+			if (isbn[i] == isbn[i - 1] && isbn[i] == '-')
+				return false;
+		}
+		short sum{};
+		for (const char& c : isbn)
+			if (c == '-')
+				sum++;
+		if (sum != 3)
+			return false;
+		return true;
+	}
+	bool valid_cpyr_date(const string& cpyr_date) {
+		//choose a date format.
+		return true;
+	}
+	bool operator==(const Book& a, const Book& b) {
+		if (a.isbn() == b.isbn())
+			return true;
+		return false;
+	}
+	bool operator!=(const Book& a, const Book& b) {
+		return !(a == b);
+	}
+	ostream& operator<<(ostream& os, const Book& a) {
+		return os << a.title() << '\n' << a.author() << '\n' << a.isbn() << '\n' << a.copyright_date() << '\n';
+	}
+
+	struct Patron {
+		//TODO
+	private:
+		int libfees;
+		string name, card_num;
+	};
 	//create a Patron class
 	// username, libcard number, libfees
 	// set/getters
