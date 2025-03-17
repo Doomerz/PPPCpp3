@@ -513,12 +513,12 @@ void ex4() {
 //then check if the user oews fees. if so report an error
 //otherwise create a transaction and add to respective vector.
 //write a function that will return a vector that contains the names of all patrons who owe fees.
-namespace Library {
+namespace Library_ {
 	struct Book {
-		enum class Genre { fiction, nonfiction, periodical, biography, children };
+		enum class Genre { unknown, fiction, nonfiction, periodical, biography, children };
 
 		Book(const string& isbn, const string& title, const string& author, const string& cpyr_date, const Genre& genre, const bool& avail = true)
-			: ISBN{ isbn }, Title{ title }, Author{ author }, Copyright_date{ cpyr_date }, genre_{genre}, available { avail }
+			: ISBN{ isbn }, Title{ title }, Author{ author }, Copyright_date{ cpyr_date }, genre_{ genre }, available{ avail }
 		{
 			if (!valid_isbn(isbn)) throw runtime_error("Book::Book: isbn not valid");
 			if (!valid_cpyr_date(cpyr_date)) throw runtime_error("Book::Book: cpyr_date not valid");
@@ -534,15 +534,16 @@ namespace Library {
 		Genre genre() const { return genre_; }
 
 		//setters
-		void avail(const bool& is_avail) { available = is_avail; }
+		void checkout() { if (!available) throw runtime_error("book already checked out"); available = false; }
+		void return_book() { if (available) throw runtime_error("book already in library"); available = true; }
 		void isbn(const string& isbn) { if (!valid_isbn(isbn)) throw runtime_error("isbn not valid"); ISBN = isbn; }
 		//void title(const string& title) { Title = title; }
 		//void author(const string& author) { Author = author; }
 		//void cpyr_date(const string& cpyr) { if (!valid_cpyr_date) throw runtime_error("cpyr not valid"); Copyright_date = cpyr; }
-		//void genre(const Genre& g) { genre_ = g; }
+		void genre(const Genre& g) { genre_ = g; }
 	private:
 		bool available;
-		Genre genre_;
+		Genre genre_ = Genre::unknown;
 		string ISBN,
 			Title,
 			Author,
@@ -585,26 +586,92 @@ namespace Library {
 	}
 
 	struct Patron {
-		//TODO
+		Patron(const string& n, const int& cardnumber, const int& fees = 0) : name{ n }, card_num{ cardnumber }, libfees{ fees } {}
+		Patron() = delete;
+
+		string username() const { return name; }
+		int fees() const { return libfees; }
+		int card_number() const { return card_num; }
+
+		void add_fee(const int& fee) { libfees += fee; }
+		void change_name(const string& new_name) { name = new_name; }
 	private:
-		int libfees;
-		string name, card_num;
+		int libfees, card_num;
+		string name;
 	};
-	//create a Patron class
-	// username, libcard number, libfees
-	// set/getters
-	// helper return bool if (libfees) return true;
-	// 
-	// create library class
-	// include vec of Books and Patrons
-	// include struct called transaction to record book being checked out,etc.
-	// .include a book, patron, and date
-	// make a vec of transactions
-	// create funcs to add books to the library, add patrons, and checkout books
-	// report error if trying to check out a book that is already checked out.
-	// if the user owes fees report error as well.
-	// func that will return a vec containing the names of all patrons who owe fees.
-	//TODO
+	bool has_fees(const Patron& patron) { return patron.fees() > 0; }
+	bool operator==(const Patron& a, const Patron& b) { return a.card_number() == b.card_number() ? true : false; }
+	bool operator!=(const Patron& a, const Patron& b) { return !(a == b); }
+
+	struct Transaction {
+		Transaction(const Book& book, const Patron& patron, const string& date)
+			: book_{ book }, user_{ patron }, date_{ date }
+		{
+		}
+		Transaction() = delete;
+
+		const Book& book() const { return book_; }
+		const Patron& user() const { return user_; }
+		const string& date() const { return date_; }
+	private:
+		Book book_;
+		Patron user_;
+		string date_;
+	};
+
+	struct Library {
+		const vector<Book>& selection() const { return books; }
+		const vector<Patron>& patrons() const { return users; }
+		const vector<Transaction>& history() const { return transactions; }
+		const Book& selection(const string& isbn) const { for (const Book& b : books) if (isbn == b.isbn()) return b; throw runtime_error("isbn not in library"); }
+
+		void add_book(const Book& book);
+		void add_user(const string& name);
+		void checkout(const Book& book, const Patron& user, const string& date);
+	private:
+		int next_card_number = 0;
+		vector<Book> books;
+		vector<Patron> users;
+		vector<Transaction> transactions;
+	};
+	void Library::add_book(const Book& book) {
+		for (const Book& b : books)
+			if (book == b)
+				throw runtime_error("duplicate book"); //just to simplify, if we want multiple copies we'll want an int instead of a bool for available.
+		books.push_back(book);
+	}
+	void Library::add_user(const string& name) {
+		Patron user(name, next_card_number);
+		next_card_number++;
+		users.push_back(user);
+	}
+	void Library::checkout(const Book& book, const Patron& user, const string& date) {
+		for (Book& b : books) {
+			if (b == book) {
+				if (book.avail()) {
+					for (Patron& p : users) {
+						if (p == user) {
+							if (!has_fees(p)) {
+								b.checkout();
+								transactions.emplace_back(Transaction(b, p, date));
+							}
+							throw runtime_error("user has outstanding balance");
+						}
+					}
+					throw runtime_error("no such user");
+				}
+				throw runtime_error("book not available");
+			}
+		}
+		throw runtime_error("book not in library");
+	}
+	vector<Patron> outstanding(const Library& lib) {
+		vector<Patron> res;
+		for (const Patron& user : lib.patrons())
+			if (has_fees(user))
+				res.push_back(user);
+		return res;
+	}
 }
 //ex10:
 //completed
@@ -616,11 +683,17 @@ namespace Library {
 //represent as a long int
 // reimplement the date member funcs in 8.4.2
 //be sure to reject dates outside the range
+namespace c8_Date {
+	//TODO
+}
 //ex13:
 //design and implement a rational number class, Rational.
 //numerator and a denominator
 //provide assignment, addition, subtraction, multiplication, division, and equality operators
 //provide a conversion ot double.
+namespace c8_math {
+	//TODO
+}
 //ex14:
 //design and implement a Money class
 //4/5 rounding rule, accurate to the last cent
@@ -635,6 +708,9 @@ namespace Library {
 //ex16:
 //Define an input operator>> that reads monetary amounts with currency denominations into Money
 //define << too
+namespace c8_finance {
+	//TODO
+}
 //ex17:
 //example where a rational gives a mathematically better result than Money
 //ex18:
@@ -642,7 +718,7 @@ namespace Library {
 
 ///Main
 int main() try {
-	ex5();
+	//should come up with some tests.
 	return 0;
 }
 catch (exception& e) {
@@ -654,4 +730,16 @@ catch (...) {
 	return -2;
 }
 
-//reading 8.7
+//
+// an enum class of error types
+class someobj {
+	struct throwable {
+		enum class failtype{one_loc_of_failure,another};
+		//but what if we could specify all distinct error locations (perhaps dynamically??)
+		//but then we use masks and other conditions like ios_base::fail bits etc. to make error groups.
+		//perhaps write a way to express that and then try to implement it
+		//we can either dynamically insert from the code or send the code to a middleman engine that then compiles post code.
+		//or we can keep it abstract.
+	};
+};
+//
