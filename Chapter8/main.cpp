@@ -678,12 +678,277 @@ namespace Library_ {
 //ex11:
 //design and implement a set of useful helper functions for the date class
 //next_workday() (!saturday && !sunday), week_of_year()
+namespace c8_e11Date {
+	class Date {
+	public:
+		class Invalid {};
+		enum class Month { jan = 1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec };
+		enum class WeekDay { monday = 1, tuesday, wednesday, thursday, friday, saturday, sunday };
+		Date(const int& year, const Month& month, const unsigned int& day);
+
+		unsigned int day() const { return d; }
+		Month month() const { return m; }
+		int year() const { return y; }
+
+		void add_day(unsigned int n);
+	private:
+		int y;
+		Month m;
+		unsigned int d;
+	};
+	unsigned int to_int(const Date::Month& m) { return static_cast<unsigned int>(m); }
+	unsigned int to_int(const Date::WeekDay& d) { return static_cast<unsigned int>(d); }
+	vector<string> month_tbl = { "Not a month", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+	ostream& operator<<(ostream& os, const Date::Month& m) { return os << month_tbl[to_int(m)]; }
+	vector<string> day_tbl = { "Not a day", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+	ostream& operator<<(ostream& os, const Date::WeekDay& d) { return os << day_tbl[to_int(d)]; }
+	ostream& operator<<(ostream& os, const Date& d) { return os << d.year() << '/' << d.month() << '/' << d.day(); }
+	Date::Month operator++(Date::Month& m) {
+		m = (m == Date::Month::dec) ? Date::Month::jan : Date::Month(to_int(m) + 1);
+		return m;
+	}
+	Date::Month int_to_month(const unsigned int& x) {
+		if (x < to_int(Date::Month::jan) || to_int(Date::Month::dec) < x)
+			throw runtime_error("bad month");
+		return Date::Month(x);
+	}
+	Date::WeekDay int_to_weekday(const unsigned int& x) {
+		if (x < to_int(Date::WeekDay::monday) || to_int(Date::WeekDay::sunday) < x)
+			throw runtime_error("bad weekday");
+		return Date::WeekDay(x);
+	}
+	bool is_leapyear(int year) {
+		//if year divisible 4
+		//but not if year is divisble by 100
+		//unless also divisible by 400
+		if (!(year % 400))
+			return true;
+		if (!(year % 100))
+			return false;
+		if (!(year % 4))
+			return true;
+		return false;
+	}
+	unsigned int days_in_month(const Date& date) {
+		switch (date.month()) {
+		case Date::Month::jan:
+			return 31;
+		case Date::Month::feb:
+			if (is_leapyear(date.year()))
+				return 29;
+			return 28;
+		case Date::Month::mar:
+			return 31;
+		case Date::Month::apr:
+			return 30;
+		case Date::Month::may:
+			return 31;
+		case Date::Month::jun:
+			return 30;
+		case Date::Month::jul:
+			return 31;
+		case Date::Month::aug:
+			return 31;
+		case Date::Month::sep:
+			return 30;
+		case Date::Month::oct:
+			return 31;
+		case Date::Month::nov:
+			return 30;
+		case Date::Month::dec:
+			return 31;
+		default:
+			throw runtime_error("bad month in days_in_month");
+		}
+	}
+	bool is_valid(const Date& date) {
+		return !(to_int(date.month()) < 1 || to_int(date.month()) > 12 || date.day() < 1 || date.day() > days_in_month(date));
+	}
+	Date::Date(const int& year, const Month& month, const unsigned int& day)
+		:y{ year }, m{ month }, d{ day }
+	{
+		if (!is_valid(*this))
+			throw Invalid{};
+	}
+	void Date::add_day(unsigned int n) {
+		while (n) {
+			unsigned int dim = days_in_month(*this);
+			if (n + d <= dim) {
+				d += n;
+				return;
+			}
+			else {
+				n -= dim - d + 1; //go to day 1 of next month
+				d = 1;
+				++m;
+				if (m == Month::jan) y++;
+			}
+		}
+	}
+	Date::WeekDay day_of_week(const Date& d) {
+		constexpr static short t[] = { 0,3,2,5,0,3,5,1,4,6,2,4 };
+		int y = d.year();
+		if (to_int(d.month()) < 3)
+			y -= 1;
+		short res = (y + y / 4 - y / 100 + y / 400 + t[to_int(d.month()) - 1] + d.day()) % 7;
+		if (res == 0) res = 7;
+		return int_to_weekday(res);
+	}
+	Date next_workday(const Date& d) {
+		Date res = d;
+		int wkd = to_int(day_of_week(d));
+		if (wkd == 7 || wkd >= 1 && wkd <= 4) {
+			res.add_day(1);
+			return res;
+		}
+		res.add_day(8 - wkd);
+		return res;
+	}
+	short week_of_year(const Date& d) {
+		Date ref(d.year(), Date::Month::jan, 1);
+		Date::WeekDay yr_dow_start = day_of_week(ref);
+		int woy_start = 0;
+		if (to_int(yr_dow_start) < to_int(Date::WeekDay::friday)) {
+			//first week of the year must contain thursday or it is the last week of the previous year.
+			woy_start++;
+		}
+		//this is a mess
+		//TODO
+	}
+	//ex11:
+	//design and implement a set of useful helper functions for the date class
+	//next_workday() (!saturday && !sunday), week_of_year()
+	//TODO
+}
 //ex12:
 //change the representation of a date to be the number of days since jan 1,1970.
 //represent as a long int
 // reimplement the date member funcs in 8.4.2
 //be sure to reject dates outside the range
 namespace c8_Date {
+	class Date {
+	public:
+		class Invalid {};
+		enum class Month { jan = 1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec };
+		enum class WeekDay { monday = 1, tuesday, wednesday, thursday, friday, saturday, sunday };
+		Date(const int& year, const Month& month, const unsigned int& day);
+
+		unsigned int day() const { return d; }
+		Month month() const { return m; }
+		int year() const { return y; }
+
+		void add_day(unsigned int n);
+	private:
+		int y;
+		Month m;
+		unsigned int d;
+	};
+	unsigned int to_int(const Date::Month& m) { return static_cast<unsigned int>(m); }
+	unsigned int to_int(const Date::WeekDay& d) { return static_cast<unsigned int>(d); }
+	vector<string> month_tbl = { "Not a month", "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+	ostream& operator<<(ostream& os, const Date::Month& m) { return os << month_tbl[to_int(m)]; }
+	vector<string> day_tbl = { "Not a day", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
+	ostream& operator<<(ostream& os, const Date::WeekDay& d) { return os << day_tbl[to_int(d)]; }
+	ostream& operator<<(ostream& os, const Date& d) { return os << d.year() << '/' << d.month() << '/' << d.day(); }
+	Date::Month operator++(Date::Month& m) {
+		m = (m == Date::Month::dec) ? Date::Month::jan : Date::Month(to_int(m) + 1);
+		return m;
+	}
+	Date::Month int_to_month(const unsigned int& x) {
+		if (x < to_int(Date::Month::jan) || to_int(Date::Month::dec) < x)
+			throw runtime_error("bad month");
+		return Date::Month(x);
+	}
+	Date::WeekDay int_to_weekday(const unsigned int& x) {
+		if (x < to_int(Date::WeekDay::monday) || to_int(Date::WeekDay::sunday) < x)
+			throw runtime_error("bad weekday");
+		return Date::WeekDay(x);
+	}
+	bool is_leapyear(int year) {
+		//if year divisible 4
+		//but not if year is divisble by 100
+		//unless also divisible by 400
+		if (!(year % 400))
+			return true;
+		if (!(year % 100))
+			return false;
+		if (!(year % 4))
+			return true;
+		return false;
+	}
+	unsigned int days_in_month(const Date& date) {
+		switch (date.month()) {
+		case Date::Month::jan:
+			return 31;
+		case Date::Month::feb:
+			if (is_leapyear(date.year()))
+				return 29;
+			return 28;
+		case Date::Month::mar:
+			return 31;
+		case Date::Month::apr:
+			return 30;
+		case Date::Month::may:
+			return 31;
+		case Date::Month::jun:
+			return 30;
+		case Date::Month::jul:
+			return 31;
+		case Date::Month::aug:
+			return 31;
+		case Date::Month::sep:
+			return 30;
+		case Date::Month::oct:
+			return 31;
+		case Date::Month::nov:
+			return 30;
+		case Date::Month::dec:
+			return 31;
+		default:
+			throw runtime_error("bad month in days_in_month");
+		}
+	}
+	bool is_valid(const Date& date) {
+		return !(to_int(date.month()) < 1 || to_int(date.month()) > 12 || date.day() < 1 || date.day() > days_in_month(date));
+	}
+	Date::Date(const int& year, const Month& month, const unsigned int& day)
+		:y{ year }, m{ month }, d{ day }
+	{
+		if (!is_valid(*this))
+			throw Invalid{};
+	}
+	void Date::add_day(unsigned int n) {
+		while (n) {
+			unsigned int dim = days_in_month(*this);
+			if (n + d <= dim) {
+				d += n;
+				return;
+			}
+			else {
+				n -= dim - d + 1; //go to day 1 of next month
+				d = 1;
+				++m;
+				if (m == Month::jan) y++;
+			}
+		}
+	}
+	Date::WeekDay day_of_week(const Date& d) {
+		//TODO
+	}
+	Date next_workday(const Date& d) {
+		//TODO
+	}
+	short week_of_year(const Date& d) {
+		//TODO
+	}
+	//ex11:
+	//design and implement a set of useful helper functions for the date class
+	//next_workday() (!saturday && !sunday), week_of_year()
+	//ex12:
+	//change the representation of a date to be the number of days since jan 1,1970.
+	//represent as a long int
+	// reimplement the date member funcs in 8.4.2
+	//be sure to reject dates outside the range
 	//TODO
 }
 //ex13:
