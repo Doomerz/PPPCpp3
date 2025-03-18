@@ -807,18 +807,31 @@ namespace c8_e11Date {
 	short week_of_year(const Date& d) {
 		Date ref(d.year(), Date::Month::jan, 1);
 		Date::WeekDay yr_dow_start = day_of_week(ref);
-		int woy_start = 0;
+		short woy = 0;
 		if (to_int(yr_dow_start) < to_int(Date::WeekDay::friday)) {
 			//first week of the year must contain thursday or it is the last week of the previous year.
-			woy_start++;
+			woy++;
 		}
-		//this is a mess
-		//TODO
+		for (; yr_dow_start != Date::WeekDay::monday; ref.add_day(1)) {
+			if (ref.day() == d.day()) {
+				if (ref.month() == d.month()) {
+					return woy;
+				}
+			}
+			if (yr_dow_start == Date::WeekDay::sunday) {
+				ref.add_day(1);
+				woy++;
+				break;
+			}
+			else
+				yr_dow_start = int_to_weekday(to_int(yr_dow_start) + 1);
+		}
+		for (int w{}; ref.day() != d.day() && ref.month() != d.month(); ref.add_day(1)) {
+			w = (w + 1) % 7;
+			if (w == 0) woy++;
+		}
+		return woy;
 	}
-	//ex11:
-	//design and implement a set of useful helper functions for the date class
-	//next_workday() (!saturday && !sunday), week_of_year()
-	//TODO
 }
 //ex12:
 //change the representation of a date to be the number of days since jan 1,1970.
@@ -831,17 +844,24 @@ namespace c8_Date {
 		class Invalid {};
 		enum class Month { jan = 1, feb, mar, apr, may, jun, jul, aug, sep, oct, nov, dec };
 		enum class WeekDay { monday = 1, tuesday, wednesday, thursday, friday, saturday, sunday };
-		Date(const int& year, const Month& month, const unsigned int& day);
+		Date(const long int& days_since_jan1_1970);
 
-		unsigned int day() const { return d; }
-		Month month() const { return m; }
-		int year() const { return y; }
+		long int days_since_epoch() const { return d_; }
+		//unsigned int day() const { return d; }
+		//Month month() const { return m; }
+		//int year() const { return y; }
 
-		void add_day(unsigned int n);
+		void add_day(const long int& n);
 	private:
-		int y;
-		Month m;
-		unsigned int d;
+		long int d_;
+		//int y;
+		//Month m;
+		//unsigned int d;
+	};
+	struct YMD {
+		int year;
+		Date::Month month;
+		int day;
 	};
 	unsigned int to_int(const Date::Month& m) { return static_cast<unsigned int>(m); }
 	unsigned int to_int(const Date::WeekDay& d) { return static_cast<unsigned int>(d); }
@@ -849,11 +869,6 @@ namespace c8_Date {
 	ostream& operator<<(ostream& os, const Date::Month& m) { return os << month_tbl[to_int(m)]; }
 	vector<string> day_tbl = { "Not a day", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday" };
 	ostream& operator<<(ostream& os, const Date::WeekDay& d) { return os << day_tbl[to_int(d)]; }
-	ostream& operator<<(ostream& os, const Date& d) { return os << d.year() << '/' << d.month() << '/' << d.day(); }
-	Date::Month operator++(Date::Month& m) {
-		m = (m == Date::Month::dec) ? Date::Month::jan : Date::Month(to_int(m) + 1);
-		return m;
-	}
 	Date::Month int_to_month(const unsigned int& x) {
 		if (x < to_int(Date::Month::jan) || to_int(Date::Month::dec) < x)
 			throw runtime_error("bad month");
@@ -876,12 +891,12 @@ namespace c8_Date {
 			return true;
 		return false;
 	}
-	unsigned int days_in_month(const Date& date) {
-		switch (date.month()) {
+	unsigned int days_in_month(const Date::Month& month, const int& year) {
+		switch (month) {
 		case Date::Month::jan:
 			return 31;
 		case Date::Month::feb:
-			if (is_leapyear(date.year()))
+			if (is_leapyear(year))
 				return 29;
 			return 28;
 		case Date::Month::mar:
@@ -908,55 +923,155 @@ namespace c8_Date {
 			throw runtime_error("bad month in days_in_month");
 		}
 	}
-	bool is_valid(const Date& date) {
-		return !(to_int(date.month()) < 1 || to_int(date.month()) > 12 || date.day() < 1 || date.day() > days_in_month(date));
+	Date::Month operator++(Date::Month& m) {
+		m = (m == Date::Month::dec) ? Date::Month::jan : Date::Month(to_int(m) + 1);
+		return m;
 	}
-	Date::Date(const int& year, const Month& month, const unsigned int& day)
-		:y{ year }, m{ month }, d{ day }
-	{
-		if (!is_valid(*this))
-			throw Invalid{};
-	}
-	void Date::add_day(unsigned int n) {
-		while (n) {
-			unsigned int dim = days_in_month(*this);
-			if (n + d <= dim) {
-				d += n;
-				return;
-			}
-			else {
-				n -= dim - d + 1; //go to day 1 of next month
-				d = 1;
-				++m;
-				if (m == Month::jan) y++;
-			}
+	YMD ymd(const Date& date) {
+		YMD res;
+		long int x = date.days_since_epoch();
+		//year
+		res.year = 1970;
+		res.month = Date::Month::jan;
+		res.day = 1;
+		while (x > 0) {
+			short diy = is_leapyear(res.year) ? 366 : 365;
+			if (x < diy)
+				break;
+			x -= diy;
+			res.year++;
 		}
+		while (x < 0) {
+			short dily = is_leapyear(res.year - 1) ? 366 : 365;
+			x += dily;
+			res.year--;
+		}
+		//month
+
+		while (true) {
+			int dim = days_in_month(res.month, res.year);
+			if (x < dim)
+				break;
+			x -= dim;
+			++res.month;
+		}
+		//day
+		res.day += x;
+		//res
+		return res;
 	}
+	ostream& operator<<(ostream& os, const Date& d) { YMD y = ymd(d); return os << y.year << '/' << y.month << '/' << y.day; }
+	Date::Date(const long int& days_since_jan1_1970) :d_{ days_since_jan1_1970 } { }
+	void Date::add_day(const long int& n) { d_ += n; }
 	Date::WeekDay day_of_week(const Date& d) {
-		//TODO
+		long int wdoe = to_int(Date::WeekDay::thursday); //jan 1, 1970 is a thursday
+		wdoe = (d.days_since_epoch() + wdoe) % 7;
+		if (wdoe == 0)
+			return Date::WeekDay::sunday;
+		return int_to_weekday(wdoe);
 	}
 	Date next_workday(const Date& d) {
-		//TODO
+		short dow = to_int(day_of_week(d));
+		if (dow < 5) {
+			return Date(d.days_since_epoch() + 1);
+		}
+		return Date(d.days_since_epoch() + 8 - dow);
 	}
 	short week_of_year(const Date& d) {
-		//TODO
+		YMD dat = ymd(d);
+		int doy{};
+		for (int m{ 1 }; m < to_int(dat.month); m++)
+			doy += days_in_month(int_to_month(m), dat.year);
+		doy += dat.day;
+		long int ref = d.days_since_epoch() - doy + 1;
+		int fwdoy = to_int(day_of_week(Date(ref)));
+		short woy{};
+		if (fwdoy < 5)
+			woy++;
+		ref += 8 - fwdoy;
+		if (d.days_since_epoch() < ref)
+			return woy;
+		woy++;
+		while (true) {
+			ref += 7;
+			if (d.days_since_epoch() < ref)
+				return woy;
+			woy++;
+		}
 	}
-	//ex11:
-	//design and implement a set of useful helper functions for the date class
-	//next_workday() (!saturday && !sunday), week_of_year()
-	//ex12:
-	//change the representation of a date to be the number of days since jan 1,1970.
-	//represent as a long int
-	// reimplement the date member funcs in 8.4.2
-	//be sure to reject dates outside the range
-	//TODO
 }
 //ex13:
 //design and implement a rational number class, Rational.
 //numerator and a denominator
 //provide assignment, addition, subtraction, multiplication, division, and equality operators
-//provide a conversion ot double.
+//provide a conversion to double.
 namespace c8_math {
+	struct Rational {
+		int num() const { return numerator; }
+		int den() const { return denominator; }
+
+		int& num() { return numerator; }
+		int& den() { return denominator; }
+		Rational& operator=(int b) {
+			numerator = b;
+			denominator = 1;
+			return *this;
+		}
+	private:
+		int numerator{ 0 }, denominator{ 1 };
+	};
+	Rational operator+(const Rational& a, const int& b) {
+		Rational res{ a };
+		res.num() += b * res.den();
+		return res;
+	}
+	Rational operator+(const Rational& a, const Rational& b) {
+		Rational res;
+		res.num() = a.num() * b.den() + b.num() * a.den();
+		res.den() = a.den() * b.den();
+		return res;
+	}
+	//addition
+	Rational operator-(const Rational& a, const int& b) {
+		Rational res{ a };
+		res.num() -= b * res.den();
+		return res;
+	}
+	Rational operator-(const Rational& a, const Rational& b) {
+		Rational res;
+		res.num() = a.num() * b.den() - b.num() * a.den();
+		res.den() = a.den() * b.den();
+		return res;
+	}
+	//subtraction
+	Rational operator*(const Rational& a, const int& b) {
+		Rational res{ a };
+		res.num() = a.num() * b;
+		return res;
+	}
+	Rational operator*(const Rational& a, const Rational& b) {
+		Rational res{ a };
+		res.num() *= b.num();
+		res.den() *= b.den();
+		return res;
+	}
+	//multiplication
+	Rational operator/(const Rational& a, const int& b) {
+		Rational res{ a };
+		res.den() *= b;
+		return res;
+	}
+	Rational operator/(const Rational& a, const Rational& b) {
+		Rational res{ a };
+		res.num() *= b.den();
+		res.den() *= b.num();
+		return res;
+	}
+	//division
+	Rational operator==(const Rational& a, const int& b);
+	Rational operator==(const Rational& a, const Rational& b);
+	//equality
+	double to_double(const Rational& a);
 	//TODO
 }
 //ex14:
