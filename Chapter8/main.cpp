@@ -1007,6 +1007,8 @@ namespace c8_Date {
 //provide a conversion to double.
 namespace c8_math {
 	struct Rational {
+		Rational(const int& n = 0, const int& d = 1) : numerator{ n }, denominator{ d } {}
+
 		int num() const { return numerator; }
 		int den() const { return denominator; }
 
@@ -1041,6 +1043,7 @@ namespace c8_math {
 		Rational res;
 		res.num() = a.num() * b.den() - b.num() * a.den();
 		res.den() = a.den() * b.den();
+
 		return res;
 	}
 	//subtraction
@@ -1068,11 +1071,11 @@ namespace c8_math {
 		return res;
 	}
 	//division
-	Rational operator==(const Rational& a, const int& b);
-	Rational operator==(const Rational& a, const Rational& b);
+	bool operator==(const Rational& a, const int& b) { if (a.num() == b * a.den()) return true; return false; }
+	bool operator==(const Rational& a, const Rational& b) { return a.num() * b.den() == b.num() * a.den(); }
 	//equality
-	double to_double(const Rational& a);
-	//TODO
+	double to_double(const Rational& a) { if (a.den()) return double(a.num()) / a.den(); throw runtime_error("denominator 0"); }
+	//conversion
 }
 //ex14:
 //design and implement a Money class
@@ -1089,6 +1092,57 @@ namespace c8_math {
 //Define an input operator>> that reads monetary amounts with currency denominations into Money
 //define << too
 namespace c8_finance {
+	class Money {
+	public:
+		enum class Denomination{USD,DKK};
+		Money(long int cent = 0, Denomination type = Denomination::USD) : cents_{cent}, denom{type} {}
+		Money(float cent = 0, Denomination type = Denomination::USD) : denom{ type } {
+			if (cent != floor(cent)) throw runtime_error("Money::Money: not representable as int");
+			cents_ = static_cast<long int>(cent);
+		}
+
+		long int cents() const { return cents_; }
+		double amount() const { return cents_ * 100; }
+		Denomination denomination() const { return denom; }
+		void conversion();
+	private:
+		long int cents_{};
+		Denomination denom{ Denomination::USD };
+	};
+	Money operator+(const Money& a, const Money& b) {
+		if (a.denomination() != b.denomination()) throw runtime_error("Denominations don't match");
+		return Money{ a.cents() + b.cents(),a.denomination() };
+	}
+	Money operator-(const Money& a, const Money& b) {
+		if (a.denomination() != b.denomination()) throw runtime_error("Denominations don't match");
+		return Money{ a.cents() - b.cents(),a.denomination() };
+	}
+	Money operator*(const Money& m, const double& b) {
+		double x = m.cents() * b;
+		if (x >= floor(x) + 0.5) return Money{ floor(x) + 1,m.denomination() };
+	}
+	Money operator/(const Money& m, const double& b) {
+		if (b == 0) throw runtime_error("Divide by zero");
+		double x = m.cents() / b;
+		if (x >= floor(x) + 0.5) return Money{ floor(x) + 1,m.denomination() };
+	}
+	//operator <<
+	//operator >>
+	
+	//ex14:
+	//design and implement a Money class
+	//4/5 rounding rule, accurate to the last cent
+	//rep as a long int of cents
+	//don't worry about numeric limits
+	//ex15:
+	//refine Money class by adding a currency (given as a constructor arg)
+	//accept a floating point initializer as long as it can be exactly represented as a long int
+	//don't accept illegal operations
+	//money*money doesn't make sense
+	//the USD1.23+DKK5.00 makes sense if you provide a conversion table definint the conversion factor.
+	//ex16:
+	//Define an input operator>> that reads monetary amounts with currency denominations into Money
+	//define << too
 	//TODO
 }
 //ex17:
