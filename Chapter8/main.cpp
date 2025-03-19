@@ -514,6 +514,30 @@ void ex4() {
 //otherwise create a transaction and add to respective vector.
 //write a function that will return a vector that contains the names of all patrons who owe fees.
 namespace Library_ {
+	//validation
+	bool valid_isbn(const string& isbn) {
+		if (isbn.size() != 13)
+			return false;
+		if (!isdigit(isbn[0]) || isbn[11] != '-' || !isalnum(isbn[12]))
+			return false;
+		for (int i{ 1 }; i < isbn.size() - 1; i++) {
+			if (!isdigit(isbn[i]) && isbn[i] != '-')
+				return false;
+			if (isbn[i] == isbn[i - 1] && isbn[i] == '-')
+				return false;
+		}
+		short sum{};
+		for (const char& c : isbn)
+			if (c == '-')
+				sum++;
+		if (sum != 3)
+			return false;
+		return true;
+	}
+	bool valid_cpyr_date(const string& cpyr_date) {
+		//choose a date format.
+		return true;
+	}
 	struct Book {
 		enum class Genre { unknown, fiction, nonfiction, periodical, biography, children };
 
@@ -549,30 +573,6 @@ namespace Library_ {
 			Author,
 			Copyright_date;
 	};
-	//validation
-	bool valid_isbn(const string& isbn) {
-		if (isbn.size() != 13)
-			return false;
-		if (!isdigit(isbn[0]) || isbn[11] != '-' || !isalnum(isbn[12]))
-			return false;
-		for (int i{ 1 }; i < isbn.size() - 1; i++) {
-			if (!isdigit(isbn[i]) && isbn[i] != '-')
-				return false;
-			if (isbn[i] == isbn[i - 1] && isbn[i] == '-')
-				return false;
-		}
-		short sum{};
-		for (const char& c : isbn)
-			if (c == '-')
-				sum++;
-		if (sum != 3)
-			return false;
-		return true;
-	}
-	bool valid_cpyr_date(const string& cpyr_date) {
-		//choose a date format.
-		return true;
-	}
 	bool operator==(const Book& a, const Book& b) {
 		if (a.isbn() == b.isbn())
 			return true;
@@ -1094,20 +1094,31 @@ namespace c8_math {
 namespace c8_finance {
 	class Money {
 	public:
-		enum class Denomination{USD,DKK};
+		enum class Denomination{USD=0,DKK};
 		Money(long int cent = 0, Denomination type = Denomination::USD) : cents_{cent}, denom{type} {}
-		Money(double cent = 0, Denomination type = Denomination::USD) : denom{ type } {
-			if (cent != floor(cent)) throw runtime_error("Money::Money: not representable as int");
-			cents_ = static_cast<long int>(cent);
+		Money(double dollar = 0, Denomination type = Denomination::USD) : denom{ type } {
+			if (dollar*100 != floor(dollar*100)) throw runtime_error("Money::Money: not representable as int");
+			cents_ = static_cast<long int>(dollar*100);
 		}
 
 		long int cents() const { return cents_; }
-		double amount() const { return cents_ * 100; }
+		double amount() const { return cents_ / double(100); }
 		Denomination denomination() const { return denom; }
 		void conversion(const Denomination& den);
+
+		double amount(const double& new_val) { cents_ = round(new_val*100); }
 	private:
 		long int cents_{};
 		Denomination denom{ Denomination::USD };
+	};
+	struct Conv_rate {
+		Money::Denomination denom;
+		double rate; //Money.amount * rate = Money as USD
+		string name;
+	};
+	const vector<Conv_rate> conv_table{
+		{Money::Denomination::USD,1,"USD"},
+		{Money::Denomination::DKK,0.15,"DKK"}
 	};
 	Money operator+(const Money& a, const Money& b) {
 		if (a.denomination() != b.denomination()) throw runtime_error("Denominations don't match");
@@ -1118,35 +1129,88 @@ namespace c8_finance {
 		return Money{ a.cents() - b.cents(),a.denomination() };
 	}
 	Money operator*(const Money& m, const double& b) {
-		double x = m.cents() * b;
-		if (x >= floor(x) + 0.5) return Money{ floor(x) + 1,m.denomination() };
+		return Money{ long int(round(m.cents() * b)),m.denomination() };
 	}
 	Money operator/(const Money& m, const double& b) {
 		if (b == 0) throw runtime_error("Divide by zero");
-		double x = m.cents() / b;
-		if (x >= floor(x) + 0.5) return Money{ floor(x) + 1,m.denomination() };
+		return Money{ long int(round(m.cents() / b)),m.denomination() };
+	}
+	string to_string(const Money::Denomination& denom) {
+		switch (denom) {
+		case Money::Denomination::USD:
+			return "USD";
+		case Money::Denomination::DKK:
+			return "DKK";
+		default:
+			throw runtime_error("not a valid denomination");
+		}
+	}
+	Money::Denomination str_to_denomination(const string& str) {
+		for (const Conv_rate& e : conv_table)
+			if (e.name == str)
+				return e.denom;
+		throw runtime_error("string not a known denomination");
+	}
+	double conversion_rate(const Money::Denomination& a, const Money::Denomination& b) {
+		double x{}, y{};
+		for (const Conv_rate& e : conv_table) {
+			if (a == e.denom) {
+				x = e.rate;
+				if (x && y) break;
+			}
+			if (b == e.denom) {
+				y = e.rate;
+				if (x && y) break;
+			}
+		}
+		if (y == 0 || x == 0) throw runtime_error("how is a conversion rate 0!?");
+		return x / y;
 	}
 	void Money::conversion(const Denomination& den) {
-		//TODO
+		cents_ = round(amount() * conversion_rate(denom, den) * 100);
 	}
-	//operator <<
-	//operator >>
-	
-	//ex14:
-	//design and implement a Money class
-	//4/5 rounding rule, accurate to the last cent
-	//rep as a long int of cents
-	//don't worry about numeric limits
-	//ex15:
-	//refine Money class by adding a currency (given as a constructor arg)
-	//accept a floating point initializer as long as it can be exactly represented as a long int
-	//don't accept illegal operations
-	//money*money doesn't make sense
-	//the USD1.23+DKK5.00 makes sense if you provide a conversion table definint the conversion factor.
-	//ex16:
-	//Define an input operator>> that reads monetary amounts with currency denominations into Money
-	//define << too
-	//TODO
+	ostream& operator<<(ostream& os, const Money& m) { return os << to_string(m.denomination()) << m.amount(); }
+	istream& operator>>(istream& is, Money& m) {
+		char c;
+		string den;
+		double val;
+		Money::Denomination denom;
+
+		if (is.get(c))
+			den += c;
+		else {
+			is.unget();
+			return is;
+		}
+		if (is.get(c))
+			den += c;
+		else {
+			is.unget();
+			is.unget();
+			return is;
+		}
+		if (is.get(c))
+			den += c;
+		else {
+			is.unget();
+			is.unget();
+			is.unget();
+			return is;
+		}
+		try {
+			denom = str_to_denomination(den);
+		}
+		catch (...) {
+			is.unget();
+			is.unget();
+			is.unget();
+			is.setstate(ios::failbit);
+			return is;
+		}
+		if (is >> val)
+			m = Money{ round(val * 100) / 100,denom };
+		return is;
+	}
 }
 //ex17:
 //example where a rational gives a mathematically better result than Money
@@ -1173,7 +1237,7 @@ class someobj {
 	struct throwable {
 		enum class failtype{one_loc_of_failure,another};
 		//but what if we could specify all distinct error locations (perhaps dynamically??)
-		//but then we use masks and other conditions like ios_base::fail bits etc. to make error groups.
+		//but then we use masks and other conditions like ios::fail bits etc. to make error groups.
 		//perhaps write a way to express that and then try to implement it
 		//we can either dynamically insert from the code or send the code to a middleman engine that then compiles post code.
 		//or we can keep it abstract.
