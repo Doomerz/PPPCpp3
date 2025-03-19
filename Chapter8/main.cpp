@@ -1096,7 +1096,7 @@ namespace c8_finance {
 	public:
 		enum class Denomination{USD,DKK};
 		Money(long int cent = 0, Denomination type = Denomination::USD) : cents_{cent}, denom{type} {}
-		Money(float cent = 0, Denomination type = Denomination::USD) : denom{ type } {
+		Money(double cent = 0, Denomination type = Denomination::USD) : denom{ type } {
 			if (cent != floor(cent)) throw runtime_error("Money::Money: not representable as int");
 			cents_ = static_cast<long int>(cent);
 		}
@@ -1104,7 +1104,7 @@ namespace c8_finance {
 		long int cents() const { return cents_; }
 		double amount() const { return cents_ * 100; }
 		Denomination denomination() const { return denom; }
-		void conversion();
+		void conversion(const Denomination& den);
 	private:
 		long int cents_{};
 		Denomination denom{ Denomination::USD };
@@ -1125,6 +1125,9 @@ namespace c8_finance {
 		if (b == 0) throw runtime_error("Divide by zero");
 		double x = m.cents() / b;
 		if (x >= floor(x) + 0.5) return Money{ floor(x) + 1,m.denomination() };
+	}
+	void Money::conversion(const Denomination& den) {
+		//TODO
 	}
 	//operator <<
 	//operator >>
