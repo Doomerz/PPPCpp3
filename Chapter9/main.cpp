@@ -25,6 +25,20 @@ void TryThis10_6() {
 }
 
 ///Drill
+namespace Drill {
+	void test_output() {
+		int birthyear = 2001;
+		cout << "Dec:\t" << dec << birthyear << endl
+			<< "Hex:\t" << hex << birthyear << endl
+			<< "Oct:\t" << oct << birthyear << endl;
+		
+		cout << dec << "age:\t" << 2025 - birthyear << endl;
+		//TODO
+	}
+} //namespace Drill
+void drill() {
+	Drill::test_output();
+} //TODO
 
 ///Review
 //Why is I/O tricky for a programmer?
@@ -161,11 +175,34 @@ void TryThis10_6() {
 //modify ex18: to test each temp converting the celsius readings to fahrenheit before putting them into the vector.
 
 //ex20:
-//
+//write function: print_year() mentioned in 9.9.2
+
+//ex21:
+//define a Roman_int class for holding Roman numerals (as ints)
+//have a << and >> defined
+//provide Roman_int with an as_int() member that returns the int value
+//use: cout << "Roman " << r << " equals " << r.as_int() << '\n';
+
+//ex22:
+//make a calculator from previous chapters taht accepts Roman numerals rather than the usual arabic ones.
+
+//ex23:
+//accept two filenames and produces a new file that is the contents of the first followed by the contents of the second
+
+//ex24:
+//take two files containing sorted ws-separated words and merge them preserving order.
+
+//ex25:
+//add a command "from x" to the calculator from previous chapters that takes input from a file "x"
+//add a command "to y" to this calculator that makes it write its output (both std and err) to file "y"
+//write a collection of test cases based on ideas from 6.3 and use that to test the calculator
+
+//ex26:
+//print the sum of all whitespace-separated integers in a text file, ignoring non integer strings.
 
 ///Main
 int main() try {
-	TryThis10_6();
+	drill();
 	return 0;
 }
 catch (exception& e) {
