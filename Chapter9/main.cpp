@@ -26,13 +26,57 @@ void TryThis10_6() {
 
 ///Drill
 namespace Drill {
+	struct Contact {
+		string first,
+			last,
+			phone,
+			email;
+	};
+	struct Point {
+		int x, y;
+	};
+	ostream& operator>>(ostream& os, const Point& p) {
+		os << '(' << p.x << ',' << p.y << ')';
+		return os;
+	}
+	istream& operator>>(istream& is, Point& p) {
+		char c;
+		int a,b;
+		is >> c;
+		if (!is) throw runtime_error("bad stream");
+		if (c != '(') {
+			is.clear(ios::failbit);
+			return is;
+		}
+		is >> a;
+		if (is.fail()) return is;
+		is >> c;
+		if (!is) throw run
+	} //TODO
 	void test_output() {
-		int birthyear = 2001;
+		int birthyear = 2001,
+			currentyear = 2025;
+		cout << showbase; //enables base to be shown for numbers
 		cout << "Dec:\t" << dec << birthyear << endl
 			<< "Hex:\t" << hex << birthyear << endl
 			<< "Oct:\t" << oct << birthyear << endl;
 		
-		cout << dec << "age:\t" << 2025 - birthyear << endl;
+		cout << dec << "age:\t" << currentyear - birthyear << endl;
+		
+		string part8{ "1234 1234 1234 1234" };
+		istringstream iss{ part8 };
+		int a, b, c, d;
+		iss >> a >> oct >> b >> hex >> c >> dec >> d;
+		cout << endl << a << '\t' << b << '\t' << c << '\t' << d << endl
+			<< "This is because first and last are decimals read as decimals, the others have differing values because they are read as different bases.\n\n";
+
+		int part9 = 1234567.89;
+		cout << "Default:\t" << defaultfloat << part9 << endl
+			<< "Fixed:\t" << fixed << part9 << endl
+			<< "Scientific:\t" << scientific << part9 << "\n\n";
+
+		//make example table part10
+		//
 		//TODO
 	}
 } //namespace Drill
