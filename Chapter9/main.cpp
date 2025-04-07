@@ -35,7 +35,7 @@ namespace Drill {
 	struct Point {
 		int x, y;
 	};
-	ostream& operator>>(ostream& os, const Point& p) {
+	ostream& operator<<(ostream& os, const Point& p) {
 		os << '(' << p.x << ',' << p.y << ')';
 		return os;
 	}
@@ -76,6 +76,21 @@ namespace Drill {
 			<< "Scientific:\t" << scientific << part9 << "\n\n";
 
 		//make example table part10
+		//first, last, phone, email
+		vector<Contact> contacts{ {},{},{},{},{} };
+		//TODO
+		//part 11
+		cout << "Enter filename to pull Points: ";
+		string file;
+		cin >> file;
+		ifstream ist{ file };
+		vector<Point> points;
+		for (Point p; ist >> p;)
+			points.push_back(p);
+		for (const Point& p : points)
+			cout << p << '\n';
+		ist.close();
+		cout << '\n';
 		//
 		//TODO
 	}
