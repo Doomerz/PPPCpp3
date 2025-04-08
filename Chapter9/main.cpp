@@ -43,16 +43,31 @@ namespace Drill {
 		char c;
 		int a,b;
 		is >> c;
-		if (!is) throw runtime_error("bad stream");
+		if (!is) return is;
 		if (c != '(') {
 			is.clear(ios::failbit);
 			return is;
 		}
 		is >> a;
-		if (is.fail()) return is;
+		if (!is) return is;
 		is >> c;
-		if (!is) throw run
-	} //TODO
+		if (!is) return is;
+		if (c != ',') {
+			is.clear(ios::failbit);
+			return is;
+		}
+		is >> b;
+		if (!is) return is;
+		is >> c;
+		if (!is) return is;
+		if (c != ')') {
+			is.clear(ios::failbit);
+			return is;
+		}
+		//finish
+		p = Point{ a,b };
+		return is;
+	}
 	void test_output() {
 		int birthyear = 2001,
 			currentyear = 2025;
@@ -77,8 +92,18 @@ namespace Drill {
 
 		//make example table part10
 		//first, last, phone, email
-		vector<Contact> contacts{ {},{},{},{},{} };
-		//TODO
+		vector<Contact> contacts{ 
+			{"Bjarne", "Stroustrup", "3456789", "bstroustrup@cpp.prog"},
+			{"Brian", "Kernighan", "1234567", "Bkernighan@cpp.prog"},
+			{"Dennis", "Ritchie", "9876543", "dritchie@cpp.prog"},
+			{"Greatest","Ever","1001337","FirstName.Greatest@LastName.Ever"},
+			{"Tommy","Tutone","8675309","Jenny@Coumbia.anr"}
+		};
+		//TODO make this output into different field widths to make a table
+		notdone
+		cout << "contacts table:\n";
+		//need to learn me some more here.
+
 		//part 11
 		cout << "Enter filename to pull Points: ";
 		string file;
@@ -87,8 +112,12 @@ namespace Drill {
 		vector<Point> points;
 		for (Point p; ist >> p;)
 			points.push_back(p);
-		for (const Point& p : points)
-			cout << p << '\n';
+		if (!ist) {
+			cout << "bad file\n";
+		}
+		else
+			for (const Point& p : points)
+				cout << p << '\n';
 		ist.close();
 		cout << '\n';
 		//
