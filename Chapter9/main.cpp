@@ -1,6 +1,25 @@
 import std;
 using namespace std;
 
+//reading
+void end_of_loop(istream& is, const char& terminator, const string& not_found) {
+	if (is.fail()) {
+		is.clear();
+		char c;
+		if (is >> c && c == terminator)
+			return;
+		throw runtime_error(not_found);
+	}
+}
+template<typename T>
+vector<T> generic_input_loop(istream& is, const char& term, const string& noterm_msg) {
+	vector<T> res;
+	for (T type; is >> type;) {
+		res.push_back(type);
+	}
+	end_of_loop(is, term, noterm_msg);
+}
+
 ///TryThis
 void TryThis10_1() {
 	//output your birth year in decimal, hexadecimal, and octal form. Label each value
@@ -32,6 +51,31 @@ namespace Drill {
 			phone,
 			email;
 	};
+	void output_contacts(ostream& os, vector<Contact> contacts) {
+		const string& tblf = "First Name",
+			tbll = "Last Name",
+			tblp = "Phone",
+			tble = "Email";
+		size_t f{tblf.size()},
+			l{tbll.size()},
+			p{tblp.size()},
+			e{tble.size()};
+		
+		for (const Contact& c : contacts) {
+			if (c.first.size() > f) f = c.first.size();
+			if (c.last.size() > l) l = c.last.size();
+			if (c.phone.size() > p) p = c.phone.size();
+			if (c.email.size() > e) e = c.email.size();
+		}
+
+		//tbl header
+		os << setw(f) << tblf << '|' << setw(l) << tbll << '|' << setw(p) << tblp << '|' << setw(e) << tble << '\n'
+			<< setfill('-') << setw(f) << '-' << '+' << setw(l) << '-' << '+' << setw(p) << '-' << '+' << setw(e) << '-' << '\n' << setfill(' ');
+		//tbl
+		for (const Contact& c : contacts) {
+			os << setw(f) << c.first << '|' << setw(l) << c.last << '|' << setw(p) << c.phone << '|' << setw(e) << c.email << '\n';
+		}
+	}
 	struct Point {
 		int x, y;
 	};
@@ -68,6 +112,13 @@ namespace Drill {
 		p = Point{ a,b };
 		return is;
 	}
+	Point get_point() {
+		Point res;
+		cout << ">>";
+		//
+
+		return res;
+	}
 	void test_output() {
 		int birthyear = 2001,
 			currentyear = 2025;
@@ -99,10 +150,9 @@ namespace Drill {
 			{"Greatest","Ever","1001337","FirstName.Greatest@LastName.Ever"},
 			{"Tommy","Tutone","8675309","Jenny@Coumbia.anr"}
 		};
-		//TODO make this output into different field widths to make a table
-		notdone
 		cout << "contacts table:\n";
-		//need to learn me some more here.
+		output_contacts(cout, contacts);
+		cout << endl;
 
 		//part 11
 		cout << "Enter filename to pull Points: ";
@@ -113,14 +163,28 @@ namespace Drill {
 		for (Point p; ist >> p;)
 			points.push_back(p);
 		if (!ist) {
-			cout << "bad file\n";
+			if (ist.fail()) {
+				if (ist.bad())
+					throw runtime_error("drill points file bad");
+				if (!ist.eof())
+					cout << "bad file\n";
+				else
+					for (const Point& p : points)
+						cout << p << '\n';
+			}
 		}
-		else
-			for (const Point& p : points)
-				cout << p << '\n';
 		ist.close();
 		cout << '\n';
-		//
+		
+		//part12
+		cout << "Enter 7 points (x,y)\n";
+		vector<Point> original_points;
+		for (int i{}; i < 7; i++)
+			original_points.push_back(get_point());
+		cout << "Our Points:\n";
+		for (const Point& p : original_points)
+			cout << p << '\n';
+		cout << '\n';
 		//TODO
 	}
 } //namespace Drill
