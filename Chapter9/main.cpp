@@ -115,7 +115,7 @@ namespace Drill {
 	Point get_point() {
 		Point res;
 		cout << ">>";
-		//
+		//TODO
 
 		return res;
 	}
