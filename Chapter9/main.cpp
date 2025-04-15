@@ -114,10 +114,26 @@ namespace Drill {
 	}
 	Point get_point() {
 		Point res;
-		cout << ">>";
-		//TODO
-
-		return res;
+		const string prompt = ">>";
+		char c;
+		
+		while (true) {
+			cout << prompt;
+			if (cin >> res) {
+				return res;
+			}
+			else {
+				if (cin.eof() || cin.bad())
+					throw runtime_error("get_point: unexpected stream state");
+				else {
+					cin.clear();
+					cout << "Bad input, try again...\n";
+					while (cin.get(c) && c != '\n');
+					if (!cin)
+						throw runtime_error("get_point: unable to reset");
+				}
+			}
+		}
 	}
 	void test_output() {
 		int birthyear = 2001,
@@ -185,12 +201,51 @@ namespace Drill {
 		for (const Point& p : original_points)
 			cout << p << '\n';
 		cout << '\n';
-		//TODO
+
+		ofstream ofs{ "mydata.txt" };
+		for (const Point& p : original_points)
+			cout << p << '\n';
+		ofs.close();
+
+		ifstream ifs{ "mydata.txt" };
+		vector<Point> processed_points;
+		while (ifs) {
+			Point p;
+			ifs >> p;
+			processed_points.push_back(p);
+		}
+
+		bool matched = true;
+		size_t size = processed_points.size() > original_points.size() ? processed_points.size() : original_points.size();
+		if (processed_points.size() != original_points.size())
+			matched = false;
+		for (int i{}; i < size; i++) {
+			if (i < original_points.size())
+				cout << original_points[i];
+			else
+				cout << "(Null,Null)";
+			cout << '\t';
+			if (i < processed_points.size())
+				cout << processed_points[i];
+			else
+				cout << "(Null,Null)";
+			cout << '\n';
+			if (matched)
+				if (original_points[i].x != processed_points[i].x || original_points[i].y != processed_points[i].y)
+					matched = false;
+		}
+
+		if (!matched)
+			cout << "Something went wrong!\n";
+		if (processed_points.size() != original_points.size()) {
+			cout << "size mismatch:\nOriginal = " << original_points.size() << "\nProcessed = " << processed_points.size();
+		}
+		cout << "\n\n";
 	}
 } //namespace Drill
 void drill() {
 	Drill::test_output();
-} //TODO
+}
 
 ///Review
 //Why is I/O tricky for a programmer?
