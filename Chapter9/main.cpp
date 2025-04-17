@@ -314,6 +314,22 @@ void drill() {
 ///Exercises
 //ex1:
 //read a text file and convert to all lowercase and output to a new file
+void c9e1(const string& inf = "c9e1i.txt", const string& opf = "c9e1o.txt") {
+	ifstream ifs{ inf };
+	if (!ifs) throw runtime_error("unable to open input file: " + inf);
+	ofstream ofs{ opf };
+	if (!ifs) throw runtime_error("unable to open output file: " + opf);
+	char c;
+	ifs >> noskipws;
+	while (ifs >> c) {
+		c = tolower(c);
+		ofs << c;
+		if (!ofs) throw runtime_error("Output file error during operation");
+	}
+	if (!ifs.eof())
+		throw runtime_error("Not end of file for input file when complete");
+	return;
+}
 
 //ex2:
 //given a filename and a word; output each line that contains that word together with the line number
@@ -409,7 +425,7 @@ void drill() {
 
 ///Main
 int main() try {
-	drill();
+	c9e1();
 	return 0;
 }
 catch (exception& e) {
