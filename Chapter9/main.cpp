@@ -318,7 +318,7 @@ void c9e1(const string& inf = "c9e1i.txt", const string& opf = "c9e1o.txt") {
 	ifstream ifs{ inf };
 	if (!ifs) throw runtime_error("unable to open input file: " + inf);
 	ofstream ofs{ opf };
-	if (!ifs) throw runtime_error("unable to open output file: " + opf);
+	if (!ofs) throw runtime_error("unable to open output file: " + opf);
 	char c;
 	ifs >> noskipws;
 	while (ifs >> c) {
@@ -334,15 +334,95 @@ void c9e1(const string& inf = "c9e1i.txt", const string& opf = "c9e1o.txt") {
 //ex2:
 //given a filename and a word; output each line that contains that word together with the line number
 //hint: getline
+void c9e2(const string& fname = "c9e2.txt", const string& find_str = "test") {
+	ifstream ifs{ fname };
+	if (!ifs) throw runtime_error("unable to open file");
+	string s;
+	int index{};
+	while (getline(ifs, s)) {
+		size_t pos = s.find(find_str,0);
+		if (pos != string::npos) {
+			cout << index << ": " << s << '\n';
+		}
+		index++;
+	}
+	if (!ifs.eof()) throw runtime_error("not end of file");
+	cout << '\n';
+	return;
+}
 
 //ex3:
 //remove all vowels from a file (disemvowels)
+const vector<char> vowels{ 'a', 'e', 'i', 'o', 'u' };
+bool is_vowel(char c) {
+	c = tolower(c);
+	for (const char& v : vowels)
+		if (c == v)
+			return true;
+	return false;
+}
+void c9e3(const string& fname = "c9e3.txt", const string& ofname = "c9e3res.txt") {
+	ifstream ifs{ fname };
+	if (!ifs) throw runtime_error("unable to open file");
+	ofstream ofs{ ofname };
+	if (!ofs) throw runtime_error("unable to open resfile");
+	for (char c{}; ifs.get(c);) {
+		if (is_vowel(c))
+			continue;
+		ofs << c;
+	}
+	return;
+}
 
 //ex4:
 //prompt user to enter several integers in any combo of octal decimal or hex using 0 and 0x base prefixes
 //interpret the numbers correctly and convert them to decimal
 //out put in properly spaced columns:
 //original_val \t base_type \t "converts to" \t decimal_val \t "decimal"
+enum class base_type {Error=0,dec=10,oct=8,hex=16,bin=2};
+base_type get_base_type(const string& s) {
+	if (s.size() < 1) return base_type::Error;
+	if (s[0] == '0' && s.size() > 1) {
+		//can be octa 0~, hex 0x~, or binary 0b~
+		switch (s[1]) {
+		case 'x':
+		case 'b':
+		default:
+		}
+	}
+	//TODO
+}
+string base_type2str(const base_type& bt) {
+	switch (bt) {
+	case base_type::Error:
+		throw runtime_error("cannot convert base_type::Error to string");
+	case base_type::dec:
+		return "Decimal";
+	case base_type::oct:
+		return "Octal";
+	case base_type::hex:
+		return "Hexadecimal";
+	case base_type::bin:
+		return "Binary";
+	default:
+		throw runtime_error("not a base_type");
+	}
+}
+ostream& operator<<(ostream& os, const base_type& bt) {
+	os << base_type2str(bt);
+	return os;
+}
+string to_decimal(const string& s, const base_type& type);
+void c9e4() {
+	string s;
+	//
+	base_type type = get_base_type(s);
+	if (type == base_type::Error)
+		cout << s << " is not a valid number" << '\n';
+	else
+		cout << s << '\t' << type << '\t' << "converts to" << '\t' << to_decimal(s, type) << "\tin decimal\n";
+	//TODO
+}
 
 //ex5:
 //read strings; for each string, output the character classiication of each char
@@ -425,7 +505,7 @@ void c9e1(const string& inf = "c9e1i.txt", const string& opf = "c9e1o.txt") {
 
 ///Main
 int main() try {
-	c9e1();
+	c9e3();
 	return 0;
 }
 catch (exception& e) {
