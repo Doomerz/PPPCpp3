@@ -381,16 +381,48 @@ void c9e3(const string& fname = "c9e3.txt", const string& ofname = "c9e3res.txt"
 //original_val \t base_type \t "converts to" \t decimal_val \t "decimal"
 enum class base_type {Error=0,dec=10,oct=8,hex=16,bin=2};
 base_type get_base_type(const string& s) {
+	base_type res = base_type::Error;
+	size_t index{};
 	if (s.size() < 1) return base_type::Error;
-	if (s[0] == '0' && s.size() > 1) {
+	if (s[index] == '0' && s.size() > 1) {
+		index++;
 		//can be octa 0~, hex 0x~, or binary 0b~
-		switch (s[1]) {
+		switch (tolower(s[index])) {
 		case 'x':
+			res = base_type::hex;
+			index++;
+			while (index < s.size()) {
+				if (!isxdigit(s[index]))
+					return base_type::Error;
+				index++;
+			}
+			return res;
 		case 'b':
+			res = base_type::bin;
+			index++;
+			while (index < s.size()) {
+				if (s[index] != '0' && s[index] != '1')
+					return base_type::Error;
+				index++;
+			}
+			return res;
 		default:
+			res = base_type::oct;
+			while (index < s.size()) {
+				if (s[index] < '0' || s[index] > '7')
+					return base_type::Error;
+				index++;
+			}
+			return res;
 		}
 	}
-	//TODO
+	res = base_type::dec;
+	while (index < s.size()) {
+		if (!isdigit(s[index]))
+			return base_type::Error;
+		index++;
+	}
+	return res;
 }
 string base_type2str(const base_type& bt) {
 	switch (bt) {
@@ -412,21 +444,79 @@ ostream& operator<<(ostream& os, const base_type& bt) {
 	os << base_type2str(bt);
 	return os;
 }
-string to_decimal(const string& s, const base_type& type);
+size_t to_decimal(const string& s, const base_type& type) {
+	//WARNING: we do not validate values of the string passed in, if this is not validated prior to passing to function it will have undefined behavior.
+	size_t idx{};
+	if (type != base_type::dec) {
+		idx++;
+		if (type != base_type::oct)
+			idx++;
+	}
+	
+	stringstream ss{ s.substr(idx) };
+	switch (type) {
+	case base_type::bin:
+	{
+		idx = 0;
+		char c;
+		while (ss >> c)
+			if (c == '1')
+				break;
+		if (!ss) {
+			if (ss.eof()) return 0;
+			throw runtime_error("wtf");
+		}
+		idx = 1;
+		while (ss >> c) {
+			idx *= 2;
+			if (c == '1')
+				idx += 1;
+		}
+		if (!ss.eof())
+			throw runtime_error("wtf");
+		return idx;
+	}
+	case base_type::oct:
+		ss >> oct;
+	case base_type::dec:
+		break;
+	case base_type::hex:
+		ss >> hex;
+		break;
+	default:
+		throw runtime_error("Not a valid base_type");
+	}
+	ss >> idx;
+	return idx;
+}
 void c9e4() {
 	string s;
-	//
-	base_type type = get_base_type(s);
-	if (type == base_type::Error)
-		cout << s << " is not a valid number" << '\n';
-	else
-		cout << s << '\t' << type << '\t' << "converts to" << '\t' << to_decimal(s, type) << "\tin decimal\n";
-	//TODO
+	
+	cout << "Enter numbers in either binary, octal, decimal, or hexadecimal with proper prefixes.\n";
+	while (cin >> s) {
+		base_type type = get_base_type(s);
+		if (type == base_type::Error)
+			cout << s << " is not a valid number" << '\n';
+		else
+			cout << s << '\t' << type << '\t' << "converts to" << '\t' << to_decimal(s, type) << "\tin decimal\n";
+	}
 }
 
 //ex5:
-//read strings; for each string, output the character classiication of each char
+//read strings; for each string, output the character classification of each char
 //note that a character can have several classifications. (see 9.10.3 table)
+char e5(const bool& boolean) { return boolean ? 'x' : ' '; }
+void c9e5(istream& is = cin, ostream& os = cout) {
+	string s;
+	while (is >> s) {
+		os << s << " is composed of:\n"
+			<< "char\tspace\talpha\tdigit\txdigit\tupper\tlower\talnum\tcntrl\tpunct\tprint\tgraph\n";
+		for (const char& c : s) {
+			os << c << '\t' << e5(isspace(c)) << '\t' << e5(isalpha(c)) << '\t' << e5(isdigit(c)) << '\t' << 
+		}
+	}
+	//TODO
+}
 
 //ex6:
 //replace punctuation with whitespace (.;,?-')
@@ -443,7 +533,7 @@ void c9e4() {
 //write: vector<string> split(const string& s) that returns a vec of whitespace separated substrings from the arg s
 
 //ex10:
-//write: vector<string split(const string& s, const string& w)
+//write: vector<string> split(const string& s, const string& w)
 //returns vec of ws-separated substrings from the argument s, where ws is defined as ordinary ws + the chars in w.
 
 //ex11:
@@ -505,7 +595,7 @@ void c9e4() {
 
 ///Main
 int main() try {
-	c9e3();
+	c9e4();
 	return 0;
 }
 catch (exception& e) {
