@@ -522,7 +522,7 @@ void c9e5(istream& is = cin, ostream& os = cout) {
 //ex6:
 //replace punctuation with whitespace (.;,?-')
 //don't modiy chars in a pair of double quotes though.
-string c9e6(const string& s = "? don’t use the as?if rule.") {
+string c9e6(const string& s = "- don't use the as-if rule.") {
 	string res;
 	size_t k{};
 	for (size_t i{}; i < s.size(); i++) {
