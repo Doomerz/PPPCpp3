@@ -511,20 +511,81 @@ void c9e5(istream& is = cin, ostream& os = cout) {
 	while (is >> s) {
 		os << s << " is composed of:\n"
 			<< "char\tspace\talpha\tdigit\txdigit\tupper\tlower\talnum\tcntrl\tpunct\tprint\tgraph\n";
-		for (const char& c : s) {
-			os << c << '\t' << e5(isspace(c)) << '\t' << e5(isalpha(c)) << '\t' << e5(isdigit(c)) << '\t' << 
+		for (const char& c : s) { //we could probably handle escaped characters like newline, etc.
+			os << c << '\t' << e5(isspace(c)) << '\t' << e5(isalpha(c)) << '\t' << e5(isdigit(c)) << '\t' << e5(isxdigit(c)) << '\t'
+				<< e5(isupper(c)) << '\t' << e5(islower(c)) << '\t' << e5(isalnum(c)) << '\t' << e5(iscntrl(c)) << '\t'
+				<< e5(ispunct(c)) << '\t' << e5(isprint(c)) << '\t' << e5(isgraph(c)) << "\n\n";
 		}
 	}
-	//TODO
 }
 
 //ex6:
 //replace punctuation with whitespace (.;,?-')
 //don't modiy chars in a pair of double quotes though.
+string c9e6(const string& s = "? don’t use the as?if rule.") {
+	string res;
+	size_t k{};
+	for (size_t i{}; i < s.size(); i++) {
+		if (ispunct(s[i])) {
+			if (s[i] == '"') {
+				k = i;
+				while (k < s.size()) {
+					k++;
+					if (s[k] == '"') {
+						for (; i <= k; i++)
+							res.push_back(s[i]);
+						break;
+					}
+				}
+				if (i < k)
+					res.push_back(' ');
+			}
+			else
+				res.push_back(' ');
+		}
+		else
+			res.push_back(s[i]);
+	}
+	cout << res;
+	return res;
+}
+
 
 //ex7:
 //modify ex6; make don't become do not and can't becomes cannot, etc.
 //leave hyphens within words intact and convert all chars to lower
+const vector<string> contractions{ "don't","can't","won't","couldn't","shouldn't", "wouldn't", "they're", "we're", "i'm", "i'd", "she'd", "she's", "we'd", "we're", "how's", "weren't" },
+nominal{ "do not", "can not", "will not", "could not", "should not", "would not", "they are", "we are", "i am", "i had", "she had", "she is", "we had", "we are", "how is", "was not" }; //could do this as another pair type
+struct Contraction_loc { size_t num, loc; };
+bool comesfirst(const Contraction_loc& before, const Contraction_loc& after) { return before.loc < after.loc ? true : false; }
+void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it right the first time or I can't.") {
+	vector<Contraction_loc> clist;
+	string temp, res;
+	char c;
+	size_t i{};
+
+	for (const char& cr : s) {
+		temp.push_back(tolower(cr));
+	}
+	for (size_t k{}; k < contractions.size(); k++) {
+		const string& e = contractions[k];
+		i = 0;
+		while (true) {
+			i = temp.find(e, i);
+			if (i == string::npos)
+				break;
+			clist.push_back({ k, i });
+		}
+	}
+	sort(clist.begin(), clist.end(), comesfirst);
+	i = 0;
+	while (i < temp.size()) {
+		for (const Contraction_loc& a : clist) {
+			res += temp.substr(i, a.loc);
+			//TODO
+		}
+	}
+}
 
 //ex8:
 //modify ex7: make a sorted list of words. run the result on a multi-page text file, look at result, and see if you can improve the program to make a better list.
@@ -595,7 +656,7 @@ void c9e5(istream& is = cin, ostream& os = cout) {
 
 ///Main
 int main() try {
-	c9e4();
+	c9e5();
 	return 0;
 }
 catch (exception& e) {
