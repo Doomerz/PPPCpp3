@@ -579,12 +579,15 @@ void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it r
 	}
 	sort(clist.begin(), clist.end(), comesfirst);
 	i = 0;
-	while (i < temp.size()) {
-		for (const Contraction_loc& a : clist) {
-			res += temp.substr(i, a.loc);
-			//TODO
-		}
+	for (const Contraction_loc& a : clist) {
+		if (a.loc + contractions[a.num].size() > temp.size())
+			throw runtime_error("contraction found past end of string");
+		res += temp.substr(i, a.loc);
+		res += nominal[a.num];
+		i = a.loc + contractions[a.num].size();
 	}
+	res += temp.substr(i);
+	cout << res; //TODO test
 }
 
 //ex8:
