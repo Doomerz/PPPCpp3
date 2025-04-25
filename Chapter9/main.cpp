@@ -554,20 +554,39 @@ string c9e6(const string& s = "- don't use the as-if rule.") {
 //ex7:
 //modify ex6; make don't become do not and can't becomes cannot, etc.
 //leave hyphens within words intact and convert all chars to lower
-const vector<string> contractions{ "don't","can't","won't","couldn't","shouldn't", "wouldn't", "they're", "we're", "i'm", "i'd", "she'd", "she's", "we'd", "we're", "how's", "weren't" },
-nominal{ "do not", "can not", "will not", "could not", "should not", "would not", "they are", "we are", "i am", "i had", "she had", "she is", "we had", "we are", "how is", "was not" }; //could do this as another pair type
-struct Contraction_loc { size_t num, loc; };
+struct Contraction { string contract, expand; };
+struct Contraction_loc { Contraction con; size_t loc; };
 bool comesfirst(const Contraction_loc& before, const Contraction_loc& after) { return before.loc < after.loc ? true : false; }
+const vector<Contraction> contractions{
+	{"don't", "do not"},
+	{ "can't","can not" },
+	{ "won't","will not" },
+	{ "couldn't","could not" },
+	{ "shouldn't","should not" },
+	{ "wouldn't", "would not" },
+	{ "they're","they are" },
+	{ "we're","we are" },
+	{ "i'm","i am" },
+	{ "i'd","i had" },
+	{ "she'd","she had" },
+	{ "she's","she is" },
+	{ "we'd","we had" },
+	{ "we're", "we are" },
+	{ "how's","how is" },
+	{ "weren't", "was not" }};
 void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it right the first time or I can't.") {
 	vector<Contraction_loc> clist;
 	string temp, res;
 	char c;
 	size_t i{};
 
+	temp.reserve(s.size());
 	for (const char& cr : s) {
 		temp.push_back(tolower(cr));
 	}
+	cout << "find contractions\n"; //DEBUG
 	for (size_t k{}; k < contractions.size(); k++) {
+		cout << "debug k=" << k << '\n'; //DEBUG
 		const string& e = contractions[k];
 		i = 0;
 		while (true) {
@@ -577,8 +596,10 @@ void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it r
 			clist.push_back({ k, i });
 		}
 	}
+	cout << "pre-sort\n"; //DEBUG
 	sort(clist.begin(), clist.end(), comesfirst);
 	i = 0;
+	cout << "start contraction sifting\n"; //DEBUG
 	for (const Contraction_loc& a : clist) {
 		if (a.loc + contractions[a.num].size() > temp.size())
 			throw runtime_error("contraction found past end of string");
@@ -659,7 +680,7 @@ void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it r
 
 ///Main
 int main() try {
-	c9e5();
+	c9e7();
 	return 0;
 }
 catch (exception& e) {
