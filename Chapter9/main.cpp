@@ -571,10 +571,9 @@ const vector<Contraction> contractions{
 	{ "she'd","she had" },
 	{ "she's","she is" },
 	{ "we'd","we had" },
-	{ "we're", "we are" },
 	{ "how's","how is" },
 	{ "weren't", "was not" }};
-void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it right the first time or I can't.") {
+void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it right the first time or I can't.") { //spoiler we didn't get it right the first time.
 	vector<Contraction_loc> clist;
 	string temp, res;
 	char c;
@@ -587,28 +586,40 @@ void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it r
 	cout << "find contractions\n"; //DEBUG
 	for (size_t k{}; k < contractions.size(); k++) {
 		cout << "debug k=" << k << '\n'; //DEBUG
-		const string& e = contractions[k];
 		i = 0;
 		while (true) {
-			i = temp.find(e, i);
+			cout << "dbg k=" << k << ":i=" << i << '\n'; //debug
+			i = temp.find(contractions[k].contract, i);
 			if (i == string::npos)
 				break;
-			clist.push_back({ k, i });
+			clist.push_back({ contractions[k], i });
+			i += contractions[k].contract.size();
 		}
 	}
 	cout << "pre-sort\n"; //DEBUG
-	sort(clist.begin(), clist.end(), comesfirst);
+	if (clist.size())
+		sort(clist.begin(), clist.end(), comesfirst);
+	else {
+		cout << s;
+		return;
+	}
 	i = 0;
+	//debug
+	for (const Contraction_loc& a : clist) {
+		cout << a.loc << ':' << a.con.contract << '\n'; //still not working, output is wrong
+	}
+	//debug
 	cout << "start contraction sifting\n"; //DEBUG
 	for (const Contraction_loc& a : clist) {
-		if (a.loc + contractions[a.num].size() > temp.size())
+		if (a.loc + a.con.contract.size() > s.size())
 			throw runtime_error("contraction found past end of string");
-		res += temp.substr(i, a.loc);
-		res += nominal[a.num];
-		i = a.loc + contractions[a.num].size();
+		res += s.substr(i, a.loc);
+		res += a.con.expand;
+		i = a.loc + a.con.contract.size();
 	}
-	res += temp.substr(i);
+	res += s.substr(i);
 	cout << res; //TODO test
+	//output thus far: we are gonna Test this and see if I'm gi am gonna get it right the first time or I can't.can not.
 }
 
 //ex8:
