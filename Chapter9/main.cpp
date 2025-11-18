@@ -557,6 +557,7 @@ string c9e6(const string& s = "- don't use the as-if rule.") {
 struct Contraction { string contract, expand; };
 struct Contraction_loc { Contraction con; size_t loc; };
 bool comesfirst(const Contraction_loc& before, const Contraction_loc& after) { return before.loc < after.loc ? true : false; }
+bool contradictions_sort_fnt(const Contraction& before, const Contraction& after) { return before.contract < after.contract ? true : false; }
 const vector<Contraction> contractions{
 	{"don't", "do not"},
 	{ "can't","can not" },
@@ -574,6 +575,20 @@ const vector<Contraction> contractions{
 	{ "how's","how is" },
 	{ "weren't", "was not" }};
 void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it right the first time or I can't.") { //spoiler we didn't get it right the first time.
+	string temp, res;
+	res.reserve(s.size());
+	temp.reserve(10); //arbitrary max anticipated word size
+	vector reference = contractions;
+	sort(reference.begin(), reference.end(), contradictions_sort_fnt);
+	for (const char& c : s) {
+		char t = tolower(c);
+		//check if it is 
+		//
+	}
+	//create calc grammar for tokenizing
+	return;
+
+	//the first time
 	vector<Contraction_loc> clist;
 	string temp, res;
 	char c;
