@@ -578,12 +578,34 @@ void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it r
 	string temp, res;
 	res.reserve(s.size());
 	temp.reserve(10); //arbitrary max anticipated word size
-	vector reference = contractions;
+	istringstream iss{ s };
+	vector<Contraction> reference = contractions;
 	sort(reference.begin(), reference.end(), contradictions_sort_fnt);
-	for (const char& c : s) {
-		char t = tolower(c);
-		//check if it is 
-		//
+	char c;
+	while (iss >> c) {
+		if (isalnum(c=tolower(c)) || c == '\'') { //make this a function
+			temp = c;
+			while (iss >> c) {
+				if (isalnum(c=tolower(c)) || c == '\'')
+					temp.push_back(c);
+				else
+					break;
+			}
+			if (!iss) {
+				pass
+			}
+			for (const Contraction& test : reference) {
+				if (test.contract == temp) {
+					res += test.expand;
+					break;
+				}
+			}
+		}
+		else
+			res.push_back(c);
+	}
+	if (!iss) {
+		pass
 	}
 	//create calc grammar for tokenizing
 	return;
