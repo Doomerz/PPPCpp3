@@ -574,45 +574,57 @@ const vector<Contraction> contractions{
 	{ "we'd","we had" },
 	{ "how's","how is" },
 	{ "weren't", "was not" }};
+bool replace_contraction(const vector<Contraction>& ref, string& test_and_result) {
+	for (const Contraction& c : ref) {
+		if (c.contract == test_and_result) {
+			test_and_result = c.expand;
+			return true;
+		}
+	}
+	return false;
+}
+istringstream& resolve_token(istringstream& iss, const vector<Contraction>& ref, string& result) { //could consider a whole token stream like the calc
+	char c;
+	iss >> c;
+	if (!iss) {
+		result = "";
+		return iss;
+	}
+	if (isalnum(c = tolower(c,locale())) || c == '\'') {
+		result = c;
+		while (iss >> c) {
+			if (isalnum(c = tolower(c, locale())) || c == '\'')
+				result.push_back(c);
+			else
+				break;
+		}
+		if (iss) {
+			iss.unget();
+		}
+		replace_contraction(ref, result);
+	}
+	else
+		result = c;
+	return iss;
+}
 void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it right the first time or I can't.") { //spoiler we didn't get it right the first time.
 	string temp, res;
 	res.reserve(s.size());
 	temp.reserve(10); //arbitrary max anticipated word size
 	istringstream iss{ s };
+	iss >> noskipws;
 	vector<Contraction> reference = contractions;
 	sort(reference.begin(), reference.end(), contradictions_sort_fnt);
-	char c;
-	while (iss >> c) {
-		if (isalnum(c=tolower(c)) || c == '\'') { //make this a function
-			temp = c;
-			while (iss >> c) {
-				if (isalnum(c=tolower(c)) || c == '\'')
-					temp.push_back(c);
-				else
-					break;
-			}
-			if (!iss) {
-				pass
-			}
-			for (const Contraction& test : reference) {
-				if (test.contract == temp) {
-					res += test.expand;
-					break;
-				}
-			}
-		}
-		else
-			res.push_back(c);
+	while (iss) {
+		resolve_token(iss, reference, temp);
+		res += temp;
 	}
-	if (!iss) {
-		pass
-	}
-	//create calc grammar for tokenizing
+	cout << res;
 	return;
 
 	//the first time
 	vector<Contraction_loc> clist;
-	string temp, res;
+	//string temp, res;
 	char c;
 	size_t i{};
 
@@ -655,9 +667,8 @@ void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it r
 		i = a.loc + a.con.contract.size();
 	}
 	res += s.substr(i);
-	cout << res; //TODO test
-	//output thus far: we are gonna Test this and see if I'm gi am gonna get it right the first time or I can't.can not.
-}
+	cout << res;
+} //redo: this needs to be a modification of the last exercise
 
 //ex8:
 //modify ex7: make a sorted list of words. run the result on a multi-page text file, look at result, and see if you can improve the program to make a better list.
