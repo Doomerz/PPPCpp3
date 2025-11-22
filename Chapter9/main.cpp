@@ -574,6 +574,7 @@ const vector<Contraction> contractions{
 	{ "we'd","we had" },
 	{ "how's","how is" },
 	{ "weren't", "was not" }};
+string e7modifier(const string&, const vector<Contraction>&);
 bool replace_contraction(const vector<Contraction>& ref, string& test_and_result) {
 	for (const Contraction& c : ref) {
 		if (c.contract == test_and_result) {
@@ -599,32 +600,52 @@ istringstream& resolve_token(istringstream& iss, const vector<Contraction>& ref,
 				break;
 		}
 		if (iss) {
-			iss.unget();
+			iss.unget(); //if the input word is only
 		}
 		replace_contraction(ref, result);
+	}
+	else if (ispunct(c)) {
+		if (c == '"') {
+			result = c;
+			while (iss >> c) {
+				result += c;
+				if (c == '"') {
+					break;
+				}
+			}
+			if (!iss) {
+				//this means no pair to end this
+				result = ' ' + e7modifier(result.substr(1),ref);
+			}
+		}
+		else
+			result = ' ';
 	}
 	else
 		result = c;
 	return iss;
 }
-void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it right the first time or I can't.") { //spoiler we didn't get it right the first time.
+string e7modifier(const string& s = "We're gonna Test this and see if I'm gonna get it right the first time or I can't.", const vector<Contraction>& reference = contractions) { //spoiler we didn't get it right the first time.
 	string temp, res;
 	res.reserve(s.size());
 	temp.reserve(10); //arbitrary max anticipated word size
 	istringstream iss{ s };
 	iss >> noskipws;
-	vector<Contraction> reference = contractions;
-	sort(reference.begin(), reference.end(), contradictions_sort_fnt);
 	while (iss) {
 		resolve_token(iss, reference, temp);
 		res += temp;
 	}
-	cout << res;
-	return;
+	return res;
+}
+void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it right the first time or I can't.") { //spoiler we didn't get it right the first time.
+	vector<Contraction> reference = contractions;
+	sort(reference.begin(), reference.end(), contradictions_sort_fnt);
+	cout << e7modifier(s, reference);
+	return; //untested
 
 	//the first time
 	vector<Contraction_loc> clist;
-	//string temp, res;
+	string temp, res;
 	char c;
 	size_t i{};
 
@@ -668,11 +689,28 @@ void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it r
 	}
 	res += s.substr(i);
 	cout << res;
-} //redo: this needs to be a modification of the last exercise
+}
 
 //ex8:
 //modify ex7: make a sorted list of words. run the result on a multi-page text file, look at result, and see if you can improve the program to make a better list.
-
+class Word_stream : public istringstream{
+public:
+	Word_stream(const string& input_str) : Word_stream::basic_istringstream{ input_str }
+	{ }
+};
+Word_stream& operator>>(Word_stream& ws, string s) {
+	//do work here
+}
+void c9e8(const string& input_str) {
+	Word_stream ws{ input_str };
+	set<string> result;
+	string s;
+	while (ws >> s)
+		result.insert(s);
+	for (const string& word : result)
+		cout << word << '\n';
+	return;
+}
 //ex9:
 //write: vector<string> split(const string& s) that returns a vec of whitespace separated substrings from the arg s
 
