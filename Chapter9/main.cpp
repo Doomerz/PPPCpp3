@@ -641,7 +641,7 @@ void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it r
 	vector<Contraction> reference = contractions;
 	sort(reference.begin(), reference.end(), contradictions_sort_fnt);
 	cout << e7modifier(s, reference);
-	return; //untested
+	return;
 
 	//the first time
 	vector<Contraction_loc> clist;
@@ -695,32 +695,143 @@ void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it r
 //modify ex7: make a sorted list of words. run the result on a multi-page text file, look at result, and see if you can improve the program to make a better list.
 class Word_stream : public istringstream{
 public:
-	Word_stream(const string& input_str) : Word_stream::basic_istringstream{ input_str }
-	{ }
+	Word_stream(const string& input_str)
+		: Word_stream::basic_istringstream{ input_str }
+	{ 
+		*this >> noskipws;
+	}
 };
-Word_stream& operator>>(Word_stream& ws, string s) {
-	//do work here
+Word_stream& operator>>(Word_stream& ws, string& s) {
+	char c;
+	ws >> c;
+	if (!ws) {
+		s = "";
+		return ws;
+	}
+	if (isalnum(c = tolower(c, locale())) || c == '\'') {
+		s = c;
+		while (ws >> c) {
+			if (isalnum(c = tolower(c, locale())) || c == '\'')
+				s.push_back(c);
+			else
+				break;
+		}
+		if (ws) {
+			ws.unget(); //if the input word is only
+		}
+		//replace_contraction(contractions, s);
+		//skiping contractions for giggles.
+	}
+	else if (ispunct(c)) {
+		if (c == '"') {
+			s = c;
+			while (ws >> c) {
+				s += c;
+				if (c == '"') {
+					break;
+				}
+			}
+			if (!ws) { //here
+				//this means no pair to end this
+				ws = Word_stream{ s.substr(1) };
+				s = ' ';
+			}
+		}
+		else
+			s = ' ';
+	}
+	else
+		s = c;
+	return ws;
 }
-void c9e8(const string& input_str) {
+void c9e8(const string& input_str = "We're gonna Test this and see if I'm gonna get it right the first time or I can't.") {
 	Word_stream ws{ input_str };
 	set<string> result;
-	string s;
-	while (ws >> s)
-		result.insert(s);
+	string s, modified;
+	while (ws >> s) {
+		if (" " == s || (s[0] == '"' && s[s.size()-1] == '"'))
+			modified += s;
+		else if (s != "") {
+			result.insert(s);
+			modified += s;
+		}
+	}
+	cout << "modified result:\n" << modified << "\nword list:\n";
 	for (const string& word : result)
 		cout << word << '\n';
 	return;
 }
 //ex9:
 //write: vector<string> split(const string& s) that returns a vec of whitespace separated substrings from the arg s
+vector<string> split(const string& s) {
+	istringstream iss{ s };
+	vector<string> res;
+	string temp;
+	while (iss >> temp)
+		res.push_back(temp);
+	return res;
+}
+void c9e9(const string& s) {
+	vector<string> res = split(s);
+	cout << "Result (size = " << res.size() << "):\n";
+	for (const string& i : res)
+		cout << i << "\n";
+}
 
 //ex10:
 //write: vector<string> split(const string& s, const string& w)
 //returns vec of ws-separated substrings from the argument s, where ws is defined as ordinary ws + the chars in w.
+bool my_any_of(const string& w, const char& test) { //an alternate version if we were doing this without the std::any_of
+	for (const char& c : w)
+		if (c == test)
+			return true;
+	return false;
+}
+vector<string> split(const string& s, const string& w) {
+	istringstream iss{ s };
+	iss >> noskipws;
+	char c;
+	string temp;
+	vector<string> res;
+	while (iss >> c) {
+		if (iswspace(c) || any_of(w.begin(), w.end(), c)) {
+			if (temp.size() > 0) {
+				res.push_back(temp);
+				temp.clear();
+			}
+		}
+		else
+			temp += c;
+	}
+	if (temp.size() > 0)
+		res.push_back(temp);
+	return res;
+}
+void c9e10(const string& s = "test-string", const string& w = "-") {
+	vector<string> res = split(s, w);
+	cout << "substrings (size = " << res.size() << ")\n";
+	for (const string& s : res)
+		cout << s << "\n";
+}
 
 //ex11:
 //reverse the order of characters in a text file.
-
+string c9e11_as_string(const string& filecontents) {
+	string res;
+	for (size_t i{ filecontents.size() }; i > 0; i--) { //if size() > 2^64bit then we have to use uint64_t so neither our iterator nor our index can go less than zero
+		res += filecontents[i - 1];
+	}
+	return res;
+}
+void c9e11_as_file(const string& filesrc = "c9e11demo.txt", const string& filedst = "c9e11demo.txt") {
+	//demo for c9e11
+	if (filesrc == filedst) {
+		//
+	}
+	else {
+		//
+	}
+}
 //ex12:
 //reverse the order of words (defined as ws-separated strings) in a file
 //assume that al the strings from the file will fit inot memory at once
