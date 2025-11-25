@@ -816,21 +816,32 @@ void c9e10(const string& s = "test-string", const string& w = "-") {
 
 //ex11:
 //reverse the order of characters in a text file.
-string c9e11_as_string(const string& filecontents) {
+string c9e11_as_string(const string& filecontents = "example string") {
 	string res;
+	res.reserve(filecontents.size());
 	for (size_t i{ filecontents.size() }; i > 0; i--) { //if size() > 2^64bit then we have to use uint64_t so neither our iterator nor our index can go less than zero
 		res += filecontents[i - 1];
 	}
 	return res;
 }
+void c9e11_as_mut_string(string& str) {
+	for (int i{}; i < str.size() / 2; i++)
+		swap(str[i], str[str.size() - 1 - i]);
+}
 void c9e11_as_file(const string& filesrc = "c9e11demo.txt", const string& filedst = "c9e11demo.txt") {
-	//demo for c9e11
-	if (filesrc == filedst) {
-		//
-	}
-	else {
-		//
-	}
+		ifstream src{ filesrc };
+		string filecontents{ istreambuf_iterator<char>(src), {} };
+		//check if eof?
+		ofstream dst{ filedst };
+		//check if opened correctly?
+		for (auto it = string::reverse_iterator(filecontents.end()); it != string::reverse_iterator(filecontents.begin()); it++) {
+			dst << *it;
+			if (!dst)
+				throw runtime_error("write failure");
+		}
+}
+void c9e11() {
+	cout << c9e11_as_string("simple test of reversing text");
 }
 //ex12:
 //reverse the order of words (defined as ws-separated strings) in a file
