@@ -646,12 +646,11 @@ void c9e7(const string& s = "We're gonna Test this and see if I'm gonna get it r
 	//the first time
 	vector<Contraction_loc> clist;
 	string temp, res;
-	char c;
 	size_t i{};
 
 	temp.reserve(s.size());
-	for (const char& cr : s) {
-		temp.push_back(tolower(cr));
+	for (const char& c : s) {
+		temp.push_back(tolower(c));
 	}
 	cout << "find contractions\n"; //DEBUG
 	for (size_t k{}; k < contractions.size(); k++) {
@@ -771,7 +770,7 @@ vector<string> split(const string& s) {
 		res.push_back(temp);
 	return res;
 }
-void c9e9(const string& s) {
+void c9e9(const string& s = "this is sample text") {
 	vector<string> res = split(s);
 	cout << "Result (size = " << res.size() << "):\n";
 	for (const string& i : res)
@@ -794,7 +793,7 @@ vector<string> split(const string& s, const string& w) {
 	string temp;
 	vector<string> res;
 	while (iss >> c) {
-		if (iswspace(c) || any_of(w.begin(), w.end(), c)) {
+		if (iswspace(c) || any_of(w.begin(), w.end(), [c](const char& test)->bool {return test == c ? true : false; })) {
 			if (temp.size() > 0) {
 				res.push_back(temp);
 				temp.clear();
@@ -832,6 +831,7 @@ void c9e11_as_file(const string& filesrc = "c9e11demo.txt", const string& fileds
 		ifstream src{ filesrc };
 		string filecontents{ istreambuf_iterator<char>(src), {} };
 		//check if eof?
+		src.close();
 		ofstream dst{ filedst };
 		//check if opened correctly?
 		for (auto it = string::reverse_iterator(filecontents.end()); it != string::reverse_iterator(filecontents.begin()); it++) {
@@ -839,6 +839,7 @@ void c9e11_as_file(const string& filesrc = "c9e11demo.txt", const string& fileds
 			if (!dst)
 				throw runtime_error("write failure");
 		}
+		dst.close();
 }
 void c9e11() {
 	cout << c9e11_as_string("simple test of reversing text");
@@ -846,6 +847,15 @@ void c9e11() {
 //ex12:
 //reverse the order of words (defined as ws-separated strings) in a file
 //assume that al the strings from the file will fit inot memory at once
+void c9e12(const string& str = "reversing word order testing") {
+	istringstream iss{ str };
+	vector<string> res;
+	string s;
+	while (iss >> s)
+		res.push_back(s);
+	for (size_t i{ res.size() }; i > 0; i--)
+		cout << res[i - 1] << '\n';
+}
 
 //ex13:
 //read a text file and write out how many character of each char classification are in the file
@@ -899,7 +909,7 @@ void c9e11() {
 
 ///Main
 int main() try {
-	c9e7();
+	c9e12();
 	return 0;
 }
 catch (exception& e) {
