@@ -550,7 +550,6 @@ string c9e6(const string& s = "- don't use the as-if rule.") {
 	return res;
 }
 
-
 //ex7:
 //modify ex6; make don't become do not and can't becomes cannot, etc.
 //leave hyphens within words intact and convert all chars to lower
@@ -760,6 +759,7 @@ void c9e8(const string& input_str = "We're gonna Test this and see if I'm gonna 
 		cout << word << '\n';
 	return;
 }
+
 //ex9:
 //write: vector<string> split(const string& s) that returns a vec of whitespace separated substrings from the arg s
 vector<string> split(const string& s) {
@@ -844,9 +844,10 @@ void c9e11_as_file(const string& filesrc = "c9e11demo.txt", const string& fileds
 void c9e11() {
 	cout << c9e11_as_string("simple test of reversing text");
 }
+
 //ex12:
 //reverse the order of words (defined as ws-separated strings) in a file
-//assume that al the strings from the file will fit inot memory at once
+//assume that all the strings from the file will fit into memory at once
 void c9e12(const string& str = "reversing word order testing") {
 	istringstream iss{ str };
 	vector<string> res;
@@ -859,9 +860,30 @@ void c9e12(const string& str = "reversing word order testing") {
 
 //ex13:
 //read a text file and write out how many character of each char classification are in the file
+void c9e13(const string& filename) {
+	ifstream file{ filename };
+	file >> noskipws;
+	vector<size_t> res(numeric_limits<unsigned char>::max()+1,0);
+	unsigned char c;
+	while (file >> c) {
+		res[c] += 1;
+	}
+	for (size_t i{}; i < res.size(); i++) {
+		if (i == 0)
+			continue;
+		if (char(i - 128) == '\n')
+			cout << "\\n";
+		else if (!isgraph(char(i - 128)))
+			cout << to_string(i - 128);
+		else
+			cout << char(i - 128);
+		cout << ':' << res[i] << "\n";
+	}
+} //untested
 
 //ex14:
 //read a file of ws-separated numbers and outputs a file of numbers using scientific format and precision 8 in four fields of 20 char per line.
+void c9e14(); //prev needs testing. could ve char conversion errors
 
 //ex15:
 //read a file of ws-separated numbers and output them in order (lowest value first), one value per line.
