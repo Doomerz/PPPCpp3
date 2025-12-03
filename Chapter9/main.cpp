@@ -860,21 +860,26 @@ void c9e12(const string& str = "reversing word order testing") {
 
 //ex13:
 //read a text file and write out how many character of each char classification are in the file
-void c9e13(const string& filename) {
+void c9e13(const string& filename = "basic code test") {
 	ifstream file{ filename };
 	file >> noskipws;
-	vector<size_t> res(numeric_limits<unsigned char>::max()+1,0);
-	unsigned char c;
+	vector<size_t> res(256,0);
+	char c;
 	while (file >> c) {
-		res[c] += 1;
+		res[short(c)+128] += 1;
 	}
 	for (size_t i{}; i < res.size(); i++) {
 		if (i == 0)
 			continue;
+		cout << setw(4);
 		if (char(i - 128) == '\n')
 			cout << "\\n";
+		else if (char(i - 128) == '\t')
+			cout << "\\t";
+		else if (char(i - 128) == '\r')
+			cout << "\\r";
 		else if (!isgraph(char(i - 128)))
-			cout << to_string(i - 128);
+			cout << to_string(short(i - 128));
 		else
 			cout << char(i - 128);
 		cout << ':' << res[i] << "\n";
@@ -931,7 +936,7 @@ void c9e14(); //prev needs testing. could ve char conversion errors
 
 ///Main
 int main() try {
-	c9e12();
+	c9e13();
 	return 0;
 }
 catch (exception& e) {
