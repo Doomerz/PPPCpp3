@@ -893,7 +893,23 @@ void c9e13(const string& filename = "c9e13.txt") {
 //ex14:
 //read a file of ws-separated numbers and outputs a file of numbers using scientific format and precision 8 in four fields of 20 char per line.
 void c9e14(const string& filename = "c9e14.txt") {
-	//todo
+	ifstream file{ filename };
+	if (!file) {
+		cout << "bad filename!";
+		return;
+	}
+	vector<double> vals;
+	double val;
+	while (file >> val) {
+		vals.push_back(val);
+	}
+	if (!file.eof()) {
+		cout << "File format incorrect; outputing only good data:\n";
+	}
+	cout << scientific;
+	for (const double& d : vals) {
+		cout << setw(20) << setprecision(8) << d << "\n";
+	}
 }
 
 //ex15:
