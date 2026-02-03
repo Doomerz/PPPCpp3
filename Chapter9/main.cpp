@@ -860,35 +860,41 @@ void c9e12(const string& str = "reversing word order testing") {
 
 //ex13:
 //read a text file and write out how many character of each char classification are in the file
-void c9e13(const string& filename = "basic code test") {
+void c9e13(const string& filename = "c9e13.txt") {
 	ifstream file{ filename };
+	if (!file) {
+		cout << "bad filename!\n";
+		return;
+	}
 	file >> noskipws;
-	vector<size_t> res(256,0);
+	vector<size_t> res(128,0);
 	char c;
 	while (file >> c) {
-		res[short(c)+128] += 1;
+		res[c] += 1;
 	}
-	for (size_t i{}; i < res.size(); i++) {
-		if (i == 0)
+	for (short i{}; i < res.size(); i++) {
+		if (i == 0 || res[i] == 0)
 			continue;
 		cout << setw(4);
-		if (char(i - 128) == '\n')
+		if (char(i) == '\n')
 			cout << "\\n";
-		else if (char(i - 128) == '\t')
+		else if (char(i) == '\t')
 			cout << "\\t";
-		else if (char(i - 128) == '\r')
+		else if (char(i) == '\r')
 			cout << "\\r";
-		else if (!isgraph(char(i - 128)))
-			cout << to_string(short(i - 128));
+		else if (!isgraph(char(i)))
+			cout << to_string(short(i));
 		else
-			cout << char(i - 128);
+			cout << char(i);
 		cout << ':' << res[i] << "\n";
 	}
-} //untested
+}
 
 //ex14:
 //read a file of ws-separated numbers and outputs a file of numbers using scientific format and precision 8 in four fields of 20 char per line.
-void c9e14(); //prev needs testing. could ve char conversion errors
+void c9e14(const string& filename = "c9e14.txt") {
+	//todo
+}
 
 //ex15:
 //read a file of ws-separated numbers and output them in order (lowest value first), one value per line.
@@ -936,7 +942,7 @@ void c9e14(); //prev needs testing. could ve char conversion errors
 
 ///Main
 int main() try {
-	c9e13();
+	c9e14();
 	return 0;
 }
 catch (exception& e) {
