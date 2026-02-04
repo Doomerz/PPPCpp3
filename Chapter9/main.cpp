@@ -907,17 +907,76 @@ void c9e14(const string& filename = "c9e14.txt") {
 		cout << "File format incorrect; outputing only good data:\n";
 	}
 	cout << scientific;
+	unsigned short count = 0;
 	for (const double& d : vals) {
-		cout << setw(20) << setprecision(8) << d << "\n";
+		cout << setw(4) << setprecision(8) << d;
+		if (count == 3) {
+			cout << '\n';
+			count = 0;
+		}
+		else
+			cout << '|';
 	}
-}
+} //untested
 
 //ex15:
 //read a file of ws-separated numbers and output them in order (lowest value first), one value per line.
 //write a value only once, and if it occurs more than once write the count of its occurrences on its line. (example given in book)
+void c9e15(const string& filename = "c9e15.txt") {
+	ifstream file{ filename };
+	if (!file) {
+		cout << "bad filename!\n";
+		return;
+	}
+	vector<double> vals;
+	double val;
+	while (file >> val) {
+		vals.push_back(val);
+	}
+	if (!file.eof()) {
+		cout << "File format incorrect; outputing only good data:\n";
+	}
+	sort(vals.begin(), vals.end());
+	size_t count{};
+	double last = vals[0] ? 0 : 1;
+	for (size_t i{}; i < vals.size(); i++) {
+		if (vals[i] == last) {
+			count++;
+			continue;
+		}
+		else {
+			if (!count)
+				cout << vals[i];
+			else {
+				cout << ':' << count << '\n' << vals[i];
+				count = 0;
+				last = vals[i];
+			}
+		}
+	}
+	if (count)
+		cout << ':' << count << '\n';
+} //untested
 
 //ex16:
 //out the sum of all the numbers in a file of ws-separated integers
+void c9e16(const string& filename = "c9e16.txt") {
+	ifstream file{ filename };
+	if (!file) {
+		cout << "bad filename!\n";
+		return;
+	}
+	long long sum{};
+	long long val;
+	while (file >> val) {
+		//ignoring dangers of overflow, etc.
+		sum += val;
+	}
+	if (!file.eof()) {
+		cout << "file improperly formatted, using only good data:\n";
+	}
+	cout << "sum of " << filename << "is: " << sum << '\n';
+} //untested
 
 //ex17:
 //create a file of data in the form of the temperature reading type defined in 9.3.2
