@@ -981,6 +981,29 @@ void c9e16(const string& filename = "c9e16.txt") {
 //ex17:
 //create a file of data in the form of the temperature reading type defined in 9.3.2
 //for testing, fill the file with at least 50 readings.
+struct reading {
+	int hour;
+	double temperature;
+};
+void c9e17(const string& filename = "c9readings.txt") {
+	ifstream test{ filename };
+	if (test) {
+		string input;
+		cout << "file " + filename + " exists! overwrite? (y/n):";
+		cin >> input;
+		if (input == "y" && input == "Y")
+			cout << "overwritting!\n";
+		else
+			return;
+	}
+	ofstream file{ filename };
+	if (!file) {
+		cout << "error opening file!";
+		return;
+	}
+	//write rest of the code here...
+	//TODO
+}
 
 //ex18:
 //read data from ex17 file into a vector and then calc the mean and median temps in the data set.
